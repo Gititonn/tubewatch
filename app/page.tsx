@@ -189,6 +189,93 @@ export default function Home() {
         {/* FEATURE CAROUSEL */}
         <FeatureCarousel />
 
+        {/* PRICING */}
+        <section className="px-4 pb-24 max-w-5xl mx-auto w-full">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-black text-white mb-3">Simple, honest pricing</h2>
+            <p style={{ color: "#888" }}>Start free. Upgrade when you&apos;re ready to go deeper.</p>
+          </div>
+
+          <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+            {/* Free */}
+            <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
+              <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>FREE</p>
+              <div className="flex items-end gap-1 mb-6">
+                  <span className="text-4xl font-black text-white">$0</span>
+                <span className="mb-1" style={{ color: "#555" }}>/mo</span>
+              </div>
+              <ul className="flex flex-col gap-3 mb-8 flex-1">
+                {["1 competitor channel", "30-day history", "Basic outlier feed", "Dashboard & video stats"].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
+                    <span style={{ color: "#00ff87" }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
+                Get started free
+              </a>
+            </div>
+
+            {/* Pro — highlighted */}
+            <div className="rounded-2xl border p-8 flex flex-col relative" style={{ borderColor: "#00ff87", background: "#0a1a0f", boxShadow: "0 0 40px rgba(0,255,135,0.12)" }}>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-black" style={{ background: "#00ff87", color: "#000" }}>
+                MOST POPULAR
+              </div>
+              <p className="text-sm font-bold mb-2" style={{ color: "#00ff87" }}>PRO</p>
+              <div className="flex items-end gap-1 mb-6">
+                <span className="text-4xl font-black text-white">$19</span>
+                <span className="mb-1" style={{ color: "#555" }}>/mo</span>
+              </div>
+              <ul className="flex flex-col gap-3 mb-8 flex-1">
+                {[
+                  "10 competitor channels",
+                  "Full history (unlimited)",
+                  '🧠 AI "Why It Worked" analysis',
+                  "Trending & Rising pages",
+                  "Patterns analysis",
+                  "Channel compare tool",
+                ].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#ccc" }}>
+                    <span style={{ color: "#00ff87" }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/signup" className="block text-center py-3 rounded-xl font-black transition-transform hover:scale-105" style={{ background: "#00ff87", color: "#000" }}>
+                Start Pro →
+              </a>
+            </div>
+
+            {/* Growth */}
+            <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
+              <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>GROWTH</p>
+              <div className="flex items-end gap-1 mb-6">
+                <span className="text-4xl font-black text-white">$49</span>
+                <span className="mb-1" style={{ color: "#555" }}>/mo</span>
+              </div>
+              <ul className="flex flex-col gap-3 mb-8 flex-1">
+                {[
+                  "Unlimited competitor channels",
+                  "Everything in Pro",
+                  "Priority sync (every 6h)",
+                  "API access (coming soon)",
+                  "Early access to new features",
+                ].map(f => (
+                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
+                    <span style={{ color: "#00ff87" }}>✓</span> {f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
+                Start Growth →
+              </a>
+            </div>
+          </div>
+
+          <p className="text-center mt-8 text-sm" style={{ color: "#444" }}>
+            All plans include a 7-day free trial · No credit card required to start · Cancel anytime
+          </p>
+        </section>
+
         {/* BOTTOM CTA */}
         <div className="text-center pb-24 px-4">
           <div className="inline-block mb-4 text-4xl">🎬</div>
@@ -196,16 +283,18 @@ export default function Home() {
           <p className="mb-8 text-lg" style={{ color: "#666" }}>
             Join creators already using TubeWatch to grow smarter.
           </p>
-          <Link
+          <a
             href="/signup"
             className="inline-block px-12 py-4 rounded-xl font-black text-black text-xl transition-transform hover:scale-105"
             style={{ background: "#00ff87", boxShadow: "0 0 40px rgba(0,255,135,0.35)" }}
           >
             Start for free →
-          </Link>
+          </a>
         </div>
 
       </main>
     </>
   );
+}
+ );
 }
