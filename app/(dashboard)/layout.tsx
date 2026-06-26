@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import Link from "next/link";
+import { NavLink } from "./nav-link";
 
 export const dynamic = "force-dynamic";
 
@@ -42,36 +42,5 @@ export default async function DashboardLayout({
         {children}
       </main>
     </div>
-  );
-}
-
-function NavLink({
-  href,
-  icon,
-  badge,
-  children,
-}: {
-  href: string;
-  icon: string;
-  badge?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-white/5"
-      style={{ color: "#888" }}
-    >
-      <span>{icon}</span>
-      <span>{children}</span>
-      {badge && (
-        <span
-          className="ml-auto text-xs px-1.5 py-0.5 rounded font-medium"
-          style={{ background: "#00ff8720", color: "#00ff87" }}
-        >
-          {badge}
-        </span>
-      )}
-    </Link>
   );
 }
