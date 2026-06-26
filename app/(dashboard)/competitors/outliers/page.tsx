@@ -247,11 +247,11 @@ export default function OutliersPage() {
                     <p
                       className="font-medium mb-2 leading-snug"
                       style={{
-                        fontSize: 14,
+                            fontSize: 14,
                         color: "#fff",
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
+                        WebkitBoxOrient: "vertical" as const,
                         overflow: "hidden",
                       }}
                     >

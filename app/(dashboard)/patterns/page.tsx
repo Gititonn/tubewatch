@@ -222,7 +222,7 @@ export default function PatternsPage() {
                             overflow: "hidden",
                             display: "-webkit-box",
                             WebkitLineClamp: 1,
-                            WebkitBoxOrient: "vertical",
+                            WebkitBoxOrient: "vertical" as const,
                             lineHeight: 1.4,
                           }}
                         >

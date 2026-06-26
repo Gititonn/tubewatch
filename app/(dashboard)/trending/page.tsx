@@ -231,7 +231,7 @@ export default function TrendingPage() {
                       color: "#fff",
                       display: "-webkit-box",
                       WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
+                      WebkitBoxOrient: "vertical" as const,
                       overflow: "hidden",
                     }}
                   >

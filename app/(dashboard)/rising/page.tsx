@@ -248,7 +248,7 @@ export default function RisingPage() {
                         color: "#fff",
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
+                        WebkitBoxOrient: "vertical" as const,
                         overflow: "hidden",
                       }}
                     >

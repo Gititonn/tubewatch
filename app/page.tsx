@@ -161,7 +161,7 @@ export default function Home() {
                       style={{
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
+                        WebkitBoxOrient: "vertical" as const,
                         overflow: "hidden",
                         lineHeight: "1.4",
                       }}
