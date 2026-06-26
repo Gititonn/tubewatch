@@ -465,24 +465,149 @@ function StatCard({
 }
 
 function EmptyState() {
+  const PREVIEW_TILES = [
+    { icon: "📈", label: "Trending Now", desc: "What's blowing up right now", accent: "#3b82f6", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.25)" },
+    { icon: "🚀", label: "Rising Videos", desc: "Spot hits before they peak", accent: "#a855f7", bg: "rgba(168,85,247,0.08)", border: "rgba(168,85,247,0.25)" },
+    { icon: "⚡", label: "Competitors", desc: "Track rival channels", accent: "#f59e0b", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.25)" },
+    { icon: "🔥", label: "Outlier Feed", desc: "Videos crushing their average", accent: "#ef4444", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)" },
+    { icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.25)" },
+    { icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#00ff87", bg: "rgba(0,255,135,0.08)", border: "rgba(0,255,135,0.25)" },
+    { icon: "⚖️", label: "Compare Channels", desc: "Head-to-head analysis", accent: "#06b6d4", bg: "rgba(6,182,212,0.08)", border: "rgba(6,182,212,0.25)" },
+    { icon: "🧠", label: "AI Insights", desc: "Why specific videos worked", accent: "#8b5cf6", bg: "rgba(139,92,246,0.08)", border: "rgba(139,92,246,0.25)" },
+  ];
+
+  const MOCK_VIDEOS = [
+    { title: "I did this every day for 30 days", views: "847K", score: 6.2, scoreColor: "#ff4444" },
+    { title: "The thumbnail formula that works", views: "312K", score: 3.1, scoreColor: "#ffaa00" },
+    { title: "Behind the scenes of my studio", views: "445K", score: 2.4, scoreColor: "#ffaa00" },
+    { title: "Q&A: your questions answered", views: "18K", score: 0.6, scoreColor: "#555" },
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-      <div className="text-6xl mb-6">🎬</div>
-      <h2 className="text-2xl font-black text-white mb-3">Connect your YouTube channel</h2>
-      <p className="text-base mb-8 max-w-md" style={{ color: "#666" }}>
-        TubeWatch analyzes your videos, scores your outliers, and tracks what&apos;s working for
-        competitors in your niche.
-      </p>
-      <Link
-        href="/connect"
-        className="inline-block px-8 py-3.5 rounded-xl font-black text-black text-base transition-transform hover:scale-105"
-        style={{ background: "#00ff87", boxShadow: "0 0 32px rgba(0,255,135,0.3)" }}
+    <div style={{ color: "#fff" }}>
+      {/* Hero */}
+      <div className="text-center py-12 px-4 mb-10">
+        <div
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-6 border"
+          style={{ borderColor: "rgba(0,255,135,0.3)", color: "#00ff87", background: "rgba(0,255,135,0.08)" }}
+        >
+          Connect once — unlock everything below
+        </div>
+        <h1 className="text-4xl font-black mb-4 leading-tight">
+          You&apos;re one step away from knowing<br />
+          <span style={{ color: "#00ff87" }}>exactly what&apos;s working.</span>
+        </h1>
+        <p className="text-lg mb-8 max-w-lg mx-auto" style={{ color: "#666" }}>
+          Connect your channel and TubeWatch builds your full analytics command center — instantly.
+        </p>
+        <Link
+          href="/connect"
+          className="inline-block px-10 py-4 rounded-xl font-black text-black text-lg transition-transform hover:scale-105"
+          style={{ background: "#00ff87", boxShadow: "0 0 40px rgba(0,255,135,0.35)" }}
+        >
+          Connect my YouTube channel
+        </Link>
+        <p className="mt-3 text-sm" style={{ color: "#333" }}>Free · Takes 30 seconds · No credit card</p>
+      </div>
+
+      {/* Mock stats preview */}
+      <div className="mb-10">
+        <p className="text-xs font-bold uppercase tracking-widest mb-4 text-center" style={{ color: "#333" }}>
+          Preview — your stats will look like this
+        </p>
+        <div className="grid grid-cols-4 gap-3 mb-3" style={{ filter: "blur(4px)", pointerEvents: "none", userSelect: "none" }}>
+          {[
+            { label: "Subscribers", value: "24.3K", icon: "\U0001f465", accent: "#00ff87" },
+            { label: "Avg Views", value: "18.2K", icon: "\U0001f441", accent: "#3b82f6" },
+            { label: "Est. Revenue (30d)", value: "$480-$1.9K", icon: "\U0001f4b0", accent: "#00ff87" },
+            { label: "Top Outlier Score", value: "6.2x", icon: "\U0001f525", accent: "#ff4444" },
+          ].map((s) => (
+            <div key={s.label} className="rounded-xl border p-4" style={{ borderColor: "#2a2a2a", background: `linear-gradient(135deg, ${s.accent}08 0%, #111 100%)` }}>
+              <div className="flex items-center gap-2 mb-2">
+                <span>{s.icon}</span>
+                <span className="text-xs uppercase tracking-wide" style={{ color: "#444" }}>{s.label}</span>
+              </div>
+              <div className="text-3xl font-black" style={{ color: s.accent }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Mock outlier spotlight */}
+        <div
+          className="rounded-2xl border p-5 mb-3 flex items-center gap-5"
+          style={{
+            borderColor: "rgba(255,68,68,0.3)",
+            background: "linear-gradient(135deg, rgba(255,68,68,0.08) 0%, rgba(255,68,68,0.03) 100%)",
+            filter: "blur(3px)",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          <div className="text-4xl">🔥</div>
+          <div className="flex-1">
+            <div className="text-xs font-bold mb-1" style={{ color: "#ff4444" }}>YOUR BIGGEST OUTLIER</div>
+            <div className="font-semibold text-sm text-white mb-1">I did this every day for 30 days</div>
+            <div className="text-xs" style={{ color: "#888" }}>847K views · 6.2x your channel average</div>
+          </div>
+          <div className="px-4 py-2 rounded-xl text-sm font-bold" style={{ background: "rgba(255,68,68,0.15)", color: "#ff4444", border: "1px solid rgba(255,68,68,0.3)" }}>
+            Analyze
+          </div>
+        </div>
+
+        {/* Mock video rows */}
+        <div
+          className="rounded-xl border overflow-hidden"
+          style={{ borderColor: "#2a2a2a", background: "#111", filter: "blur(3px)", pointerEvents: "none", userSelect: "none" }}
+        >
+          {MOCK_VIDEOS.map((v, i) => (
+            <div key={i} className="flex items-center gap-4 px-5 py-3 border-b last:border-b-0" style={{ borderColor: "#1a1a1a" }}>
+              <div className="w-16 h-9 rounded flex-shrink-0" style={{ background: "#2a2a2a" }} />
+              <div className="flex-1 text-sm font-medium text-white truncate">{v.title}</div>
+              <div className="text-sm font-semibold text-white">{v.views}</div>
+              <div className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ color: v.scoreColor, background: v.scoreColor + "20" }}>
+                {v.score}x
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Feature tiles */}
+      <div className="mb-10">
+        <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "#444" }}>
+          Everything you unlock
+        </p>
+        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+          {PREVIEW_TILES.map((tile) => (
+            <div
+              key={tile.label}
+              className="rounded-xl border p-4"
+              style={{ borderColor: tile.border, background: tile.bg }}
+            >
+              <div className="text-2xl mb-2">{tile.icon}</div>
+              <div className="font-bold text-sm mb-1" style={{ color: tile.accent }}>{tile.label}</div>
+              <div className="text-xs leading-relaxed" style={{ color: "#555" }}>{tile.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom CTA */}
+      <div
+        className="rounded-2xl border p-8 text-center"
+        style={{ borderColor: "rgba(0,255,135,0.2)", background: "linear-gradient(135deg, rgba(0,255,135,0.05) 0%, #111 100%)" }}
       >
-        Connect channel
-      </Link>
-      <p className="mt-4 text-sm" style={{ color: "#333" }}>
-        Takes 30 seconds · Free
-      </p>
+        <div className="text-3xl mb-3">🎬</div>
+        <h3 className="text-xl font-black text-white mb-2">Ready to see your channel&apos;s full picture?</h3>
+        <p className="text-sm mb-6" style={{ color: "#555" }}>Connect and everything above unlocks instantly.</p>
+        <Link
+          href="/connect"
+          className="inline-block px-8 py-3.5 rounded-xl font-black text-black transition-transform hover:scale-105"
+          style={{ background: "#00ff87", boxShadow: "0 0 30px rgba(0,255,135,0.3)" }}
+        >
+          Connect channel
+        </Link>
+      </div>
     </div>
   );
 }
