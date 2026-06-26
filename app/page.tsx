@@ -1,40 +1,207 @@
 import Link from "next/link";
 
+const cards = [
+  { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🖼️", title: "The thumbnail that changed everything", views: "1.2M views", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "💬", title: "Honest review: is it actually worth it?", views: "23K views", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
+  { emoji: "📈", title: "How I grew 10K subs in 60 days", views: "312K views", badge: "⭐ Viral", badgeColor: "#8b5cf6", bg: "#120a1a" },
+  { emoji: "🎤", title: "Q&A: your questions answered!", views: "18K views", badge: "😴 Below avg", badgeColor: "#666", bg: "#111" },
+  { emoji: "🎬", title: "Behind the scenes of my studio setup", views: "445K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🎯", title: "The video formula that actually works", views: "671K views", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "🏆", title: "100K subscribers! How we got here", views: "89K views", badge: "⭐ Milestone", badgeColor: "#ffaa00", bg: "#1a150a" },
+  { emoji: "🍕", title: "I only ate one food for a week", views: "2.1M views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🎮", title: "Playing games I've never tried before", views: "156K views", badge: "📈 Growing", badgeColor: "#00ff87", bg: "#0a1a0f" },
+];
+
+const features = [
+  { icon: "🔥", label: "Outlier Detection" },
+  { icon: "📊", label: "View Analytics" },
+  { icon: "📬", label: "Weekly Digest" },
+  { icon: "📈", label: "Growth Tracking" },
+  { icon: "🏷️", label: "Tag Insights" },
+  { icon: "⚡", label: "Real-time Data" },
+];
+
 export default function Home() {
+  const doubled = [...cards, ...cards];
+
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: "#0f0f0f" }}>
-      <div className="text-center max-w-2xl">
-        <div className="mb-6 inline-block px-3 py-1 rounded-full text-xs font-medium border" style={{ borderColor: "#00ff87", color: "#00ff87" }}>
-          Beta — Free for early creators
+    <>
+      <style>{`
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        @keyframes glow-pulse {
+          0%, 100% { box-shadow: 0 0 24px rgba(0,255,135,0.3); }
+          50%       { box-shadow: 0 0 48px rgba(0,255,135,0.6); }
+        }
+        @keyframes badge-pop {
+          0%, 100% { transform: scale(1); }
+          50%       { transform: scale(1.08); }
+        }
+        .marquee-inner {
+          display: flex;
+          gap: 16px;
+          width: max-content;
+          animation: marquee 35s linear infinite;
+        }
+        .marquee-inner:hover { animation-play-state: paused; }
+        .cta-primary { animation: glow-pulse 3s ease-in-out infinite; }
+        .video-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .video-card:hover {
+          transform: translateY(-6px) scale(1.03);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        .badge-hot { animation: badge-pop 2s ease-in-out infinite; }
+      `}</style>
+
+      <main className="min-h-screen flex flex-col" style={{ background: "#0f0f0f", overflow: "hidden" }}>
+
+        {/* HERO */}
+        <section className="flex flex-col items-center justify-center px-4 pt-20 pb-10 text-center">
+          <div
+            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border-2"
+            style={{ borderColor: "#00ff87", color: "#00ff87", background: "rgba(0,255,135,0.08)" }}
+          >
+            ✨ Beta — Free for early creators
+          </div>
+
+          <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight max-w-3xl">
+            YouTube analytics built for creators who{" "}
+            <span style={{ color: "#00ff87", textShadow: "0 0 40px rgba(0,255,135,0.45)" }}>
+              aren&apos;t famous yet.
+            </span>
+          </h1>
+
+          <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
+            Spot your breakout videos before they blow up. Built for channels with{" "}
+            <strong style={{ color: "#ccc" }}>0–100K subscribers.</strong>
+          </p>
+
+          <div className="flex gap-4 justify-center flex-wrap">
+            <Link
+              href="/signup"
+              className="cta-primary px-8 py-3.5 rounded-xl font-black text-black text-lg transition-transform hover:scale-105"
+              style={{ background: "#00ff87" }}
+            >
+              🚀 Get started free
+            </Link>
+            <Link
+              href="/login"
+              className="px-8 py-3.5 rounded-xl font-semibold border-2 text-lg transition-all hover:border-white hover:text-white"
+              style={{ borderColor: "#2a2a2a", color: "#888" }}
+            >
+              Sign in
+            </Link>
+          </div>
+
+          <p className="mt-4 text-sm" style={{ color: "#444" }}>
+            No credit card required · Cancel anytime
+          </p>
+        </section>
+
+        {/* FEATURE PILLS */}
+        <div className="flex gap-3 justify-center flex-wrap px-4 mb-14">
+          {features.map((f) => (
+            <span
+              key={f.label}
+              className="px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-1.5"
+              style={{ background: "#1a1a1a", color: "#ccc", border: "1px solid #2a2a2a" }}
+            >
+              {f.icon} {f.label}
+            </span>
+          ))}
         </div>
-        <h1 className="text-5xl font-bold text-white mb-4 leading-tight">
-          YouTube analytics built for creators who{" "}
-          <span style={{ color: "#00ff87" }}>aren&apos;t famous yet.</span>
-        </h1>
-        <p className="text-lg mb-8" style={{ color: "#888888" }}>
-          Find your outlier videos, understand what&apos;s working, and grow faster.
-          Built for channels with 0&#8211;100K subscribers.
-        </p>
-        <div className="flex gap-4 justify-center">
+
+        {/* VIDEO CARDS MARQUEE */}
+        <div className="mb-16" style={{ position: "relative" }}>
+          <div style={{
+            position: "absolute", left: 0, top: 0, bottom: 0, width: "100px", zIndex: 10,
+            background: "linear-gradient(to right, #0f0f0f, transparent)",
+            pointerEvents: "none",
+          }} />
+          <div style={{
+            position: "absolute", right: 0, top: 0, bottom: 0, width: "100px", zIndex: 10,
+            background: "linear-gradient(to left, #0f0f0f, transparent)",
+            pointerEvents: "none",
+          }} />
+
+          <div style={{ overflow: "hidden", padding: "10px 0" }}>
+            <div className="marquee-inner">
+              {doubled.map((card, i) => (
+                <div
+                  key={i}
+                  className="video-card flex-shrink-0 rounded-2xl overflow-hidden cursor-pointer"
+                  style={{ width: "220px", background: card.bg, border: "1px solid #222" }}
+                >
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      height: "124px",
+                      background: card.bg,
+                      fontSize: "52px",
+                      borderBottom: "1px solid #1c1c1c",
+                      position: "relative",
+                    }}
+                  >
+                    {card.emoji}
+                    <div style={{
+                      position: "absolute", bottom: "8px", right: "8px",
+                      background: "rgba(0,0,0,0.75)", borderRadius: "4px",
+                      padding: "2px 5px", fontSize: "10px", color: "#fff", fontWeight: 700,
+                    }}>
+                      ▶ 4:32
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p
+                      className="text-white text-xs font-semibold mb-1"
+                      style={{
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {card.title}
+                    </p>
+                    <p className="text-xs mb-2" style={{ color: "#555" }}>{card.views}</p>
+                    <span
+                      className={card.badge.includes("🔥") || card.badge.includes("🚀") ? "badge-hot inline-block" : "inline-block"}
+                      style={{
+                        padding: "2px 8px", borderRadius: "999px", fontSize: "11px", fontWeight: 700,
+                        background: card.badgeColor + "22", color: card.badgeColor,
+                        border: `1px solid ${card.badgeColor}55`,
+                      }}
+                    >
+                      {card.badge}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* BOTTOM CTA */}
+        <div className="text-center pb-24 px-4">
+          <div className="inline-block mb-4 text-4xl">🎬</div>
+          <p className="text-3xl font-black text-white mb-2">Ready to find your breakout video?</p>
+          <p className="mb-8 text-lg" style={{ color: "#666" }}>
+            Join creators already using TubeWatch to grow smarter.
+          </p>
           <Link
             href="/signup"
-            className="px-6 py-3 rounded-lg font-semibold text-black transition-opacity hover:opacity-90"
-            style={{ background: "#00ff87" }}
+            className="inline-block px-12 py-4 rounded-xl font-black text-black text-xl transition-transform hover:scale-105"
+            style={{ background: "#00ff87", boxShadow: "0 0 40px rgba(0,255,135,0.35)" }}
           >
-            Get started free
-          </Link>
-          <Link
-            href="/login"
-            className="px-6 py-3 rounded-lg font-semibold border transition-colors hover:border-white"
-            style={{ borderColor: "#2a2a2a", color: "#888888" }}
-          >
-            Sign in
+            Start for free →
           </Link>
         </div>
-        <p className="mt-6 text-sm" style={{ color: "#444" }}>
-          No credit card required · Free plan available
-        </p>
-      </div>
-    </main>
+
+      </main>
+    </>
   );
 }
