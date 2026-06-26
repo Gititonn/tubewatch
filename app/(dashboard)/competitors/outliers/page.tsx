@@ -56,6 +56,12 @@ export default function OutliersPage() {
   const [selectedChannel, setSelectedChannel] = useState("");
   const [minScore, setMinScore] = useState(3);
   const [loading, setLoading] = useState(true);
+  const [whyItWorked, setWhyItWorked] = useState<{
+    videoId: string;
+    content: string;
+    loading: boolean;
+  } | null>(null);
+  const [whyCache, setWhyCache] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetch("/api/competitors/channels")
@@ -75,6 +81,43 @@ export default function OutliersPage() {
     const data = await res.json();
     setOutliers(data.outliers ?? []);
     setLoading(false);
+  }
+
+  async function handleWhyItWorked(
+    videoId: string,
+    title: string,
+    viewCount: number,
+    outlierScore: number | null,
+    channelName: string | undefined,
+    publishedAt: string | null
+  ) {
+    // Return cached result immediately
+    if (whyCache[videoId]) {
+      setWhyItWorked({ videoId, content: whyCache[videoId], loading: false });
+      return;
+    }
+    setWhyItWorked({ videoId, content: "", loading: true });
+
+    const res = await fetch("/api/ai/why-it-worked", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ videoId, title, viewCount, outlierScore, channelName, publishedAt }),
+    });
+
+    if (!res.body) return;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = "";
+    setWhyItWorked({ videoId, content: "", loading: false });
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      full += decoder.decode(value, { stream: true });
+      setWhyItWorked({ videoId, content: full, loading: false });
+    }
+
+    setWhyCache((prev) => ({ ...prev, [videoId]: full }));
   }
 
   return (
@@ -158,82 +201,154 @@ export default function OutliersPage() {
             const ch = v.competitor_channels;
 
             return (
-              <a
+              // Outer div — button cannot be nested inside <a> (invalid HTML)
+              <div
                 key={v.id}
-                href={ytUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-xl border overflow-hidden transition-transform hover:scale-[1.02]"
-                style={{ borderColor: "#2a2a2a", background: "#111", textDecoration: "none" }}
+                className="rounded-xl border overflow-hidden"
+                style={{ borderColor: "#2a2a2a", background: "#111" }}
               >
-                {/* Thumbnail */}
-                <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
-                  {v.thumbnail_url ? (
-                    <img
-                      src={v.thumbnail_url}
-                      alt={v.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center" style={{ color: "#333" }}>
-                      ▶
-                    </div>
-                  )}
-                  {/* Outlier badge */}
-                  <div
-                    className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold"
-                    style={{
-                      background: colors.bg,
-                      border: `1px solid ${colors.border}`,
-                      color: colors.text,
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
-                    🔥 {score.toFixed(1)}x
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-3">
-                  <p
-                    className="font-medium mb-2 leading-snug"
-                    style={{ fontSize: 14, color: "#fff", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}
-                  >
-                    {v.title}
-                  </p>
-
-                  {/* Channel row */}
-                  <div className="flex items-center gap-2 mb-3">
-                    {ch?.thumbnail_url ? (
+                {/* Clickable link area */}
+                <a
+                  href={ytUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block transition-transform hover:scale-[1.02]"
+                  style={{ textDecoration: "none" }}
+                >
+                  {/* Thumbnail */}
+                  <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
+                    {v.thumbnail_url ? (
                       <img
-                        src={ch.thumbnail_url}
-                        alt={ch.channel_name}
-                        className="w-5 h-5 rounded-full object-cover"
+                        src={v.thumbnail_url}
+                        alt={v.title}
+                        className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
-                      <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                        style={{ background: "#2a2a2a" }}
-                      >
-                        {ch?.channel_name?.[0] ?? "?"}
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "#333" }}>
+                        ▶
                       </div>
                     )}
-                    <span style={{ fontSize: 12, color: "#888" }}>{ch?.channel_name}</span>
-                    <span style={{ fontSize: 12, color: "#444", marginLeft: "auto" }}>
-                      {fmtDate(v.published_at)}
-                    </span>
+                    {/* Outlier badge */}
+                    <div
+                      className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold"
+                      style={{
+                        background: colors.bg,
+                        border: `1px solid ${colors.border}`,
+                        color: colors.text,
+                        backdropFilter: "blur(4px)",
+                      }}
+                    >
+                      🔥 {score.toFixed(1)}x
+                    </div>
                   </div>
 
-                  {/* Stats */}
-                  <div className="flex items-center gap-3" style={{ fontSize: 12, color: "#666" }}>
-                    <span>👁 {fmt(v.view_count)}</span>
-                    <span>👍 {fmt(v.like_count)}</span>
-                    <span>💬 {fmt(v.comment_count)}</span>
+                  {/* Info */}
+                  <div className="p-3">
+                    <p
+                      className="font-medium mb-2 leading-snug"
+                      style={{
+                        fontSize: 14,
+                        color: "#fff",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {v.title}
+                    </p>
+
+                    {/* Channel row */}
+                    <div className="flex items-center gap-2 mb-3">
+                      {ch?.thumbnail_url ? (
+                        <img
+                          src={ch.thumbnail_url}
+                          alt={ch.channel_name}
+                          className="w-5 h-5 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                          style={{ background: "#2a2a2a" }}
+                        >
+                          {ch?.channel_name?.[0] ?? "?"}
+                        </div>
+                      )}
+                      <span style={{ fontSize: 12, color: "#888" }}>{ch?.channel_name}</span>
+                      <span style={{ fontSize: 12, color: "#444", marginLeft: "auto" }}>
+                        {fmtDate(v.published_at)}
+                      </span>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex items-center gap-3" style={{ fontSize: 12, color: "#666" }}>
+                      <span>👁 {fmt(v.view_count)}</span>
+                      <span>👍 {fmt(v.like_count)}</span>
+                      <span>💬 {fmt(v.comment_count)}</span>
+                    </div>
                   </div>
+                </a>
+
+                {/* Why It Worked button — outside <a> to keep HTML valid */}
+                <div className="px-3 pb-3">
+                  <button
+                    onClick={() =>
+                      handleWhyItWorked(
+                        v.youtube_video_id,
+                        v.title,
+                        v.view_count,
+                        v.outlier_score,
+                        v.competitor_channels?.channel_name,
+                        v.published_at
+                      )
+                    }
+                    className="mt-2 w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+                    style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#888" }}
+                  >
+                    🧠 Why It Worked
+                  </button>
                 </div>
-              </a>
+              </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Why It Worked slide-out panel */}
+      {whyItWorked && (
+        <div
+          className="fixed right-0 top-0 bottom-0 z-50 flex flex-col border-l overflow-y-auto"
+          style={{ width: 420, background: "#111", borderColor: "#2a2a2a" }}
+        >
+          <div
+            className="flex items-center justify-between p-4 border-b flex-shrink-0"
+            style={{ borderColor: "#2a2a2a" }}
+          >
+            <span className="font-semibold text-sm">🧠 Why It Worked</span>
+            <button
+              onClick={() => setWhyItWorked(null)}
+              style={{ color: "#555" }}
+              className="hover:text-white text-xl leading-none"
+            >
+              ×
+            </button>
+          </div>
+          <div className="p-4 flex-1">
+            {whyItWorked.loading ? (
+              <p style={{ color: "#555", fontSize: 13 }}>Analyzing…</p>
+            ) : (
+              <p
+                style={{
+                  color: "#ccc",
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {whyItWorked.content}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>

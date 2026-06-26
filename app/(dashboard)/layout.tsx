@@ -25,8 +25,11 @@ export default async function DashboardLayout({
         <nav className="flex flex-col gap-1 flex-1">
           <NavLink href="/dashboard" icon="⊞">Dashboard</NavLink>
           <NavLink href="/videos" icon="▶">Videos</NavLink>
+          <NavLink href="/trending" icon="📈">Trending</NavLink>
+          <NavLink href="/rising" icon="🚀">Rising</NavLink>
           <NavLink href="/competitors" icon="⚡">Competitors</NavLink>
           <NavLink href="/competitors/outliers" icon="🔥">Outliers</NavLink>
+          <NavLink href="/patterns" icon="🎯">Patterns</NavLink>
           <NavLink href="/outlier" icon="⭐">Outlier Score</NavLink>
           <NavLink href="/compare" icon="⚖">Compare</NavLink>
           <NavLink href="/settings" icon="⚙">Settings</NavLink>
