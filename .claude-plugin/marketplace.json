@@ -1,0 +1,20 @@
+{
+  "name": "tubewatch",
+  "owner": {
+    "name": "TubeWatch",
+    "url": "https://github.com/Gititonn/tubewatch"
+  },
+  "plugins": [
+    {
+      "name": "tubewatch",
+      "source": {
+        "source": "github",
+        "repo": "Gititonn/tubewatch"
+      },
+      "description": "YouTube analytics dashboard — track views, estimated revenue, subscriber growth, and per-video performance. Connects to the YouTube Analytics API via OAuth and syncs your channel data automatically.",
+      "version": "0.1.0",
+      "category": "analytics",
+      "keywords": ["youtube", "analytics", "dashboard", "revenue", "creator"]
+    }
+  ]
+}
