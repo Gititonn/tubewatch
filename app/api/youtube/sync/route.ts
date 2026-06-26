@@ -11,6 +11,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing channelDbId or youtubeChannelId" }, { status: 400 });
   }
 
+  // Server-side cooldown check (1 hour for free users)
+  const supabaseCheck = createServiceClient();
+  const { data: channelRow } = await supabaseCheck
+    .from("channels")
+    .select("last_synced_at")
+    .eq("id", channelDbId)
+    .single();
+
+  if (channelRow?.last_synced_at) {
+    const lastSync = new Date(channelRow.last_synced_at).getTime();
+    const cooldownMs = 60 * 60 * 1000; // 1 hour
+    if (Date.now() - lastSync < cooldownMs) {
+      const minutesLeft = Math.ceil((cooldownMs - (Date.now() - lastSync)) / 60_000);
+      return NextResponse.json(
+        { error: `Sync cooldown active. Try again in ${minutesLeft} min.` },
+        { status: 429 }
+      );
+    }
+  }
+
   const ytVideos = await getChannelVideos(youtubeChannelId);
 
   if (!ytVideos || ytVideos.length === 0) {
@@ -35,7 +55,7 @@ export async function POST(request: Request) {
   // Calculate outlier scores
   const withScores = calculateOutlierScores(rawVideos as Video[]);
 
-  const supabase = createServiceClient();
+  const supabase = supabaseCheck;
 
   const { error } = await supabase.from("videos").upsert(
     withScores.map((v) => ({ ...v, updated_at: new Date().toISOString() })),

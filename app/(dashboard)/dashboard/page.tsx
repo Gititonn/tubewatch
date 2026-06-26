@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import Image from "next/image";
 import ResyncButton from "./ResyncButton";
+import AnalyticsChart from "./AnalyticsChart";
 
 export const dynamic = "force-dynamic";
 
@@ -87,10 +88,6 @@ export default async function DashboardPage() {
     )[0] ?? null;
   const mostRecent = videos[0] ?? null;
 
-  // Last 12 videos chronologically for bar chart
-  const chartVideos = [...videos].slice(0, 12).reverse();
-  const maxViews = Math.max(...chartVideos.map((v) => v.view_count ?? 0), 1);
-
   return (
     <div className="p-8 max-w-6xl">
       <h1 className="text-2xl font-bold text-white mb-6">Dashboard</h1>
@@ -125,6 +122,7 @@ export default async function DashboardPage() {
             <ResyncButton
               channelDbId={channel.id}
               youtubeChannelId={channel.youtube_channel_id}
+              lastSyncedAt={channel.last_synced_at ?? null}
             />
           </div>
 
@@ -178,58 +176,8 @@ export default async function DashboardPage() {
 
           {/* Chart + Most Recent */}
           <div className="grid gap-4 mb-6" style={{ gridTemplateColumns: "2fr 1fr" }}>
-            {/* Bar chart */}
-            <div
-              className="rounded-xl border p-5"
-              style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}
-            >
-              <div className="text-sm font-semibold text-white mb-1">
-                Recent Video Performance
-              </div>
-              <div className="text-xs mb-4" style={{ color: "#555" }}>
-                Last {chartVideos.length} videos · colored by outlier score
-              </div>
-              {chartVideos.length > 0 ? (
-                <>
-                  <div className="flex items-end gap-1.5 h-36">
-                    {chartVideos.map((v, i) => {
-                      const pct = ((v.view_count ?? 0) / maxViews) * 100;
-                      const color = outlierColor(v.outlier_score);
-                      const rev = estRevenue(v.view_count ?? 0);
-                      return (
-                        <div
-                          key={i}
-                          className="flex-1 flex flex-col items-center justify-end"
-                          title={`${v.title ?? "Video"}\n${(v.view_count ?? 0).toLocaleString()} views\nEst. ${rev.label}`}
-                        >
-                          <div
-                            className="w-full rounded-t"
-                            style={{
-                              height: `${Math.max(pct, 4)}%`,
-                              background: color,
-                              opacity: 0.9,
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex items-center gap-4 mt-3 flex-wrap">
-                    <LegendDot color="#ff4444" label="Outlier 3x+" />
-                    <LegendDot color="#ffaa00" label="Strong 2x+" />
-                    <LegendDot color="#00ff87" label="Above avg" />
-                    <LegendDot color="#2a2a2a" label="Below avg" />
-                  </div>
-                </>
-              ) : (
-                <div
-                  className="h-36 flex items-center justify-center text-sm"
-                  style={{ color: "#444" }}
-                >
-                  Sync your channel to see the chart
-                </div>
-              )}
-            </div>
+            {/* Analytics chart (real data if Google connected, fallback to per-video bars) */}
+            <AnalyticsChart />
 
             {/* Most recent video */}
             <div
