@@ -26,6 +26,7 @@ export default async function DashboardLayout({
           <NavLink href="/dashboard" icon="⊞">Dashboard</NavLink>
           <NavLink href="/videos" icon="▶">Videos</NavLink>
           <NavLink href="/outlier" icon="⭐" badge="New">Outlier Score</NavLink>
+          <NavLink href="/compare" icon="⚖">Compare</NavLink>
           <NavLink href="/settings" icon="⚙">Settings</NavLink>
         </nav>
         <form action="/api/auth/signout" method="POST">
