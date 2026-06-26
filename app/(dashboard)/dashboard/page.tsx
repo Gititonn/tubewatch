@@ -402,6 +402,7 @@ function StatCard({
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5">

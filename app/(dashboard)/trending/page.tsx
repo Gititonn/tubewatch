@@ -95,7 +95,7 @@ export default function TrendingPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Trending on YouTube</h1>
         <p style={{ color: "#888", fontSize: 14 }}>
-          What's breaking through right now — across all categories.
+          What&apos;s breaking through right now — across all categories.
         </p>
       </div>
 

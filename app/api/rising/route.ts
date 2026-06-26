@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const filtered = (data ?? []).filter((v: any) => {
+  const filtered = (data ?? []).filter((v: Record<string, unknown>) => {
     const ch = Array.isArray(v.competitor_channels)
       ? v.competitor_channels[0]
       : v.competitor_channels;

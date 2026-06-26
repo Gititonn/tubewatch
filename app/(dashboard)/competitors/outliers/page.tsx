@@ -125,7 +125,7 @@ export default function OutliersPage() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
         <p style={{ color: "#888", fontSize: 14 }}>
-          Competitor videos that massively outperformed their channel's average.
+          Competitor videos that massively outperformed their channel&apos;s average.
         </p>
       </div>
 
@@ -352,5 +352,5 @@ export default function OutliersPage() {
         </div>
       )}
     </div>
-  );
+    );
 }

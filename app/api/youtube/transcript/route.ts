@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
       fullText,
       wordCount: fullText.split(' ').length,
     })
-  } catch (err: any) {
+  } catch (err) {
     // Common causes: transcripts disabled, private video, wrong ID
-    const message = err?.message || 'Failed to fetch transcript'
+    const message = (err instanceof Error ? err.message : null) || 'Failed to fetch transcript'
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
