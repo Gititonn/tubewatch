@@ -52,7 +52,7 @@ export default function PatternsPage() {
 
   useEffect(() => {
     loadPatterns();
-  }, [selectedChannel]);
+  }, [selectedChannel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadPatterns() {
     setLoading(true);
@@ -202,6 +202,7 @@ export default function PatternsPage() {
                       style={{ textDecoration: "none" }}
                     >
                       {p.topVideo.thumbnailUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={p.topVideo.thumbnailUrl}
                           alt={p.topVideo.title}

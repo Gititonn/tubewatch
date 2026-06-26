@@ -212,6 +212,7 @@ export default function RisingPage() {
                 <a href={ytUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
                   <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
                     {v.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={v.thumbnail_url}
                         alt={v.title}
@@ -258,6 +259,7 @@ export default function RisingPage() {
 
                   <div className="flex items-center gap-2 mb-1">
                     {ch?.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={ch.thumbnail_url}
                         alt={ch.channel_name}

@@ -55,7 +55,7 @@ export default function TrendingPage() {
 
   useEffect(() => {
     load()
-  }, [type, region, category])
+  }, [type, region, category]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function load() {
     setLoading(true)
@@ -201,6 +201,7 @@ export default function TrendingPage() {
                   style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}
                 >
                   {v.thumbnailUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={v.thumbnailUrl}
                       alt={v.title}

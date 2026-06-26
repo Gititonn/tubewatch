@@ -161,6 +161,7 @@ export default function CompetitorsPage() {
               style={{ borderColor: "#2a2a2a", background: "#111" }}
             >
               {ch.thumbnail_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={ch.thumbnail_url}
                   alt={ch.channel_name}
@@ -272,6 +273,7 @@ export default function CompetitorsPage() {
                     style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}
                   >
                     {r.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={r.thumbnail}
                         alt={r.name ?? ""}

@@ -71,7 +71,7 @@ export default function OutliersPage() {
 
   useEffect(() => {
     loadOutliers();
-  }, [selectedChannel, minScore]);
+  }, [selectedChannel, minScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadOutliers() {
     setLoading(true);
@@ -218,6 +218,7 @@ export default function OutliersPage() {
                   {/* Thumbnail */}
                   <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
                     {v.thumbnail_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={v.thumbnail_url}
                         alt={v.title}
@@ -261,6 +262,7 @@ export default function OutliersPage() {
                     {/* Channel row */}
                     <div className="flex items-center gap-2 mb-3">
                       {ch?.thumbnail_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={ch.thumbnail_url}
                           alt={ch.channel_name}
