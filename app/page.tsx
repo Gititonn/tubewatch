@@ -1,4 +1,5 @@
 import Link from "next/link";
+import FeatureCarousel from "./feature-carousel";
 
 const cards = [
   { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
@@ -184,6 +185,9 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* FEATURE CAROUSEL */}
+        <FeatureCarousel />
 
         {/* BOTTOM CTA */}
         <div className="text-center pb-24 px-4">
