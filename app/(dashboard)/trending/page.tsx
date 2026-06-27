@@ -107,6 +107,11 @@ export default function TrendingPage() {
           question: `Why is this YouTube video trending right now? Video title: "${v.title}" by ${v.channelName}. It has ${v.viewCount.toLocaleString()} views. Explain in 2-3 punchy sentences what makes this video click-worthy and why it's getting traction. Be specific and tactical.`
         })
       })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setAiText(prev => ({ ...prev, [id]: data.error ?? "Something went wrong. Try again." }))
+        return
+      }
       if (!res.body) { setAiLoading(prev => { const n = new Set(prev); n.delete(id); return n }); return }
       const reader = res.body.getReader()
       const decoder = new TextDecoder()

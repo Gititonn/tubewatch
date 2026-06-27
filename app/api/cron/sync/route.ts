@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
+import { syncChannel } from "@/lib/sync";
 
 export async function GET(request: Request) {
   // Verify Vercel cron secret
@@ -17,20 +18,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const { origin } = new URL(request.url);
+  // Call the shared sync function directly — no open HTTP endpoint, no cooldown
+  // for the scheduled job.
   const results = await Promise.allSettled(
     (channels ?? []).map((ch) =>
-      fetch(`${origin}/api/youtube/sync`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          channelDbId: ch.id,
-          youtubeChannelId: ch.youtube_channel_id,
-        }),
-      })
+      syncChannel(ch.id, ch.youtube_channel_id, { enforceCooldown: false })
     )
   );
 
-  const succeeded = results.filter((r) => r.status === "fulfilled").length;
+  const succeeded = results.filter(
+    (r) => r.status === "fulfilled" && "synced" in r.value
+  ).length;
   return NextResponse.json({ synced: succeeded, total: channels?.length ?? 0 });
 }

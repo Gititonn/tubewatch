@@ -104,6 +104,16 @@ export default function OutliersPage() {
       body: JSON.stringify({ videoId, title, viewCount, outlierScore, channelName, publishedAt }),
     });
 
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setWhyItWorked({
+        videoId,
+        content: data.error ?? "Unable to generate analysis.",
+        loading: false,
+      });
+      return;
+    }
+
     if (!res.body) return;
     const reader = res.body.getReader();
     const decoder = new TextDecoder();

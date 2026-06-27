@@ -29,6 +29,13 @@ export default function AIPage() {
         body: JSON.stringify({ question: q }),
       });
 
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setAnswer(data.error ?? "Something went wrong. Try again.");
+        setLoading(false);
+        return;
+      }
+
       if (!res.body) { setLoading(false); return; }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();

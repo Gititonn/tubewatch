@@ -54,6 +54,16 @@ export default function OutlierPage() {
       body: JSON.stringify({ videoId: video.id, channelId }),
     });
 
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setInsights((prev) => ({
+        ...prev,
+        [video.id]: data.error ?? "Unable to generate insight.",
+      }));
+      setLoadingInsight(null);
+      return;
+    }
+
     if (!res.body) return;
     const reader = res.body.getReader();
     const decoder = new TextDecoder();

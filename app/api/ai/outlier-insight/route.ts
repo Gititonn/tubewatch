@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
+import { getUserPlan, isPaidPlan } from "@/lib/plan";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -10,6 +11,13 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!isPaidPlan(await getUserPlan(supabase, user.id))) {
+    return NextResponse.json(
+      { error: "Upgrade to a paid plan to use AI insights." },
+      { status: 402 }
+    );
   }
 
   const { videoId, channelId } = await request.json();

@@ -1,76 +1,40 @@
 import { NextResponse } from "next/server";
-import { createServiceClient } from "@/lib/supabase/server";
-import { getChannelVideos, parseDurationToSeconds } from "@/lib/youtube";
-import { calculateOutlierScores } from "@/lib/outlier";
-import type { Video } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
+import { syncChannel } from "@/lib/sync";
 
 export async function POST(request: Request) {
-  const { channelDbId, youtubeChannelId } = await request.json();
-
-  if (!channelDbId || !youtubeChannelId) {
-    return NextResponse.json({ error: "Missing channelDbId or youtubeChannelId" }, { status: 400 });
+  // Require an authenticated user.
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Server-side cooldown check (1 hour for free users)
-  const supabaseCheck = createServiceClient();
-  const { data: channelRow } = await supabaseCheck
+  const { channelDbId } = await request.json();
+  if (!channelDbId) {
+    return NextResponse.json({ error: "Missing channelDbId" }, { status: 400 });
+  }
+
+  // Verify ownership via the RLS-scoped client, and derive the YouTube channel
+  // id from the owned row (never trust a caller-supplied youtubeChannelId).
+  const { data: channel } = await supabase
     .from("channels")
-    .select("last_synced_at")
+    .select("id, youtube_channel_id")
     .eq("id", channelDbId)
     .single();
 
-  if (channelRow?.last_synced_at) {
-    const lastSync = new Date(channelRow.last_synced_at).getTime();
-    const cooldownMs = 60 * 60 * 1000; // 1 hour
-    if (Date.now() - lastSync < cooldownMs) {
-      const minutesLeft = Math.ceil((cooldownMs - (Date.now() - lastSync)) / 60_000);
-      return NextResponse.json(
-        { error: `Sync cooldown active. Try again in ${minutesLeft} min.` },
-        { status: 429 }
-      );
-    }
+  if (!channel) {
+    return NextResponse.json({ error: "Channel not found" }, { status: 404 });
   }
 
-  const ytVideos = await getChannelVideos(youtubeChannelId);
+  const result = await syncChannel(channel.id, channel.youtube_channel_id, {
+    enforceCooldown: true,
+  });
 
-  if (!ytVideos || ytVideos.length === 0) {
-    return NextResponse.json({ synced: 0 });
+  if ("error" in result) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
-
-  const rawVideos: Omit<Video, "id" | "updated_at">[] = ytVideos.map((v) => ({
-    channel_id: channelDbId,
-    youtube_video_id: v.id!,
-    title: v.snippet?.title ?? null,
-    published_at: v.snippet?.publishedAt ?? null,
-    view_count: parseInt(v.statistics?.viewCount ?? "0"),
-    like_count: parseInt(v.statistics?.likeCount ?? "0"),
-    comment_count: parseInt(v.statistics?.commentCount ?? "0"),
-    duration_seconds: v.contentDetails?.duration
-      ? parseDurationToSeconds(v.contentDetails.duration)
-      : null,
-    thumbnail_url: v.snippet?.thumbnails?.medium?.url ?? null,
-    outlier_score: null,
-  }));
-
-  // Calculate outlier scores
-  const withScores = calculateOutlierScores(rawVideos as Video[]);
-
-  const supabase = supabaseCheck;
-
-  const { error } = await supabase.from("videos").upsert(
-    withScores.map((v) => ({ ...v, updated_at: new Date().toISOString() })),
-    { onConflict: "channel_id,youtube_video_id" }
-  );
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  // Update last_synced_at
-  await supabase
-    .from("channels")
-    .update({ last_synced_at: new Date().toISOString() })
-    .eq("id", channelDbId);
-
-  return NextResponse.json({ synced: withScores.length });
+  return NextResponse.json(result);
 }

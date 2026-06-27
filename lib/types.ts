@@ -1,7 +1,7 @@
 export interface Profile {
   id: string;
   email: string | null;
-  plan: "free" | "pro";
+  plan: "free" | "pro" | "growth";
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   created_at: string;
