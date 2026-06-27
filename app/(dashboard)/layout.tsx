@@ -20,7 +20,9 @@ export default async function DashboardLayout({
     <div className="flex min-h-screen" style={{ background: "#0f0f0f" }}>
       <aside className="w-56 flex-shrink-0 flex flex-col border-r py-6 px-4" style={{ borderColor: "#1a1a1a", background: "#0a0a0a" }}>
         <div className="mb-8 px-2">
-          <span className="text-lg font-black tracking-tight" style={{ color: "#00ff87" }}>TubeWatch</span>
+          <span className="text-lg font-black tracking-tight">
+            <span style={{ color: "#ff3333" }}>Tube</span><span style={{ color: "#00ff87" }}>Watch</span>
+          </span>
         </div>
         <nav className="flex flex-col gap-0.5 flex-1">
           <NavLink href="/dashboard" icon="⊞">Dashboard</NavLink>
