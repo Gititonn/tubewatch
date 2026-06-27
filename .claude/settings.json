@@ -14,8 +14,18 @@
       "Bash(git checkout*)",
       "Bash(git branch*)",
       "Bash(git reset --soft*)",
-      "Bash(git show*)"
+      "Bash(git show*)",
+      "Bash(node .claude/hooks/verify-stop.js)"
     ],
     "deny": []
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node .claude/hooks/verify-stop.js" }
+        ]
+      }
+    ]
   }
 }
