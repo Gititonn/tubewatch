@@ -189,6 +189,41 @@ export default async function DashboardPage() {
         </>
       )}
 
+
+      {/* AI Strategy Card — always shown */}
+      <Link href="/ai">
+        <div
+          className="rounded-2xl border p-5 mb-6 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.01]"
+          style={{
+            borderColor: "rgba(168,85,247,0.35)",
+            background: "linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(139,92,246,0.04) 60%, #111 100%)",
+            boxShadow: "0 0 30px rgba(168,85,247,0.08)",
+          }}
+        >
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}
+          >
+            🧠
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="font-black text-white">AI Strategy Coach</span>
+              <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>NEW</span>
+            </div>
+            <div className="text-sm" style={{ color: "#666" }}>
+              Ask Claude anything — title strategies, why videos go viral, how to grow faster.
+            </div>
+          </div>
+          <div
+            className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-black transition-all hover:scale-105"
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
+          >
+            Ask AI →
+          </div>
+        </div>
+      </Link>
+
       {/* TRENDING NOW */}
       {trendingCache && trendingCache.length > 0 && (
         <div className="mb-10">
@@ -278,6 +313,7 @@ export default async function DashboardPage() {
             { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
             { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#00ff87", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
             { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
+            { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask Claude your YouTube strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
             { href: "/videos", icon: "▶️", label: "All Videos", desc: "Full library + outlier scores", accent: "#888", border: "rgba(255,255,255,0.1)", bg: "rgba(255,255,255,0.03)" },
           ].map((t) => (
             <Link key={t.href} href={t.href}>

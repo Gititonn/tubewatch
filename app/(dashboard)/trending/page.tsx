@@ -52,6 +52,9 @@ export default function TrendingPage() {
   const [error, setError] = useState<string | null>(null)
   const [tracked, setTracked] = useState<Set<string>>(new Set())
   const [tracking, setTracking] = useState<Set<string>>(new Set())
+  const [aiOpen, setAiOpen] = useState<string | null>(null)
+  const [aiText, setAiText] = useState<Record<string, string>>({})
+  const [aiLoading, setAiLoading] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     load()
@@ -88,6 +91,35 @@ export default function TrendingPage() {
       next.delete(v.channelId)
       return next
     })
+  }
+
+  async function askWhyTrending(v: VideoItem) {
+    const id = v.youtubeVideoId
+    if (aiOpen === id) { setAiOpen(null); return }
+    setAiOpen(id)
+    if (aiText[id]) return
+    setAiLoading(prev => new Set(prev).add(id))
+    try {
+      const res = await fetch("/api/ai/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: `Why is this YouTube video trending right now? Video title: "${v.title}" by ${v.channelName}. It has ${v.viewCount.toLocaleString()} views. Explain in 2-3 punchy sentences what makes this video click-worthy and why it's getting traction. Be specific and tactical.`
+        })
+      })
+      if (!res.body) { setAiLoading(prev => { const n = new Set(prev); n.delete(id); return n }); return }
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let full = ""
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        full += decoder.decode(value, { stream: true })
+        setAiText(prev => ({ ...prev, [id]: full }))
+      }
+    } finally {
+      setAiLoading(prev => { const n = new Set(prev); n.delete(id); return n })
+    }
   }
 
   return (
@@ -250,27 +282,49 @@ export default function TrendingPage() {
                   <span>{fmtDate(v.publishedAt)}</span>
                 </div>
 
-                <button
-                  onClick={() => trackChannel(v)}
-                  disabled={tracked.has(v.channelId) || tracking.has(v.channelId)}
-                  className="w-full py-1.5 rounded-lg text-xs font-medium"
-                  style={{
-                    background: tracked.has(v.channelId) ? "#1a1a1a" : "#00ff87",
-                    color: tracked.has(v.channelId) ? "#00ff87" : "#000",
-                    border: "1px solid #00ff87",
-                    cursor:
-                      tracked.has(v.channelId) || tracking.has(v.channelId)
-                        ? "default"
-                        : "pointer",
-                    opacity: tracking.has(v.channelId) ? 0.6 : 1,
-                  }}
-                >
-                  {tracked.has(v.channelId)
-                    ? "✓ Tracked"
-                    : tracking.has(v.channelId)
-                    ? "Tracking…"
-                    : "Track Channel"}
-                </button>
+                <div className="flex gap-2 mb-2">
+                  <button
+                    onClick={() => trackChannel(v)}
+                    disabled={tracked.has(v.channelId) || tracking.has(v.channelId)}
+                    className="flex-1 py-1.5 rounded-lg text-xs font-medium"
+                    style={{
+                      background: tracked.has(v.channelId) ? "#1a1a1a" : "#00ff87",
+                      color: tracked.has(v.channelId) ? "#00ff87" : "#000",
+                      border: "1px solid #00ff87",
+                      cursor: tracked.has(v.channelId) || tracking.has(v.channelId) ? "default" : "pointer",
+                      opacity: tracking.has(v.channelId) ? 0.6 : 1,
+                    }}
+                  >
+                    {tracked.has(v.channelId) ? "✓ Tracked" : tracking.has(v.channelId) ? "Tracking…" : "Track Channel"}
+                  </button>
+                  <button
+                    onClick={() => askWhyTrending(v)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-black transition-all hover:scale-105"
+                    style={{
+                      background: aiOpen === v.youtubeVideoId ? "linear-gradient(135deg, #a855f7, #7c3aed)" : "rgba(168,85,247,0.15)",
+                      color: aiOpen === v.youtubeVideoId ? "#fff" : "#c084fc",
+                      border: "1px solid rgba(168,85,247,0.4)",
+                    }}
+                  >
+                    🧠 AI
+                  </button>
+                </div>
+                {aiOpen === v.youtubeVideoId && (
+                  <div className="rounded-xl p-3 mt-1" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.2)" }}>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-xs font-black" style={{ color: "#a855f7" }}>🧠 Why It&apos;s Trending</span>
+                    </div>
+                    {aiLoading.has(v.youtubeVideoId) && !aiText[v.youtubeVideoId] ? (
+                      <div className="flex gap-1">
+                        {[0,1,2].map(i => (
+                          <span key={i} className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: "#a855f7", opacity: 0.7 }} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs leading-relaxed" style={{ color: "#ccc" }}>{aiText[v.youtubeVideoId]}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}
