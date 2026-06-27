@@ -18,39 +18,43 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen" style={{ background: "#0f0f0f" }}>
-      <aside className="w-56 flex-shrink-0 flex flex-col border-r py-6 px-4" style={{ borderColor: "#2a2a2a", background: "#0f0f0f" }}>
+      <aside className="w-56 flex-shrink-0 flex flex-col border-r py-6 px-4" style={{ borderColor: "#1a1a1a", background: "#0a0a0a" }}>
         <div className="mb-8 px-2">
-          <span className="text-lg font-bold" style={{ color: "#00ff87" }}>TubeWatch</span>
+          <span className="text-lg font-black tracking-tight" style={{ color: "#00ff87" }}>TubeWatch</span>
         </div>
-        <nav className="flex flex-col gap-1 flex-1">
-          <NavLink href="/dashboard" icon="\u229e">Dashboard</NavLink>
-          <NavLink href="/videos" icon="\u25b6">Videos</NavLink>
-          <NavLink href="/trending" icon="\U0001f4c8">Trending</NavLink>
-          <NavLink href="/rising" icon="\U0001f680">Rising</NavLink>
-          <NavLink href="/competitors" icon="\u26a1">Competitors</NavLink>
-          <NavLink href="/competitors/outliers" icon="\U0001f525">Outliers</NavLink>
-          <NavLink href="/outlier" icon="\u2b50">Outlier Score</NavLink>
-          <NavLink href="/compare" icon="\u2696">Compare</NavLink>
-          <NavLink href="/patterns" icon="\U0001f3af">Patterns</NavLink>
-
-          {/* AI Section */}
-          <div className="mt-3 mb-1 px-2">
-            <span className="text-xs font-black uppercase tracking-widest" style={{ color: "rgba(168,85,247,0.5)" }}>
-              AI Powered
-            </span>
-          </div>
-          <NavLink href="/ai" icon="\U0001f9e0" ai badge="NEW">AI Insights</NavLink>
+        <nav className="flex flex-col gap-0.5 flex-1">
+          <NavLink href="/dashboard" icon="⊞">Dashboard</NavLink>
+          <NavLink href="/videos" icon="▶">Videos</NavLink>
 
           <div className="mt-3 mb-1 px-2">
-            <span className="text-xs uppercase tracking-widest" style={{ color: "#333" }}>Account</span>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>Discover</span>
           </div>
-          <NavLink href="/billing" icon="\U0001f4b3">Billing</NavLink>
-          <NavLink href="/settings" icon="\u2699">Settings</NavLink>
+          <NavLink href="/trending" icon="📈">Trending</NavLink>
+          <NavLink href="/rising" icon="🚀">Rising</NavLink>
+          <NavLink href="/competitors" icon="⚡">Competitors</NavLink>
+          <NavLink href="/competitors/outliers" icon="🔥">Outlier Feed</NavLink>
+
+          <div className="mt-3 mb-1 px-2">
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>Analyze</span>
+          </div>
+          <NavLink href="/outlier" icon="⭐">Outlier Score</NavLink>
+          <NavLink href="/patterns" icon="🎯">Patterns</NavLink>
+          <NavLink href="/compare" icon="⚖">Compare</NavLink>
+
+          <div className="mt-3 mb-1 px-2">
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>AI</span>
+          </div>
+          <NavLink href="/ai" icon="🧠" ai badge="NEW">AI Coach</NavLink>
+
+          <div className="mt-auto pt-4 flex flex-col gap-0.5">
+            <NavLink href="/billing" icon="💳">Billing</NavLink>
+            <NavLink href="/settings" icon="⚙">Settings</NavLink>
+          </div>
         </nav>
-        <form action="/api/auth/signout" method="POST">
+        <form action="/api/auth/signout" method="POST" className="mt-4">
           <button
-            className="w-full text-left px-3 py-2 rounded-lg text-sm transition-colors hover:bg-white/5"
-            style={{ color: "#555" }}
+            className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors hover:bg-white/5"
+            style={{ color: "#333" }}
           >
             Sign out
           </button>
