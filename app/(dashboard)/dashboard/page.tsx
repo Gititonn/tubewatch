@@ -142,7 +142,7 @@ export default async function DashboardPage() {
               />
             )}
             <div className="flex-1 min-w-0 relative z-10">
-              <div className="font-black text-white text-lg truncate">{channel.channel_name}</div>
+              <div className="font-black text-white text-lg" style={{ wordBreak: "break-word" }}>{channel.channel_name}</div>
               <div className="text-sm" style={{ color: "#555" }}>
                 {fmt(channel.subscriber_count ?? 0)} subscribers &middot; {videos.length} videos
               </div>
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Personal stats */}
-          <div className="grid grid-cols-4 gap-3 mb-6">
+          <div className="grid gap-3 mb-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
             <StatCard label="Subscribers" value={fmt(channel.subscriber_count ?? 0)} icon="👥" accent="#00ff87" sub="total" />
             <StatCard label="Avg Views / Video" value={fmt(avgViews)} icon="👁" accent="#3b82f6" sub={`across ${videos.length} videos`} />
             <StatCard label="Est. Revenue (30d)" value={recentViews > 0 ? estRevenue(recentViews) : "---"} icon="💰" accent="#00ff87" sub="based on avg CPM" />
@@ -389,14 +389,14 @@ function SectionHeader({ label, href }: { label: string; href?: string }) {
 
 function StatCard({ label, value, icon, accent, sub }: { label: string; value: string; icon: string; accent: string; sub?: string }) {
   return (
-    <div className="rounded-xl border p-4 flex flex-col gap-1"
+    <div className="rounded-xl border p-4 flex flex-col gap-1 min-w-0"
       style={{ borderColor: "#2a2a2a", background: `linear-gradient(135deg, ${accent}08 0%, #111 100%)` }}>
       <div className="flex items-center gap-2">
-        <span className="text-sm">{icon}</span>
-        <span className="text-xs uppercase tracking-wide font-semibold" style={{ color: "#444" }}>{label}</span>
+        <span className="text-sm flex-shrink-0">{icon}</span>
+        <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: "#444" }}>{label}</span>
       </div>
-      <div className="text-3xl font-black mt-1" style={{ color: accent }}>{value}</div>
-      {sub && <div className="text-xs" style={{ color: "#444" }}>{sub}</div>}
+      <div className="text-2xl font-black mt-1 leading-tight break-all" style={{ color: accent }}>{value}</div>
+      {sub && <div className="text-xs truncate" style={{ color: "#444" }}>{sub}</div>}
     </div>
   );
 }
