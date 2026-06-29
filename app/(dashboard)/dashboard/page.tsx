@@ -156,9 +156,9 @@ export default async function DashboardPage() {
 
           {/* Personal stats */}
           <div className="grid gap-3 mb-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
-            <StatCard label="Subscribers" value={fmt(channel.subscriber_count ?? 0)} icon="👥" accent="#00ff87" sub="total" />
+            <StatCard label="Subscribers" value={fmt(channel.subscriber_count ?? 0)} icon="👥" accent="#4ade80" sub="total" />
             <StatCard label="Avg Views / Video" value={fmt(avgViews)} icon="👁" accent="#3b82f6" sub={`across ${videos.length} videos`} />
-            <StatCard label="Est. Revenue (30d)" value={recentViews > 0 ? estRevenue(recentViews) : "---"} icon="💰" accent="#00ff87" sub="based on avg CPM" />
+            <StatCard label="Est. Revenue (30d)" value={recentViews > 0 ? estRevenue(recentViews) : "---"} icon="💰" accent="#4ade80" sub="based on avg CPM" />
             <StatCard label="Top Outlier" value={topOutlier?.outlier_score ? topOutlier.outlier_score.toFixed(1) + "x" : "---"} icon="🔥" accent="#ff4444" sub="channel median" />
           </div>
 
@@ -236,7 +236,7 @@ export default async function DashboardPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border overflow-hidden block transition-all hover:border-blue-500/40 hover:scale-[1.02]"
-                style={{ borderColor: "#2a2a2a", background: "#111" }}
+                style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
               >
                 {v.thumbnail_url && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -267,7 +267,7 @@ export default async function DashboardPage() {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const ch = Array.isArray(v.competitor_channels) ? v.competitor_channels[0] : (v.competitor_channels as any);
               const score = v.outlier_score ?? 0;
-              const scoreColor = score >= 10 ? "#ff4444" : score >= 5 ? "#ffaa00" : "#00ff87";
+              const scoreColor = score >= 10 ? "#ff4444" : score >= 5 ? "#ffaa00" : "#4ade80";
               return (
                 <a
                   key={v.id}
@@ -275,7 +275,7 @@ export default async function DashboardPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-xl border overflow-hidden block transition-all hover:border-red-500/40 hover:scale-[1.02]"
-                  style={{ borderColor: "#2a2a2a", background: "#111" }}
+                  style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                 >
                   {v.thumbnail_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -311,7 +311,7 @@ export default async function DashboardPage() {
             { href: "/competitors", icon: "⚡", label: "Competitors", desc: "Track rival channels", accent: "#f59e0b", border: "rgba(245,158,11,0.25)", bg: "rgba(245,158,11,0.07)" },
             { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed", desc: "Videos crushing their average", accent: "#ef4444", border: "rgba(239,68,68,0.25)", bg: "rgba(239,68,68,0.07)" },
             { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
-            { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#00ff87", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
+            { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#4ade80", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
             { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
             { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask Claude your YouTube strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
             { href: "/videos", icon: "▶️", label: "All Videos", desc: "Full library + outlier scores", accent: "#888", border: "rgba(255,255,255,0.1)", bg: "rgba(255,255,255,0.03)" },
@@ -340,7 +340,7 @@ export default async function DashboardPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border overflow-hidden block hover:border-white/20 transition-colors"
-                style={{ borderColor: "#2a2a2a", background: "#111" }}
+                style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
               >
                 {v.thumbnail_url ? (
                   <Image src={v.thumbnail_url} alt={v.title ?? ""} width={320} height={180}
@@ -359,7 +359,7 @@ export default async function DashboardPage() {
                     {v.outlier_score != null && v.outlier_score >= 1.2 && (
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded-md"
                         style={{
-                          color: v.outlier_score >= 3 ? "#ff4444" : v.outlier_score >= 2 ? "#ffaa00" : "#00ff87",
+                          color: v.outlier_score >= 3 ? "#ff4444" : v.outlier_score >= 2 ? "#ffaa00" : "#4ade80",
                           background: v.outlier_score >= 3 ? "rgba(255,68,68,0.15)" : v.outlier_score >= 2 ? "rgba(255,170,0,0.15)" : "rgba(0,255,135,0.15)",
                         }}>
                         {v.outlier_score.toFixed(1)}x

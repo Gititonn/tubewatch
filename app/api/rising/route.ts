@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { getUserPlan, isPaidPlan } from "@/lib/plan";
 
 export async function GET(request: Request) {
   const authClient = createClient();
   const { data: { user } } = await authClient.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const plan = await getUserPlan(authClient, user.id);
+  if (!isPaidPlan(plan)) {
+    return NextResponse.json({ error: "Upgrade to Pro to unlock this feature." }, { status: 402 });
+  }
 
   const { searchParams } = new URL(request.url);
   const minScore = parseFloat(searchParams.get("minScore") ?? "3");

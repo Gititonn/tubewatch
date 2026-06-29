@@ -73,6 +73,7 @@ export default function ComparePage() {
   const [channels, setChannels] = useState<ChannelData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
 
   async function addChannel() {
     const h = handle.trim().replace(/^@/, "");
@@ -90,7 +91,9 @@ export default function ComparePage() {
     try {
       const res = await fetch(`/api/youtube/compare?handle=${encodeURIComponent(h)}`);
       const data = await res.json();
-      if (!res.ok) {
+      if (res.status === 402) {
+        setUpgradeRequired(true);
+      } else if (!res.ok) {
         setError(data.error || "Channel not found.");
       } else {
         setChannels((prev) => [...prev, data]);
@@ -107,8 +110,21 @@ export default function ComparePage() {
     setChannels((prev) => prev.filter((c) => c.id !== id));
   }
 
+  if (upgradeRequired) {
+    return (
+      <div className="p-4 md:p-8 max-w-7xl">
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", padding: "2rem" }}>
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔒</div>
+          <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: "0.5rem" }}>Compare Channels is a Pro Feature</h2>
+          <p style={{ color: "#666", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
+          <a href="/billing" style={{ background: "#00ff87", color: "#000", fontWeight: 700, padding: "0.75rem 1.5rem", borderRadius: "0.75rem", textDecoration: "none" }}>Upgrade to Pro →</a>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-8 max-w-7xl">
+    <div className="p-4 md:p-8 max-w-7xl">
       <h1 className="text-2xl font-bold text-white mb-2">Compare Channels</h1>
       <p className="text-sm mb-8" style={{ color: "#666" }}>
         Add up to 4 YouTube channels to compare side by side.
@@ -138,7 +154,7 @@ export default function ComparePage() {
       </div>
 
       {error && (
-        <p className="mb-6 text-sm px-4 py-2 rounded-lg" style={{ color: "#ff6b6b", background: "#ff4444" + "15", border: "1px solid #ff444430" }}>
+        <p className="mb-6 text-sm px-4 py-2 rounded-lg" style={{ color: "#ff6b6b", background: "#ff444415", border: "1px solid #ff444430" }}>
           {error}
         </p>
       )}
@@ -298,7 +314,6 @@ export default function ComparePage() {
                     {ch.recentVideos.map((v, i) => (
                       <div key={i} className="flex items-start gap-2">
                         <span
-                          className="text-xs font-bold mt-0.5 flex-shrink-0 w-12 text-center px-1.5 py-0.5 rounded"
                           style={{
                             color: outlierColor(v.outlierScore),
                             background: outlierColor(v.outlierScore) + "18",

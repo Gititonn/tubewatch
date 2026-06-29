@@ -1,4 +1,5 @@
 # TubeWatch — Full Project Handoff
+**Last updated: 2026-06-29**
 
 ## What This Is
 
@@ -201,7 +202,7 @@ TubeWatch (logo: Tube=red, Watch=green)
 
 ## Pending / Not Yet Done
 
-- [ ] **Stripe webhook secret + env vars not added to Vercel** — Stripe checkout will fail in production. Need to add `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` to Vercel environment variables, and create the webhook endpoint in the Stripe dashboard pointing to `https://tubewatchhq.com/api/stripe/webhook` with events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`.
+- [x] **Stripe fully wired** — live keys in Vercel, webhook `we_1TnirxKXNOHU6kx1uf1CARje` active. Account under review until ~2026-07-02; payments will work once cleared.
 
 - [ ] **AI markdown rendering** — Claude responses include `**bold**` markdown that renders as raw asterisks. Need to add a simple markdown renderer (e.g. `react-markdown` or a regex replace) to the AI response boxes.
 
@@ -238,17 +239,21 @@ TubeWatch (logo: Tube=red, Watch=green)
 ## Environment Variables (all set in Vercel except Stripe)
 
 ```
-NEXT_PUBLIC_SUPABASE_URL          ✅ Set
-NEXT_PUBLIC_SUPABASE_ANON_KEY     ✅ Set
-SUPABASE_SERVICE_ROLE_KEY         ✅ Set
-YOUTUBE_API_KEY                   ✅ Set
-ANTHROPIC_API_KEY                 ✅ Set
-RESEND_API_KEY                    ✅ Set
-CRON_SECRET                       ✅ Set
-STRIPE_SECRET_KEY                 ❌ NOT set in Vercel
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ❌ NOT set in Vercel
-STRIPE_WEBHOOK_SECRET             ❌ NOT set in Vercel
+NEXT_PUBLIC_SUPABASE_URL           ✅ Set
+NEXT_PUBLIC_SUPABASE_ANON_KEY      ✅ Set
+SUPABASE_SERVICE_ROLE_KEY          ✅ Set
+YOUTUBE_API_KEY                    ✅ Set
+ANTHROPIC_API_KEY                  ✅ Set
+RESEND_API_KEY                     ✅ Set
+CRON_SECRET                        ✅ Set
+STRIPE_SECRET_KEY                  ✅ Set (live, sk_live_)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ✅ Set (live, pk_live_)
+STRIPE_WEBHOOK_SECRET              ✅ Set (whsec_tH36ktZfMIktKou2dkRwJyUfD3nAUdVu)
+GOOGLE_CLIENT_ID                   ✅ Set
+NEXT_PUBLIC_APP_URL                ✅ Set
 ```
+
+**Stripe is in LIVE mode.** Account `acct_1TlwH5KXNOHU6kx1` is under review — live payments are paused for ~2–3 days from 2026-06-29. Webhook `we_1TnirxKXNOHU6kx1uf1CARje` listens at `https://tubewatchhq.com/api/stripe/webhook` for `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`.
 
 ---
 
@@ -284,10 +289,11 @@ Use the following prompt to start a new conversation that picks up exactly where
 > - Nav with DISCOVER / ANALYZE / AI sections, TubeWatch logo (Tube=red, Watch=green)
 >
 > **Immediate priorities:**
-> 1. Add Stripe env vars to Vercel (`STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`) and create the webhook in Stripe dashboard pointing to `https://tubewatchhq.com/api/stripe/webhook` with events: checkout.session.completed, customer.subscription.updated, customer.subscription.deleted
+> 1. **Wait for Stripe review to clear** (~2026-07-02) then test a real checkout end-to-end
 > 2. Render markdown in AI responses (Claude returns `**bold**` as raw asterisks)
 > 3. Gate Pro/Growth features behind actual subscription checks
 > 4. Improve empty states on Rising/Patterns/Outlier Feed for new users with no competitors tracked
+> 5. Get first real user — share landing page, get someone to sign up and connect YouTube
 >
 > **Key technical rules:**
 > - Deploy via `.\push.bat` from PowerShell (handles git lock file, commits, pushes to GitHub → Vercel auto-deploys)

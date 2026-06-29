@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NavLink } from "./nav-link";
+import { MobileNav } from "./MobileNav";
 
 export const dynamic = "force-dynamic";
 
@@ -17,11 +18,21 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#0f0f0f" }}>
-      <aside className="w-56 flex-shrink-0 flex flex-col border-r py-6 px-4" style={{ borderColor: "#1a1a1a", background: "#0a0a0a" }}>
+    <div className="min-h-screen md:flex" style={{ background: "#0f0f0f" }}>
+      {/* Mobile header + drawer - hidden on md+ */}
+      <div className="md:hidden">
+        <MobileNav />
+      </div>
+
+      {/* Desktop sidebar - hidden on mobile */}
+      <aside
+        className="hidden md:flex w-56 flex-shrink-0 flex-col border-r py-6 px-4"
+        style={{ borderColor: "#1a1a1a", background: "#0a0a0a" }}
+      >
         <div className="mb-8 px-2">
           <span className="text-lg font-black tracking-tight">
-            <span style={{ color: "#ff3333" }}>Tube</span><span style={{ color: "#00ff87" }}>Watch</span>
+            <span style={{ color: "#ff3333" }}>Tube</span>
+            <span style={{ color: "#00ff87" }}>Watch</span>
           </span>
         </div>
         <nav className="flex flex-col gap-0.5 flex-1">
@@ -29,7 +40,7 @@ export default async function DashboardLayout({
           <NavLink href="/videos" icon="▶">Videos</NavLink>
 
           <div className="mt-3 mb-1 px-2">
-            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>Discover</span>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#404040" }}>Discover</span>
           </div>
           <NavLink href="/trending" icon="📈">Trending</NavLink>
           <NavLink href="/rising" icon="🚀">Rising</NavLink>
@@ -37,14 +48,14 @@ export default async function DashboardLayout({
           <NavLink href="/competitors/outliers" icon="🔥">Outlier Feed</NavLink>
 
           <div className="mt-3 mb-1 px-2">
-            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>Analyze</span>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#404040" }}>Analyze</span>
           </div>
           <NavLink href="/outlier" icon="⭐">Outlier Score</NavLink>
           <NavLink href="/patterns" icon="🎯">Patterns</NavLink>
           <NavLink href="/compare" icon="⚖">Compare</NavLink>
 
           <div className="mt-3 mb-1 px-2">
-            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#2a2a2a" }}>AI</span>
+            <span className="text-xs uppercase tracking-widest font-semibold" style={{ color: "#404040" }}>AI</span>
           </div>
           <NavLink href="/ai" icon="🧠" ai badge="NEW">AI Coach</NavLink>
 
@@ -55,6 +66,7 @@ export default async function DashboardLayout({
         </nav>
         <form action="/api/auth/signout" method="POST" className="mt-4">
           <button
+            type="submit"
             className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors hover:bg-white/5"
             style={{ color: "#333" }}
           >
@@ -62,6 +74,7 @@ export default async function DashboardLayout({
           </button>
         </form>
       </aside>
+
       <main className="flex-1 overflow-auto">
         {children}
       </main>

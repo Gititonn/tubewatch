@@ -39,9 +39,9 @@ function fmtDate(iso: string | null): string {
 }
 
 function scoreColor(score: number): { bg: string; border: string; text: string } {
-  if (score >= 10) return { bg: "rgba(255,68,68,0.12)", border: "#ff4444", text: "#ff6666" };
+  if (score >= 10) return { bg: "rgba(255,68,68,0.12)", border: "#f87171", text: "#fca5a5" };
   if (score >= 5) return { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" };
-  return { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#00ff87" };
+  return { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };
 }
 
 const MIN_SCORE_OPTIONS = [
@@ -122,7 +122,7 @@ export default function OutliersPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl" style={{ color: "#fff" }}>
+    <div className="p-4 md:p-8 max-w-6xl" style={{ color: "#fff" }}>
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
         <p style={{ color: "#888", fontSize: 14 }}>
@@ -178,18 +178,106 @@ export default function OutliersPage() {
       {loading ? (
         <div style={{ color: "#555", paddingTop: 48, textAlign: "center" }}>Loading…</div>
       ) : outliers.length === 0 ? (
-        <div
-          className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-          style={{ borderColor: "#2a2a2a", background: "#111" }}
-        >
-          <div className="text-4xl mb-4">🔥</div>
-          <p className="font-semibold mb-1">No outlier videos found</p>
-          <p style={{ color: "#555", fontSize: 14 }}>
-            {channels.length === 0
-              ? "Add competitor channels to start tracking outlier videos."
-              : "Try lowering the minimum score or syncing your channels."}
-          </p>
-        </div>
+        channels.length === 0 ? (
+          <div>
+            {/* Rich empty state — no competitors tracked */}
+            <div
+              className="rounded-xl border flex flex-col items-center justify-center py-16 text-center mb-8"
+              style={{ borderColor: "#2a2a2a", background: "#111" }}
+            >
+              <div className="text-6xl mb-4">🔥</div>
+              <h2 className="text-xl font-black text-white mb-3">See Every Video Crushing Its Channel Average</h2>
+              <p style={{ color: "#666", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
+                The Outlier Feed surfaces competitor videos scoring 3x+ above their channel median — your direct pipeline to proven formats you can adapt.
+              </p>
+              <a
+                href="/competitors"
+                className="mt-6 inline-block px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
+                style={{
+                  border: "1px solid #00ff87",
+                  color: "#00ff87",
+                  background: "transparent",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(0,255,135,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                }}
+              >
+                Add Your First Competitor →
+              </a>
+            </div>
+
+            {/* Ghost preview cards */}
+            <div
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                opacity: 0.4,
+                pointerEvents: "none",
+                filter: "blur(1px)",
+              }}
+            >
+              {[
+                { title: "I Tried Every Productivity App for 30 Days", channel: "TechMinimalist", views: 184200, likes: 6800, comments: 412, score: 8.2, published: "2026-06-20T00:00:00Z" },
+                { title: "Why YouTube Shorts Are Killing Long-Form (Data)", channel: "CreatorInsights", views: 97400, likes: 3200, comments: 198, score: 5.6, published: "2026-06-24T00:00:00Z" },
+                { title: "The 5AM Routine That Actually Changed My Life", channel: "MindsetDaily", views: 312000, likes: 14100, comments: 1032, score: 12.1, published: "2026-06-18T00:00:00Z" },
+              ].map((v, i) => {
+                const colors = v.score >= 10
+                  ? { bg: "rgba(255,68,68,0.12)", border: "#f87171", text: "#fca5a5" }
+                  : v.score >= 5
+                  ? { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" }
+                  : { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };
+                return (
+                  <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: "#2a2a2a", background: "#111" }}>
+                    <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "#333", fontSize: 24 }}>▶</div>
+                      <div
+                        className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold"
+                        style={{ background: colors.bg, border: `1px solid ${colors.border}`, color: colors.text }}
+                      >
+                        🔥 {v.score.toFixed(1)}x
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      <p className="font-medium mb-2 leading-snug" style={{ fontSize: 14, color: "#fff" }}>{v.title}</p>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "#2a2a2a" }}>
+                          {v.channel[0]}
+                        </div>
+                        <span style={{ fontSize: 12, color: "#888" }}>{v.channel}</span>
+                        <span style={{ fontSize: 12, color: "#444", marginLeft: "auto" }}>
+                          {new Date(v.published).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3" style={{ fontSize: 12, color: "#666" }}>
+                        <span>👁 {v.views >= 1000 ? (v.views / 1000).toFixed(0) + "K" : v.views}</span>
+                        <span>👍 {v.likes >= 1000 ? (v.likes / 1000).toFixed(1) + "K" : v.likes}</span>
+                        <span>💬 {v.comments}</span>
+                      </div>
+                    </div>
+                    <div className="px-3 pb-3">
+                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#888" }}>
+                        🧠 Why It Worked
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div
+            className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
+            style={{ borderColor: "#2a2a2a", background: "#111" }}
+          >
+            <div className="text-4xl mb-4">🔥</div>
+            <p className="font-semibold mb-1">No outlier videos found</p>
+            <p style={{ color: "#555", fontSize: 14 }}>Try lowering the minimum score or syncing your channels.</p>
+          </div>
+        )
       ) : (
         <div
           className="grid gap-4"

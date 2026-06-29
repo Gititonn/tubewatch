@@ -199,7 +199,7 @@ export default function TrendingPage() {
           className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
           style={{ borderColor: "#2a2a2a", background: "#111" }}
         >
-          <p className="font-semibold mb-2" style={{ color: "#ff6666" }}>
+          <p className="font-semibold mb-2" style={{ color: "#fca5a5" }}>
             Failed to load trending videos
           </p>
           <p style={{ color: "#555", fontSize: 14 }}>{error}</p>
@@ -295,7 +295,7 @@ export default function TrendingPage() {
                     className="flex-1 py-1.5 rounded-lg text-xs font-medium"
                     style={{
                       background: tracked.has(v.channelId) ? "#1a1a1a" : "#00ff87",
-                      color: tracked.has(v.channelId) ? "#00ff87" : "#000",
+                      color: tracked.has(v.channelId) ? "#4ade80" : "#000",
                       border: "1px solid #00ff87",
                       cursor: tracked.has(v.channelId) || tracking.has(v.channelId) ? "default" : "pointer",
                       opacity: tracking.has(v.channelId) ? 0.6 : 1,

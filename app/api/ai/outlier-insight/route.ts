@@ -49,11 +49,13 @@ Outlier score: ${video.outlier_score}× (>2 = overperformer, <0.5 = underperform
 
 In 2-3 concise sentences, explain what likely caused this video's ${
     (video.outlier_score ?? 1) > 1 ? "strong" : "weak"
-  } performance. Consider: title hooks, topic relevance, timing, video format, and engagement signals. Be specific and actionable.`;
+  } performance. Consider: title hooks, topic relevance, timing, video format, and engagement signals. Be specific and actionable.
+
+End with "**Your Move:**" — 2 bullet points: one concrete thing to replicate from this video's approach, or one specific thing to change if it underperformed. Reference this video's actual data.`;
 
   const stream = await anthropic.messages.stream({
     model: "claude-sonnet-4-6",
-    max_tokens: 256,
+    max_tokens: 400,
     messages: [{ role: "user", content: prompt }],
   });
 

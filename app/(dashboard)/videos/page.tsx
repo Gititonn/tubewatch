@@ -26,7 +26,7 @@ export default async function VideosPage() {
     : { data: [] };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <h1 className="text-2xl font-bold text-white mb-6">Videos</h1>
 
       {!channel && (
@@ -37,7 +37,8 @@ export default async function VideosPage() {
 
       {videos && videos.length > 0 && (
         <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#2a2a2a" }}>
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="min-w-[560px] w-full text-sm">
             <thead>
               <tr style={{ borderBottom: "1px solid #2a2a2a", background: "#1a1a1a" }}>
                 <th className="text-left px-4 py-3 font-medium" style={{ color: "#888" }}>Video</th>
@@ -66,6 +67,7 @@ export default async function VideosPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

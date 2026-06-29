@@ -87,7 +87,7 @@ export default function OutlierPage() {
   });
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Outlier Score</h1>
@@ -103,7 +103,7 @@ export default function OutlierPage() {
               className="px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors"
               style={{
                 background: filter === f ? "#00ff8720" : "#1a1a1a",
-                color: filter === f ? "#00ff87" : "#888",
+                color: filter === f ? "#4ade80" : "#888",
                 border: `1px solid ${filter === f ? "#00ff87" : "#2a2a2a"}`,
               }}
             >
@@ -191,9 +191,9 @@ export default function OutlierPage() {
                         <td colSpan={6} className="px-4 pb-4 pt-1">
                           <div
                             className="rounded-lg px-4 py-3 text-sm"
-                            style={{ background: "#111", color: "#aaa", border: "1px solid #2a2a2a" }}
+                            style={{ background: "#111", color: "#aaa", border: "1px solid #2a2a2a", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                           >
-                            <span style={{ color: "#00ff87", fontWeight: 700 }}>✦ AI Insight</span>
+                            <span style={{ color: "#4ade80", fontWeight: 700 }}>✦ AI Insight</span>
                             <div className="mt-1"><MarkdownContent content={insights[v.id]} /></div>
                           </div>
                         </td>

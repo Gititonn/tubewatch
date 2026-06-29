@@ -30,7 +30,9 @@ export async function POST(request: Request) {
 
 The creator is asking: "${question}"
 
-Give a direct, tactical, specific answer in 3-5 sentences or short paragraphs. Be concrete — avoid generic advice. Reference real patterns, data, and strategies that actually work for small channels. If relevant, mention specific formats, structures, or examples that illustrate your point.`;
+Give a direct, tactical, specific answer in 3-5 sentences or short paragraphs. Be concrete — avoid generic advice. Reference real patterns, data, and strategies that actually work for small channels. If relevant, mention specific formats, structures, or examples that illustrate your point.
+
+End your response with a "**Your Move:**" section containing exactly 2-3 bullet points. Each bullet is a specific, actionable task the creator can do this week — not generic advice. Format each as "• [specific action]".`;
 
   const stream = await anthropic.messages.stream({
     model: "claude-haiku-4-5-20251001",

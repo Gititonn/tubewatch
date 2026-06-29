@@ -53,7 +53,9 @@ In 3-4 short paragraphs, explain:
 3. **Why It Spread** — emotional or shareability factors
 4. **Steal This** — one concrete thing a creator should copy in their next video
 
-Be specific and tactical, not generic.`;
+Be specific and tactical, not generic.
+
+Close with "**Your Move:**" — 3 bullets: (1) a specific title formula to steal from this video, (2) the hook structure to copy in their next video, (3) one content angle to test based on this video's success.`;
 
   const stream = await anthropic.messages.stream({
     model: "claude-haiku-4-5-20251001",

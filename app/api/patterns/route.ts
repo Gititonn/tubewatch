@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getUserPlan, isPaidPlan } from "@/lib/plan";
 
 const PATTERNS = [
   { name: "Numbered list", regex: /^\d+\s/i },
@@ -18,6 +19,11 @@ export async function GET(request: Request) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const plan = await getUserPlan(supabase, user.id);
+  if (!isPaidPlan(plan)) {
+    return NextResponse.json({ error: "Upgrade to Pro to unlock this feature." }, { status: 402 });
+  }
 
   const { searchParams } = new URL(request.url);
   const channelId = searchParams.get("channelId");

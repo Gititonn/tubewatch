@@ -43,6 +43,7 @@ export default function PatternsPage() {
   const [channels, setChannels] = useState<{ id: string; channel_name: string }[]>([]);
   const [selectedChannel, setSelectedChannel] = useState("");
   const [loading, setLoading] = useState(true);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
 
   useEffect(() => {
     fetch("/api/competitors/channels")
@@ -59,6 +60,11 @@ export default function PatternsPage() {
     const params = new URLSearchParams({ minVideos: "5" });
     if (selectedChannel) params.set("channelId", selectedChannel);
     const res = await fetch(`/api/patterns?${params}`);
+    if (res.status === 402) {
+      setUpgradeRequired(true);
+      setLoading(false);
+      return;
+    }
     const json = await res.json();
     setData(json);
     setLoading(false);
@@ -68,7 +74,7 @@ export default function PatternsPage() {
   const tooFewVideos = data && !hasData && typeof data.totalVideos === "number" && data.totalVideos < 5;
 
   return (
-    <div className="p-8 max-w-6xl" style={{ color: "#fff" }}>
+    <div className="p-4 md:p-8 max-w-6xl" style={{ color: "#fff" }}>
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Title & Hook Patterns</h1>
         <p style={{ color: "#888", fontSize: 14 }}>
@@ -92,34 +98,89 @@ export default function PatternsPage() {
         </select>
       </div>
 
-      {loading ? (
+      {upgradeRequired ? (
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", padding: "2rem" }}>
+          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔒</div>
+          <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: "0.5rem" }}>Title &amp; Hook Patterns is a Pro Feature</h2>
+          <p style={{ color: "#666", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
+          <a href="/billing" style={{ background: "#00ff87", color: "#000", fontWeight: 700, padding: "0.75rem 1.5rem", borderRadius: "0.75rem", textDecoration: "none" }}>Upgrade to Pro →</a>
+        </div>
+      ) : loading ? (
         <div style={{ color: "#555", paddingTop: 48, textAlign: "center" }}>Loading…</div>
       ) : !hasData ? (
-        <div
-          className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-          style={{ borderColor: "#2a2a2a", background: "#111" }}
-        >
-          <div className="text-4xl mb-4">📊</div>
-          <p className="font-semibold mb-1">
-            {channels.length === 0
-              ? "Add and sync competitor channels to build your pattern library"
-              : "Not enough data yet"}
-          </p>
-          <p style={{ color: "#555", fontSize: 14 }}>
-            {tooFewVideos
-              ? `Need at least 5 videos to detect patterns (${data!.totalVideos} found)`
-              : "Need at least 5 videos to detect patterns"}
-          </p>
-        </div>
+        channels.length === 0 ? (
+          <div>
+            <div
+              className="rounded-xl border flex flex-col items-center justify-center py-16 text-center mb-8"
+              style={{ borderColor: "#2a2a2a", background: "#111" }}
+            >
+              <div className="text-6xl mb-4">🎯</div>
+              <h2 className="text-xl font-black text-white mb-3">Decode What Makes Competitors Win</h2>
+              <p style={{ color: "#666", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
+                Patterns analyzes title formulas, hook structures, and content strategies from channels you track.{" "}
+                The more competitors you add, the sharper the insights.
+              </p>
+              <a
+                href="/competitors"
+                className="mt-6 inline-block px-5 py-2.5 rounded-lg text-sm font-semibold"
+                style={{ border: "1px solid #00ff87", color: "#00ff87", background: "transparent", textDecoration: "none" }}
+              >
+                Add Your First Competitor →
+              </a>
+            </div>
+
+            <div
+              className="grid gap-4"
+              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", opacity: 0.4, pointerEvents: "none", filter: "blur(1px)" }}
+            >
+              {[
+                { name: "How To / Tutorial", count: 14, avg: "7.4", bar: 82, vs: "2.8" },
+                { name: "Number List (e.g. 5 Ways)", count: 9, avg: "5.1", bar: 60, vs: "2.1" },
+                { name: "Personal Story Hook", count: 6, avg: "9.3", bar: 95, vs: "3.0" },
+              ].map((p, i) => (
+                <div key={i} style={{ background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 16 }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold" style={{ fontSize: 15 }}>{p.name}</span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-md" style={{ background: "rgba(0,255,135,0.1)", border: "1px solid rgba(0,255,135,0.26)", color: "#00ff87" }}>
+                      🔥 {p.avg}x avg
+                    </span>
+                  </div>
+                  <p style={{ color: "#888", fontSize: 12, marginBottom: 10 }}>{p.count} matching videos</p>
+                  <div style={{ background: "#1a1a1a", height: 6, borderRadius: 3, marginBottom: 4, overflow: "hidden" }}>
+                    <div style={{ width: `${p.bar}%`, height: "100%", background: "#00ff87", borderRadius: 3 }} />
+                  </div>
+                  <p style={{ color: "#888", fontSize: 12, marginBottom: 12 }}>{p.vs}x the average</p>
+                  <div>
+                    <p style={{ color: "#555", fontSize: 11, marginBottom: 6 }}>Best example:</p>
+                    <div className="flex items-center gap-2">
+                      <div style={{ width: 64, height: 36, background: "#1a1a1a", borderRadius: 4, flexShrink: 0 }} />
+                      <p style={{ color: "#ccc", fontSize: 12 }}>Sample video title here</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div
+            className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
+            style={{ borderColor: "#2a2a2a", background: "#111" }}
+          >
+            <div className="text-4xl mb-4">📊</div>
+            <p className="font-semibold mb-1">Not enough data yet</p>
+            <p style={{ color: "#555", fontSize: 14 }}>
+              {tooFewVideos
+                ? `Need at least 5 videos to detect patterns (${data!.totalVideos} found)`
+                : "Need at least 5 videos to detect patterns"}
+            </p>
+          </div>
+        )
       ) : (
         <>
           {data!.summary && (
             <div
               className="rounded-xl mb-6 px-5 py-4"
-              style={{
-                background: "rgba(0,255,135,0.08)",
-                border: "1px solid rgba(0,255,135,0.2)",
-              }}
+              style={{ background: "rgba(0,255,135,0.08)", border: "1px solid rgba(0,255,135,0.2)" }}
             >
               <p style={{ color: "#ccc", fontSize: 14, lineHeight: 1.6 }}>
                 {renderSummary(data!.summary)}
@@ -130,10 +191,7 @@ export default function PatternsPage() {
             </div>
           )}
 
-          <div
-            className="grid gap-4"
-            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))" }}
-          >
+          <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))" }}>
             {data!.patterns.map((p) => {
               const barWidth = Math.min((p.vsAverage / 3) * 100, 100);
               const color = scoreColor(p.avgOutlierScore);
@@ -142,24 +200,13 @@ export default function PatternsPage() {
               return (
                 <div
                   key={p.name}
-                  style={{
-                    background: "#111",
-                    border: "1px solid #2a2a2a",
-                    borderRadius: 12,
-                    padding: 16,
-                  }}
+                  style={{ background: "#111", border: "1px solid #2a2a2a", borderRadius: 12, padding: 16 }}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-semibold" style={{ fontSize: 15 }}>
-                      {p.name}
-                    </span>
+                    <span className="font-semibold" style={{ fontSize: 15 }}>{p.name}</span>
                     <span
                       className="text-xs font-bold px-2 py-0.5 rounded-md"
-                      style={{
-                        background: `${color}18`,
-                        border: `1px solid ${color}44`,
-                        color,
-                      }}
+                      style={{ background: `${color}18`, border: `1px solid ${color}44`, color }}
                     >
                       🔥 {p.avgOutlierScore}x avg
                     </span>
@@ -169,28 +216,12 @@ export default function PatternsPage() {
                     {p.matchCount} matching video{p.matchCount !== 1 ? "s" : ""}
                   </p>
 
-                  <div
-                    style={{
-                      background: "#1a1a1a",
-                      height: 6,
-                      borderRadius: 3,
-                      marginBottom: 4,
-                      overflow: "hidden",
-                    }}
-                  >
+                  <div style={{ background: "#1a1a1a", height: 6, borderRadius: 3, marginBottom: 4, overflow: "hidden" }}>
                     <div
-                      style={{
-                        width: `${barWidth}%`,
-                        height: "100%",
-                        background: "#00ff87",
-                        borderRadius: 3,
-                        transition: "width 0.4s ease",
-                      }}
+                      style={{ width: `${barWidth}%`, height: "100%", background: "#00ff87", borderRadius: 3, transition: "width 0.4s ease" }}
                     />
                   </div>
-                  <p style={{ color: "#888", fontSize: 12, marginBottom: 12 }}>
-                    {p.vsAverage}x the average
-                  </p>
+                  <p style={{ color: "#888", fontSize: 12, marginBottom: 12 }}>{p.vsAverage}x the average</p>
 
                   <div>
                     <p style={{ color: "#555", fontSize: 11, marginBottom: 6 }}>Best example:</p>
@@ -206,13 +237,7 @@ export default function PatternsPage() {
                         <img
                           src={p.topVideo.thumbnailUrl}
                           alt={p.topVideo.title}
-                          style={{
-                            width: 64,
-                            height: 36,
-                            objectFit: "cover",
-                            borderRadius: 4,
-                            flexShrink: 0,
-                          }}
+                          style={{ width: 64, height: 36, objectFit: "cover", borderRadius: 4, flexShrink: 0 }}
                         />
                       )}
                       <div className="flex-1 min-w-0">
@@ -231,14 +256,7 @@ export default function PatternsPage() {
                         </p>
                       </div>
                       {p.topVideo.outlierScore != null && (
-                        <span
-                          style={{
-                            color: scoreColor(p.topVideo.outlierScore),
-                            fontSize: 11,
-                            fontWeight: 700,
-                            flexShrink: 0,
-                          }}
-                        >
+                        <span style={{ color: scoreColor(p.topVideo.outlierScore), fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
                           {p.topVideo.outlierScore}x
                         </span>
                       )}

@@ -2,8 +2,19 @@ import { NextResponse } from "next/server";
 import { getChannelByHandle, getChannelVideos } from "@/lib/youtube";
 import { calculateOutlierScores } from "@/lib/outlier";
 import type { Video } from "@/lib/types";
+import { createClient } from "@/lib/supabase/server";
+import { getUserPlan, isPaidPlan } from "@/lib/plan";
 
 export async function GET(request: Request) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const plan = await getUserPlan(supabase, user.id);
+  if (!isPaidPlan(plan)) {
+    return NextResponse.json({ error: "Upgrade to Pro to unlock this feature." }, { status: 402 });
+  }
+
   const { searchParams } = new URL(request.url);
   const handle = searchParams.get("handle");
 
@@ -71,6 +82,7 @@ export async function GET(request: Request) {
         ? {
             title: topOutlier.title,
             views: topOutlier.view_count,
+            
             thumbnail: topOutlier.thumbnail_url,
             outlierScore: topOutlier.outlier_score,
           }
