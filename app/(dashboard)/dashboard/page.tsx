@@ -1,4 +1,5 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import Link from "next/link";
 import Image from "next/image";
 import ResyncButton from "./ResyncButton";
@@ -32,6 +33,9 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser();
 
   const serviceClient = createServiceClient();
+
+  // AI Coach is paid-gated; free users should be upsold, not sent into a 402.
+  const aiUnlocked = isPaidPlan(await getUserPlan(supabase, user!.id));
 
   // Channel (optional)
   const { data: channels } = await supabase
@@ -85,7 +89,7 @@ export default async function DashboardPage() {
     .limit(6);
 
   return (
-    <div className="p-6 max-w-6xl" style={{ color: "#fff" }}>
+    <div className="p-6 max-w-6xl" style={{ color: "var(--text-primary)" }}>
 
       {/* Connect banner — only shown if no channel */}
       {!channel && (
@@ -99,7 +103,7 @@ export default async function DashboardPage() {
           <div className="text-3xl">📺</div>
           <div className="flex-1">
             <div className="font-black text-white mb-0.5">Connect your YouTube channel</div>
-            <div className="text-sm" style={{ color: "#666" }}>
+            <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Add YOUR channel to see your outlier scores, revenue estimates, and personal stats on top of this feed.
             </div>
           </div>
@@ -119,7 +123,7 @@ export default async function DashboardPage() {
           <div
             className="rounded-2xl border p-5 flex items-center gap-4 mb-6 relative overflow-hidden"
             style={{
-              borderColor: "#2a2a2a",
+              borderColor: "var(--border)",
               background: "linear-gradient(135deg, #161616 0%, #111 60%, #0a1a0f 100%)",
             }}
           >
@@ -143,7 +147,7 @@ export default async function DashboardPage() {
             )}
             <div className="flex-1 min-w-0 relative z-10">
               <div className="font-black text-white text-lg" style={{ wordBreak: "break-word" }}>{channel.channel_name}</div>
-              <div className="text-sm" style={{ color: "#555" }}>
+              <div className="text-sm" style={{ color: "var(--text-muted)" }}>
                 {fmt(channel.subscriber_count ?? 0)} subscribers &middot; {videos.length} videos
               </div>
             </div>
@@ -175,7 +179,7 @@ export default async function DashboardPage() {
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-black mb-1" style={{ color: "#ff4444" }}>YOUR BIGGEST OUTLIER</div>
                   <div className="font-semibold text-white truncate text-sm mb-1">{topOutlier.title}</div>
-                  <div className="text-xs" style={{ color: "#888" }}>
+                  <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     {fmt(topOutlier.view_count ?? 0)} views &middot; {topOutlier.outlier_score.toFixed(1)}x your channel average
                   </div>
                 </div>
@@ -190,8 +194,8 @@ export default async function DashboardPage() {
       )}
 
 
-      {/* AI Strategy Card — always shown */}
-      <Link href="/ai">
+      {/* AI Strategy Card — always shown; free users are sent to billing, not a 402 */}
+      <Link href={aiUnlocked ? "/ai" : "/billing"}>
         <div
           className="rounded-2xl border p-5 mb-6 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.01]"
           style={{
@@ -209,17 +213,17 @@ export default async function DashboardPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <span className="font-black text-white">AI Strategy Coach</span>
-              <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>NEW</span>
+              <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>{aiUnlocked ? "NEW" : "PRO"}</span>
             </div>
-            <div className="text-sm" style={{ color: "#666" }}>
+            <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Ask Claude anything — title strategies, why videos go viral, how to grow faster.
             </div>
           </div>
           <div
             className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-black transition-all hover:scale-105"
-            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "var(--text-primary)" }}
           >
-            Ask AI →
+            {aiUnlocked ? "Ask AI →" : "Unlock with Pro →"}
           </div>
         </div>
       </Link>
@@ -236,7 +240,7 @@ export default async function DashboardPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border overflow-hidden block transition-all hover:border-blue-500/40 hover:scale-[1.02]"
-                style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
               >
                 {v.thumbnail_url && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -248,7 +252,7 @@ export default async function DashboardPage() {
                     {v.title}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs" style={{ color: "#555" }}>{fmt(v.view_count ?? 0)} views</span>
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fmt(v.view_count ?? 0)} views</span>
                     <span className="text-xs" style={{ color: "#3b82f6" }}>{v.channel_name}</span>
                   </div>
                 </div>
@@ -275,7 +279,7 @@ export default async function DashboardPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-xl border overflow-hidden block transition-all hover:border-red-500/40 hover:scale-[1.02]"
-                  style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
+                  style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                 >
                   {v.thumbnail_url && (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -287,7 +291,7 @@ export default async function DashboardPage() {
                       {v.title}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs" style={{ color: "#555" }}>{ch?.channel_name ?? ""}</span>
+                      <span className="text-xs" style={{ color: "var(--text-muted)" }}>{ch?.channel_name ?? ""}</span>
                       <span className="text-xs font-black px-1.5 py-0.5 rounded"
                         style={{ color: scoreColor, background: scoreColor + "20" }}>
                         {score.toFixed(1)}x
@@ -321,7 +325,7 @@ export default async function DashboardPage() {
                 style={{ borderColor: t.border, background: t.bg }}>
                 <div className="text-xl mb-2">{t.icon}</div>
                 <div className="font-bold text-sm mb-1" style={{ color: t.accent }}>{t.label}</div>
-                <div className="text-xs leading-relaxed" style={{ color: "#555" }}>{t.desc}</div>
+                <div className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{t.desc}</div>
               </div>
             </Link>
           ))}
@@ -340,14 +344,14 @@ export default async function DashboardPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-xl border overflow-hidden block hover:border-white/20 transition-colors"
-                style={{ borderColor: "#2a2a2a", background: "#111", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
               >
                 {v.thumbnail_url ? (
                   <Image src={v.thumbnail_url} alt={v.title ?? ""} width={320} height={180}
                     className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
                 ) : (
                   <div className="w-full flex items-center justify-center text-2xl"
-                    style={{ aspectRatio: "16/9", background: "#1a1a1a", color: "#333" }}>&#9654;</div>
+                    style={{ aspectRatio: "16/9", background: "var(--bg-card)", color: "var(--text-muted)" }}>&#9654;</div>
                 )}
                 <div className="p-3">
                   <p className="text-white text-xs font-semibold mb-2 leading-snug"
@@ -355,7 +359,7 @@ export default async function DashboardPage() {
                     {v.title}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs" style={{ color: "#555" }}>{fmt(v.view_count ?? 0)} views</span>
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fmt(v.view_count ?? 0)} views</span>
                     {v.outlier_score != null && v.outlier_score >= 1.2 && (
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded-md"
                         style={{
@@ -379,9 +383,9 @@ export default async function DashboardPage() {
 function SectionHeader({ label, href }: { label: string; href?: string }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: "#444" }}>{label}</h2>
+      <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>{label}</h2>
       {href && (
-        <Link href={href} className="text-xs" style={{ color: "#444" }}>See all</Link>
+        <Link href={href} className="text-xs" style={{ color: "var(--text-muted)" }}>See all</Link>
       )}
     </div>
   );
@@ -390,13 +394,13 @@ function SectionHeader({ label, href }: { label: string; href?: string }) {
 function StatCard({ label, value, icon, accent, sub }: { label: string; value: string; icon: string; accent: string; sub?: string }) {
   return (
     <div className="rounded-xl border p-4 flex flex-col gap-1 min-w-0"
-      style={{ borderColor: "#2a2a2a", background: `linear-gradient(135deg, ${accent}08 0%, #111 100%)` }}>
+      style={{ borderColor: "var(--border)", background: `linear-gradient(135deg, ${accent}08 0%, #111 100%)` }}>
       <div className="flex items-center gap-2">
         <span className="text-sm flex-shrink-0">{icon}</span>
-        <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: "#444" }}>{label}</span>
+        <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: "var(--text-muted)" }}>{label}</span>
       </div>
       <div className="text-2xl font-black mt-1 leading-tight break-all" style={{ color: accent }}>{value}</div>
-      {sub && <div className="text-xs truncate" style={{ color: "#444" }}>{sub}</div>}
+      {sub && <div className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{sub}</div>}
     </div>
   );
 }

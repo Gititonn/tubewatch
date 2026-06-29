@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
+import { STRIPE_PLAN_CONFIG } from "@/lib/plans";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" });
 }
 
-const PLAN_CONFIG = {
-  pro: { name: "TubeWatch Pro", unit_amount: 1900 },
-  growth: { name: "TubeWatch Growth", unit_amount: 4900 },
-} as const;
-
-type Plan = keyof typeof PLAN_CONFIG;
+type Plan = keyof typeof STRIPE_PLAN_CONFIG;
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -31,7 +27,7 @@ export async function POST(request: Request) {
     planParam = formData.get("plan")?.toString();
   }
   const plan: Plan = planParam === "growth" ? "growth" : "pro";
-  const planConfig = PLAN_CONFIG[plan];
+  const planConfig = STRIPE_PLAN_CONFIG[plan];
 
   const { data: profile } = await supabase
     .from("profiles")

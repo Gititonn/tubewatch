@@ -1,35 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { PLANS } from "@/lib/plans";
 
 type BillingStatus = {
   plan: "free" | "pro" | "growth";
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
 };
-
-const FREE_FEATURES = [
-  "1 competitor channel",
-  "30-day history",
-  "Basic outlier feed",
-  "Dashboard & videos",
-];
-
-const PRO_FEATURES = [
-  "10 competitor channels",
-  "Full history",
-  "🧠 AI \"Why It Worked\"",
-  "Trending & Rising",
-  "Patterns analysis",
-  "Compare tool",
-];
-
-const GROWTH_FEATURES = [
-  "Unlimited competitor channels",
-  "Everything in Pro",
-  "Priority sync (6h vs 24h)",
-  "API access (coming soon)",
-];
 
 function FeatureList({ features }: { features: string[] }) {
   return (
@@ -107,8 +85,8 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>$0<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
-              <FeatureList features={FREE_FEATURES} />
+              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.free.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <FeatureList features={PLANS.free.features} />
               <div className="mt-auto pt-6">
                 <div
                   className="w-full py-2 rounded-lg text-sm text-center"
@@ -138,8 +116,8 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>$19<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
-              <FeatureList features={PRO_FEATURES} />
+              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
                 {currentPlan === "pro" ? (
                   <a
@@ -164,7 +142,7 @@ export default function BillingPage() {
                       className="w-full py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
                       style={{ background: "#00ff87", color: "#000" }}
                     >
-                      Upgrade to Pro
+                      {PLANS.pro.ctaUpgrade}
                     </button>
                   </form>
                 )}
@@ -190,8 +168,8 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>$49<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
-              <FeatureList features={GROWTH_FEATURES} />
+              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
                 {currentPlan === "growth" ? (
                   <a
@@ -209,7 +187,7 @@ export default function BillingPage() {
                       className="w-full py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
                       style={{ background: "#00ff87", color: "#000" }}
                     >
-                      Upgrade to Growth
+                      {PLANS.growth.ctaUpgrade}
                     </button>
                   </form>
                 )}

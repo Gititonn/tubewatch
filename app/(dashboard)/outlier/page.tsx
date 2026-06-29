@@ -91,7 +91,7 @@ export default function OutlierPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Outlier Score</h1>
-          <p className="text-sm mt-1" style={{ color: "#888" }}>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             How each video performed vs. your channel median.
           </p>
         </div>
@@ -102,9 +102,9 @@ export default function OutlierPage() {
               onClick={() => setFilter(f)}
               className="px-3 py-1.5 rounded-lg text-sm font-medium capitalize transition-colors"
               style={{
-                background: filter === f ? "#00ff8720" : "#1a1a1a",
-                color: filter === f ? "#4ade80" : "#888",
-                border: `1px solid ${filter === f ? "#00ff87" : "#2a2a2a"}`,
+                background: filter === f ? "#00ff8720" : "var(--bg-card)",
+                color: filter === f ? "#4ade80" : "var(--text-secondary)",
+                border: `1px solid ${filter === f ? "#00ff87" : "var(--border)"}`,
               }}
             >
               {f}
@@ -113,14 +113,14 @@ export default function OutlierPage() {
         </div>
       </div>
 
-      {loading && <p style={{ color: "#888" }}>Loading videos…</p>}
+      {loading && <p style={{ color: "var(--text-secondary)" }}>Loading videos…</p>}
 
       {!loading && videos.length === 0 && (
-        <p style={{ color: "#888" }}>No videos yet. Connect and sync a channel first.</p>
+        <p style={{ color: "var(--text-secondary)" }}>No videos yet. Connect and sync a channel first.</p>
       )}
 
       {filtered.length > 0 && (
-        <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "#2a2a2a" }}>
+        <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>
           <table className="min-w-[820px] w-full text-sm">
             <colgroup>
               <col className="w-auto" />
@@ -131,12 +131,12 @@ export default function OutlierPage() {
               <col style={{ width: "100px" }} />
             </colgroup>
             <thead>
-              <tr style={{ borderBottom: "1px solid #2a2a2a", background: "#1a1a1a" }}>
-                <th className="text-left px-4 py-3 font-medium" style={{ color: "#888" }}>Video</th>
-                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "#888" }}>Published</th>
-                <th className="text-right px-4 py-3 font-medium" style={{ color: "#888" }}>Views</th>
-                <th className="text-right px-4 py-3 font-medium" style={{ color: "#888" }}>Duration</th>
-                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "#888" }}>Outlier Score</th>
+              <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-card)" }}>
+                <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Video</th>
+                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>Published</th>
+                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Views</th>
+                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Duration</th>
+                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>Outlier Score</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -146,7 +146,7 @@ export default function OutlierPage() {
                 return (
                   <Fragment key={v.id}>
                     <tr
-                      style={{ borderBottom: insights[v.id] ? "none" : "1px solid #1a1a1a" }}
+                      style={{ borderBottom: insights[v.id] ? "none" : "1px solid var(--border)" }}
                       className="hover:bg-white/[0.02]"
                     >
                       <td className="px-4 py-3">
@@ -163,13 +163,13 @@ export default function OutlierPage() {
                           <span className="text-white truncate">{v.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "#888" }}>
+                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
                         {v.published_at ? new Date(v.published_at).toLocaleDateString() : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "#ccc" }}>
+                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
                         {v.view_count.toLocaleString()}
                       </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "#888" }}>
+                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
                         {formatDuration(v.duration_seconds)}
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -180,18 +180,18 @@ export default function OutlierPage() {
                           onClick={() => fetchInsight(v)}
                           disabled={loadingInsight === v.id}
                           className="text-xs px-3 py-1.5 rounded-lg border whitespace-nowrap transition-colors hover:border-white disabled:opacity-40"
-                          style={{ borderColor: "#2a2a2a", color: "#888" }}
+                          style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
                         >
                           {loadingInsight === v.id ? "Analyzing…" : "Explain"}
                         </button>
                       </td>
                     </tr>
                     {insights[v.id] && (
-                      <tr style={{ borderBottom: "1px solid #1a1a1a" }}>
+                      <tr style={{ borderBottom: "1px solid var(--border)" }}>
                         <td colSpan={6} className="px-4 pb-4 pt-1">
                           <div
                             className="rounded-lg px-4 py-3 text-sm"
-                            style={{ background: "#111", color: "#aaa", border: "1px solid #2a2a2a", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
+                            style={{ background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                           >
                             <span style={{ color: "#4ade80", fontWeight: 700 }}>✦ AI Insight</span>
                             <div className="mt-1"><MarkdownContent content={insights[v.id]} /></div>
@@ -207,9 +207,9 @@ export default function OutlierPage() {
         </div>
       )}
 
-      <div className="mt-6 flex gap-6 text-xs" style={{ color: "#555" }}>
+      <div className="mt-6 flex gap-6 text-xs" style={{ color: "var(--text-muted)" }}>
         <span><span style={{ color: "#22c55e" }}>●</span> &gt;2.0× = Outlier 🚀</span>
-        <span><span style={{ color: "#888" }}>●</span> 0.5–2.0× = Normal</span>
+        <span><span style={{ color: "var(--text-secondary)" }}>●</span> 0.5–2.0× = Normal</span>
         <span><span style={{ color: "#ef4444" }}>●</span> &lt;0.5× = Underperformer 📉</span>
       </div>
     </div>
@@ -225,7 +225,7 @@ function ScoreBadge({
 }) {
   const styles = {
     outlier: { background: "rgba(34,197,94,0.15)", color: "#22c55e" },
-    normal: { background: "rgba(136,136,136,0.15)", color: "#888" },
+    normal: { background: "rgba(136,136,136,0.15)", color: "var(--text-secondary)" },
     underperformer: { background: "rgba(239,68,68,0.15)", color: "#ef4444" },
   };
   return (

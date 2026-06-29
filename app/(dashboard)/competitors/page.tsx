@@ -120,11 +120,11 @@ export default function CompetitorsPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl" style={{ color: "#fff" }}>
+    <div className="p-8 max-w-5xl" style={{ color: "var(--text-primary)" }}>
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold mb-1">Competitor Channels</h1>
-          <p style={{ color: "#888", fontSize: 14 }}>
+          <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
             Track competitor channels and surface their breakout videos.
           </p>
         </div>
@@ -138,17 +138,17 @@ export default function CompetitorsPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "#555", paddingTop: 48, textAlign: "center" }}>
+        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>
           Loading…
         </div>
       ) : channels.length === 0 ? (
         <div
           className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-          style={{ borderColor: "#2a2a2a", background: "#111" }}
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
         >
           <div className="text-4xl mb-4">🎯</div>
           <p className="font-semibold mb-1">No competitor channels yet</p>
-          <p style={{ color: "#555", fontSize: 14 }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 14 }}>
             Add channels to start tracking outlier videos.
           </p>
         </div>
@@ -158,7 +158,7 @@ export default function CompetitorsPage() {
             <div
               key={ch.id}
               className="flex items-center gap-4 rounded-xl border px-5 py-4"
-              style={{ borderColor: "#2a2a2a", background: "#111" }}
+              style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
             >
               {ch.thumbnail_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -170,7 +170,7 @@ export default function CompetitorsPage() {
               ) : (
                 <div
                   className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-lg font-bold"
-                  style={{ background: "#2a2a2a" }}
+                  style={{ background: "var(--border)" }}
                 >
                   {ch.channel_name[0]}
                 </div>
@@ -180,14 +180,14 @@ export default function CompetitorsPage() {
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="font-semibold truncate">{ch.channel_name}</span>
                   {ch.channel_handle && (
-                    <span style={{ color: "#555", fontSize: 13 }}>
+                    <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
                       @{ch.channel_handle.replace(/^@/, "")}
                     </span>
                   )}
                 </div>
                 <div
                   className="flex gap-4 text-xs"
-                  style={{ color: "#888" }}
+                  style={{ color: "var(--text-secondary)" }}
                 >
                   <span>{fmt(ch.subscriber_count)} subs</span>
                   <span>{ch.video_count ?? "—"} videos synced</span>
@@ -201,7 +201,7 @@ export default function CompetitorsPage() {
                   onClick={() => handleSync(ch.id)}
                   disabled={syncing === ch.id}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity hover:opacity-70 disabled:opacity-40"
-                  style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#ccc" }}
+                  style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
                 >
                   {syncing === ch.id ? "Syncing…" : "Sync Now"}
                 </button>
@@ -209,7 +209,7 @@ export default function CompetitorsPage() {
                   onClick={() => handleDelete(ch.id)}
                   disabled={deleting === ch.id}
                   className="px-3 py-1.5 rounded-lg text-xs font-medium transition-opacity hover:opacity-70 disabled:opacity-40"
-                  style={{ background: "#1a1a1a", border: "1px solid #3a1a1a", color: "#ff4444" }}
+                  style={{ background: "var(--bg-card)", border: "1px solid #3a1a1a", color: "#ff4444" }}
                 >
                   {deleting === ch.id ? "…" : "Remove"}
                 </button>
@@ -228,13 +228,13 @@ export default function CompetitorsPage() {
         >
           <div
             className="w-full max-w-lg rounded-2xl border p-6"
-            style={{ background: "#111", borderColor: "#2a2a2a" }}
+            style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}
           >
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">Add Competitor Channel</h2>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ color: "#555" }}
+                style={{ color: "var(--text-muted)" }}
                 className="hover:text-white transition-colors text-xl leading-none"
               >
                 ×
@@ -249,9 +249,9 @@ export default function CompetitorsPage() {
                 placeholder="Channel name, @handle, or URL…"
                 className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
                 style={{
-                  background: "#1a1a1a",
-                  border: "1px solid #2a2a2a",
-                  color: "#fff",
+                  background: "var(--bg-card)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-primary)",
                 }}
               />
               <button
@@ -270,7 +270,7 @@ export default function CompetitorsPage() {
                   <div
                     key={r.channelId}
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5"
-                    style={{ background: "#1a1a1a", border: "1px solid #2a2a2a" }}
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
                   >
                     {r.thumbnail ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -282,14 +282,14 @@ export default function CompetitorsPage() {
                     ) : (
                       <div
                         className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold"
-                        style={{ background: "#2a2a2a" }}
+                        style={{ background: "var(--border)" }}
                       >
                         {(r.name ?? "?")[0]}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm truncate">{r.name}</div>
-                      <div style={{ color: "#555", fontSize: 12 }}>
+                      <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
                         {fmt(r.subscriberCount)} subscribers
                       </div>
                     </div>
@@ -307,7 +307,7 @@ export default function CompetitorsPage() {
             )}
 
             {!searching && searchQuery && searchResults.length === 0 && (
-              <p style={{ color: "#555", fontSize: 13, textAlign: "center", paddingTop: 8 }}>
+              <p style={{ color: "var(--text-muted)", fontSize: 13, textAlign: "center", paddingTop: 8 }}>
                 No channels found. Try a different name or handle.
               </p>
             )}

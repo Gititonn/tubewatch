@@ -43,8 +43,8 @@ function StatRow({ label, values, highlight }: {
   const minVal = Math.min(...nums);
 
   return (
-    <tr style={{ borderBottom: "1px solid #1a1a1a" }}>
-      <td className="py-3 pr-4 text-sm font-medium" style={{ color: "#666", width: "140px" }}>
+    <tr style={{ borderBottom: "1px solid var(--border)" }}>
+      <td className="py-3 pr-4 text-sm font-medium" style={{ color: "var(--text-secondary)", width: "140px" }}>
         {label}
       </td>
       {values.map((v, i) => {
@@ -115,8 +115,8 @@ export default function ComparePage() {
       <div className="p-4 md:p-8 max-w-7xl">
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", padding: "2rem" }}>
           <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔒</div>
-          <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: "0.5rem" }}>Compare Channels is a Pro Feature</h2>
-          <p style={{ color: "#666", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
+          <h2 style={{ color: "var(--text-primary)", fontWeight: 800, marginBottom: "0.5rem" }}>Compare Channels is a Pro Feature</h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
           <a href="/billing" style={{ background: "#00ff87", color: "#000", fontWeight: 700, padding: "0.75rem 1.5rem", borderRadius: "0.75rem", textDecoration: "none" }}>Upgrade to Pro →</a>
         </div>
       </div>
@@ -126,14 +126,14 @@ export default function ComparePage() {
   return (
     <div className="p-4 md:p-8 max-w-7xl">
       <h1 className="text-2xl font-bold text-white mb-2">Compare Channels</h1>
-      <p className="text-sm mb-8" style={{ color: "#666" }}>
+      <p className="text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
         Add up to 4 YouTube channels to compare side by side.
       </p>
 
       {/* Search bar */}
       <div className="flex gap-3 mb-8">
-        <div className="flex-1 flex items-center gap-3 px-4 rounded-xl border" style={{ background: "#1a1a1a", borderColor: "#2a2a2a" }}>
-          <span style={{ color: "#555" }}>@</span>
+        <div className="flex-1 flex items-center gap-3 px-4 rounded-xl border" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
+          <span style={{ color: "var(--text-muted)" }}>@</span>
           <input
             className="flex-1 bg-transparent py-3 text-white text-sm outline-none"
             placeholder="channelhandle"
@@ -160,10 +160,10 @@ export default function ComparePage() {
       )}
 
       {channels.length === 0 && (
-        <div className="rounded-xl border p-16 text-center" style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}>
+        <div className="rounded-xl border p-16 text-center" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
           <div className="text-5xl mb-4">📊</div>
           <p className="text-white font-semibold mb-2">No channels added yet</p>
-          <p className="text-sm" style={{ color: "#555" }}>
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Search any YouTube channel by handle to start comparing.
           </p>
           <div className="mt-6 flex gap-2 justify-center flex-wrap">
@@ -172,7 +172,7 @@ export default function ComparePage() {
                 key={ex}
                 onClick={() => { setHandle(ex.replace("@", "")); }}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:bg-white/10"
-                style={{ background: "#222", color: "#888", border: "1px solid #2a2a2a" }}
+                style={{ background: "#222", color: "var(--text-secondary)", border: "1px solid var(--border)" }}
               >
                 {ex}
               </button>
@@ -186,11 +186,11 @@ export default function ComparePage() {
           {/* Channel header cards */}
           <div className="grid gap-4 mb-8" style={{ gridTemplateColumns: `repeat(${channels.length}, 1fr)` }}>
             {channels.map((ch) => (
-              <div key={ch.id} className="rounded-xl border p-5 relative" style={{ background: "#1a1a1a", borderColor: "#2a2a2a" }}>
+              <div key={ch.id} className="rounded-xl border p-5 relative" style={{ background: "var(--bg-card)", borderColor: "var(--border)" }}>
                 <button
                   onClick={() => removeChannel(ch.id)}
                   className="absolute top-3 right-3 w-6 h-6 rounded-full text-xs flex items-center justify-center transition-colors hover:bg-white/10"
-                  style={{ color: "#555" }}
+                  style={{ color: "var(--text-muted)" }}
                 >
                   ✕
                 </button>
@@ -200,7 +200,7 @@ export default function ComparePage() {
                   )}
                   <div>
                     <div className="font-bold text-white text-sm leading-tight">{ch.name}</div>
-                    <div className="text-xs" style={{ color: "#555" }}>{ch.handle}</div>
+                    <div className="text-xs" style={{ color: "var(--text-muted)" }}>{ch.handle}</div>
                   </div>
                 </div>
                 <div className="text-2xl font-black" style={{ color: "#00ff87" }}>
@@ -210,23 +210,23 @@ export default function ComparePage() {
                     ? (ch.subscribers / 1_000).toFixed(1) + "K"
                     : ch.subscribers.toLocaleString()}
                 </div>
-                <div className="text-xs mt-0.5" style={{ color: "#555" }}>subscribers</div>
+                <div className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>subscribers</div>
               </div>
             ))}
           </div>
 
           {/* Stats table */}
-          <div className="rounded-xl border overflow-hidden mb-8" style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}>
-            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "#2a2a2a" }}>
+          <div className="rounded-xl border overflow-hidden mb-8" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
+            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "var(--border)" }}>
               Stats Comparison
             </div>
             <div className="p-5">
               <table className="w-full">
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #2a2a2a" }}>
-                    <th className="py-2 text-left text-xs font-medium" style={{ color: "#444", width: "140px" }}>Metric</th>
+                  <tr style={{ borderBottom: "1px solid var(--border)" }}>
+                    <th className="py-2 text-left text-xs font-medium" style={{ color: "var(--text-muted)", width: "140px" }}>Metric</th>
                     {channels.map((ch) => (
-                      <th key={ch.id} className="py-2 px-4 text-center text-xs font-medium truncate" style={{ color: "#444" }}>
+                      <th key={ch.id} className="py-2 px-4 text-center text-xs font-medium truncate" style={{ color: "var(--text-muted)" }}>
                         {ch.name}
                       </th>
                     ))}
@@ -259,13 +259,13 @@ export default function ComparePage() {
           </div>
 
           {/* Top outlier videos */}
-          <div className="rounded-xl border overflow-hidden mb-8" style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}>
-            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "#2a2a2a" }}>
+          <div className="rounded-xl border overflow-hidden mb-8" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
+            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "var(--border)" }}>
               🔥 Top Outlier Video (per channel)
             </div>
             <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${channels.length}, 1fr)`, background: "#2a2a2a" }}>
               {channels.map((ch) => (
-                <div key={ch.id} className="p-4" style={{ background: "#1a1a1a" }}>
+                <div key={ch.id} className="p-4" style={{ background: "var(--bg-card)" }}>
                   {ch.topOutlier ? (
                     <>
                       {ch.topOutlier.thumbnail && (
@@ -279,7 +279,7 @@ export default function ComparePage() {
                       )}
                       <p className="text-white text-xs font-semibold mb-2 line-clamp-2">{ch.topOutlier.title}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs" style={{ color: "#555" }}>
+                        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
                           {ch.topOutlier.views.toLocaleString()} views
                         </span>
                         <span
@@ -295,7 +295,7 @@ export default function ComparePage() {
                       </div>
                     </>
                   ) : (
-                    <p className="text-sm" style={{ color: "#555" }}>No data</p>
+                    <p className="text-sm" style={{ color: "var(--text-muted)" }}>No data</p>
                   )}
                 </div>
               ))}
@@ -303,13 +303,13 @@ export default function ComparePage() {
           </div>
 
           {/* Recent videos breakdown */}
-          <div className="rounded-xl border overflow-hidden" style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}>
-            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "#2a2a2a" }}>
+          <div className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
+            <div className="px-5 py-3 border-b text-sm font-semibold text-white" style={{ borderColor: "var(--border)" }}>
               Recent Videos
             </div>
             <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${channels.length}, 1fr)`, background: "#2a2a2a" }}>
               {channels.map((ch) => (
-                <div key={ch.id} className="p-4" style={{ background: "#1a1a1a" }}>
+                <div key={ch.id} className="p-4" style={{ background: "var(--bg-card)" }}>
                   <div className="space-y-2">
                     {ch.recentVideos.map((v, i) => (
                       <div key={i} className="flex items-start gap-2">
@@ -324,7 +324,7 @@ export default function ComparePage() {
                         </span>
                         <div className="min-w-0">
                           <p className="text-white text-xs leading-snug line-clamp-2">{v.title}</p>
-                          <p className="text-xs mt-0.5" style={{ color: "#555" }}>{v.views.toLocaleString()} views</p>
+                          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>{v.views.toLocaleString()} views</p>
                         </div>
                       </div>
                     ))}

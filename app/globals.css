@@ -2,39 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══ DARK MODE (default) ═══════════════════════════════════════════ */
 :root {
-  --bg: #0f0f0f;
-  --card: #1a1a1a;
-  --border: #2a2a2a;
-  --accent: #00ff87;
-  --text-primary: #ffffff;
-  --text-secondary: #888888;
+  --bg:            #0B0F19;
+  --bg-card:       #111827;
+  --bg-sidebar:    #080D16;
+  --border:        rgba(255,255,255,0.07);
+  --accent:        #10B981;
+  --accent-glow:   rgba(16,185,129,0.12);
+  --accent-ai:     #6366F1;
+  --text-primary:  #F9FAFB;
+  --text-secondary:#9CA3AF;
+  --text-muted:    #4B5563;
+  --nav-label:     #404040;
+  --scrollbar:     rgba(255,255,255,0.1);
 }
 
-* {
-  box-sizing: border-box;
+/* ═══ LIGHT MODE ════════════════════════════════════════════════════ */
+html.light {
+  --bg:            #F8FAFC;
+  --bg-card:       #FFFFFF;
+  --bg-sidebar:    #0F172A;
+  --border:        #E2E8F0;
+  --accent:        #059669;
+  --accent-glow:   #ECFDF5;
+  --accent-ai:     #4F46E5;
+  --text-primary:  #0F172A;
+  --text-secondary:#475569;
+  --text-muted:    #94A3B8;
+  --nav-label:     #64748B;
+  --scrollbar:     #CBD5E1;
 }
+
+* { box-sizing: border-box; }
 
 body {
   background-color: var(--bg);
   color: var(--text-primary);
   font-family: var(--font-inter), system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/* Light mode: flip hardcoded dark card colors */
+html.light [style*="background: \"#1a1a1a\""],
+html.light [style*="background: \"#111\""],
+html.light [style*="background: \"#111827\""],
+html.light [style*='background: "#1a1a1a"'],
+html.light [style*='background: "#111"'] {
+  background: var(--bg-card) !important;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg);
+html.light [style*="borderColor: \"#2a2a2a\""],
+html.light [style*='borderColor: "#2a2a2a"'],
+html.light [style*="border: \"1px solid #2a2a2a\""],
+html.light [style*='border: "1px solid #2a2a2a"'] {
+  border-color: var(--border) !important;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+  .text-balance { text-wrap: balance; }
 }

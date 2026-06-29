@@ -122,10 +122,10 @@ export default function OutliersPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-6xl" style={{ color: "#fff" }}>
+    <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
-        <p style={{ color: "#888", fontSize: 14 }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
           Competitor videos that massively outperformed their channel&apos;s average.
         </p>
       </div>
@@ -137,9 +137,9 @@ export default function OutliersPage() {
           onChange={(e) => setSelectedChannel(e.target.value)}
           className="px-3 py-2 rounded-lg text-sm outline-none"
           style={{
-            background: "#1a1a1a",
-            border: "1px solid #2a2a2a",
-            color: "#ccc",
+            background: "var(--bg-card)",
+            border: "1px solid var(--border)",
+            color: "var(--text-secondary)",
           }}
         >
           <option value="">All Channels</option>
@@ -168,7 +168,7 @@ export default function OutliersPage() {
         </div>
 
         {!loading && (
-          <span style={{ color: "#555", fontSize: 13, marginLeft: "auto" }}>
+          <span style={{ color: "var(--text-muted)", fontSize: 13, marginLeft: "auto" }}>
             {outliers.length} video{outliers.length !== 1 ? "s" : ""}
           </span>
         )}
@@ -176,18 +176,18 @@ export default function OutliersPage() {
 
       {/* Content */}
       {loading ? (
-        <div style={{ color: "#555", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
       ) : outliers.length === 0 ? (
         channels.length === 0 ? (
           <div>
             {/* Rich empty state — no competitors tracked */}
             <div
               className="rounded-xl border flex flex-col items-center justify-center py-16 text-center mb-8"
-              style={{ borderColor: "#2a2a2a", background: "#111" }}
+              style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
             >
               <div className="text-6xl mb-4">🔥</div>
               <h2 className="text-xl font-black text-white mb-3">See Every Video Crushing Its Channel Average</h2>
-              <p style={{ color: "#666", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
+              <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
                 The Outlier Feed surfaces competitor videos scoring 3x+ above their channel median — your direct pipeline to proven formats you can adapt.
               </p>
               <a
@@ -231,9 +231,9 @@ export default function OutliersPage() {
                   ? { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" }
                   : { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };
                 return (
-                  <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: "#2a2a2a", background: "#111" }}>
-                    <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
-                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "#333", fontSize: 24 }}>▶</div>
+                  <div key={i} className="rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}>
+                    <div className="relative" style={{ paddingBottom: "56.25%", background: "var(--bg-card)" }}>
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "var(--text-muted)", fontSize: 24 }}>▶</div>
                       <div
                         className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold"
                         style={{ background: colors.bg, border: `1px solid ${colors.border}`, color: colors.text }}
@@ -242,24 +242,24 @@ export default function OutliersPage() {
                       </div>
                     </div>
                     <div className="p-3">
-                      <p className="font-medium mb-2 leading-snug" style={{ fontSize: 14, color: "#fff" }}>{v.title}</p>
+                      <p className="font-medium mb-2 leading-snug" style={{ fontSize: 14, color: "var(--text-primary)" }}>{v.title}</p>
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "#2a2a2a" }}>
                           {v.channel[0]}
                         </div>
-                        <span style={{ fontSize: 12, color: "#888" }}>{v.channel}</span>
-                        <span style={{ fontSize: 12, color: "#444", marginLeft: "auto" }}>
+                        <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{v.channel}</span>
+                        <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: "auto" }}>
                           {new Date(v.published).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3" style={{ fontSize: 12, color: "#666" }}>
+                      <div className="flex items-center gap-3" style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                         <span>👁 {v.views >= 1000 ? (v.views / 1000).toFixed(0) + "K" : v.views}</span>
                         <span>👍 {v.likes >= 1000 ? (v.likes / 1000).toFixed(1) + "K" : v.likes}</span>
                         <span>💬 {v.comments}</span>
                       </div>
                     </div>
                     <div className="px-3 pb-3">
-                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#888" }}>
+                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}>
                         🧠 Why It Worked
                       </div>
                     </div>
@@ -271,11 +271,11 @@ export default function OutliersPage() {
         ) : (
           <div
             className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-            style={{ borderColor: "#2a2a2a", background: "#111" }}
+            style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
           >
             <div className="text-4xl mb-4">🔥</div>
             <p className="font-semibold mb-1">No outlier videos found</p>
-            <p style={{ color: "#555", fontSize: 14 }}>Try lowering the minimum score or syncing your channels.</p>
+            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Try lowering the minimum score or syncing your channels.</p>
           </div>
         )
       ) : (
@@ -294,7 +294,7 @@ export default function OutliersPage() {
               <div
                 key={v.id}
                 className="rounded-xl border overflow-hidden"
-                style={{ borderColor: "#2a2a2a", background: "#111" }}
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
               >
                 {/* Clickable link area */}
                 <a
@@ -305,7 +305,7 @@ export default function OutliersPage() {
                   style={{ textDecoration: "none" }}
                 >
                   {/* Thumbnail */}
-                  <div className="relative" style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}>
+                  <div className="relative" style={{ paddingBottom: "56.25%", background: "var(--bg-card)" }}>
                     {v.thumbnail_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -314,7 +314,7 @@ export default function OutliersPage() {
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "#333" }}>
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: "var(--text-muted)" }}>
                         ▶
                       </div>
                     )}
@@ -338,7 +338,7 @@ export default function OutliersPage() {
                       className="font-medium mb-2 leading-snug"
                       style={{
                             fontSize: 14,
-                        color: "#fff",
+                        color: "var(--text-primary)",
                         display: "-webkit-box",
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: "vertical" as const,
@@ -365,14 +365,14 @@ export default function OutliersPage() {
                           {ch?.channel_name?.[0] ?? "?"}
                         </div>
                       )}
-                      <span style={{ fontSize: 12, color: "#888" }}>{ch?.channel_name}</span>
-                      <span style={{ fontSize: 12, color: "#444", marginLeft: "auto" }}>
+                      <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{ch?.channel_name}</span>
+                      <span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: "auto" }}>
                         {fmtDate(v.published_at)}
                       </span>
                     </div>
 
                     {/* Stats */}
-                    <div className="flex items-center gap-3" style={{ fontSize: 12, color: "#666" }}>
+                    <div className="flex items-center gap-3" style={{ fontSize: 12, color: "var(--text-secondary)" }}>
                       <span>👁 {fmt(v.view_count)}</span>
                       <span>👍 {fmt(v.like_count)}</span>
                       <span>💬 {fmt(v.comment_count)}</span>
@@ -394,7 +394,7 @@ export default function OutliersPage() {
                       )
                     }
                     className="mt-2 w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
-                    style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#888" }}
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
                   >
                     🧠 Why It Worked
                   </button>
@@ -409,16 +409,16 @@ export default function OutliersPage() {
       {whyItWorked && (
         <div
           className="fixed right-0 top-0 bottom-0 z-50 flex flex-col border-l overflow-y-auto"
-          style={{ width: 420, background: "#111", borderColor: "#2a2a2a" }}
+          style={{ width: 420, background: "var(--bg-card)", borderColor: "var(--border)" }}
         >
           <div
             className="flex items-center justify-between p-4 border-b flex-shrink-0"
-            style={{ borderColor: "#2a2a2a" }}
+            style={{ borderColor: "var(--border)" }}
           >
             <span className="font-semibold text-sm">🧠 Why It Worked</span>
             <button
               onClick={() => setWhyItWorked(null)}
-              style={{ color: "#555" }}
+              style={{ color: "var(--text-muted)" }}
               className="hover:text-white text-xl leading-none"
             >
               ×
@@ -426,9 +426,9 @@ export default function OutliersPage() {
           </div>
           <div className="p-4 flex-1">
             {whyItWorked.loading ? (
-              <p style={{ color: "#555", fontSize: 13 }}>Analyzing…</p>
+              <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Analyzing…</p>
             ) : (
-              <div style={{ color: "#ccc", fontSize: 13 }}>
+              <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>
                 <MarkdownContent content={whyItWorked.content} />
               </div>
             )}

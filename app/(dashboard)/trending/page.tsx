@@ -129,10 +129,10 @@ export default function TrendingPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl" style={{ color: "#fff" }}>
+    <div className="p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1">Trending on YouTube</h1>
-        <p style={{ color: "#888", fontSize: 14 }}>
+        <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
           What&apos;s breaking through right now — across all categories.
         </p>
       </div>
@@ -159,7 +159,7 @@ export default function TrendingPage() {
           value={region}
           onChange={(e) => setRegion(e.target.value)}
           className="px-3 py-2 rounded-lg text-sm outline-none"
-          style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#ccc" }}
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
         >
           {REGIONS.map((r) => (
             <option key={r.value} value={r.value}>
@@ -186,25 +186,25 @@ export default function TrendingPage() {
         </div>
 
         {!loading && !error && (
-          <span style={{ color: "#555", fontSize: 13, marginLeft: "auto" }}>
+          <span style={{ color: "var(--text-muted)", fontSize: 13, marginLeft: "auto" }}>
             {videos.length} video{videos.length !== 1 ? "s" : ""}
           </span>
         )}
       </div>
 
       {loading ? (
-        <div style={{ color: "#555", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
       ) : error ? (
         <div
           className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-          style={{ borderColor: "#2a2a2a", background: "#111" }}
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
         >
           <p className="font-semibold mb-2" style={{ color: "#fca5a5" }}>
             Failed to load trending videos
           </p>
-          <p style={{ color: "#555", fontSize: 14 }}>{error}</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 14 }}>{error}</p>
           {(error.toLowerCase().includes("api") || error.toLowerCase().includes("key")) && (
-            <p style={{ color: "#555", fontSize: 13, marginTop: 8 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 8 }}>
               Make sure YOUTUBE_API_KEY is set in your environment variables.
             </p>
           )}
@@ -212,10 +212,10 @@ export default function TrendingPage() {
       ) : videos.length === 0 ? (
         <div
           className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"
-          style={{ borderColor: "#2a2a2a", background: "#111" }}
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
         >
           <p className="font-semibold mb-1">No videos found</p>
-          <p style={{ color: "#555", fontSize: 14 }}>Try a different region or category.</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Try a different region or category.</p>
         </div>
       ) : (
         <div
@@ -226,7 +226,7 @@ export default function TrendingPage() {
             <div
               key={v.youtubeVideoId}
               className="rounded-xl border overflow-hidden"
-              style={{ borderColor: "#2a2a2a", background: "#111" }}
+              style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
             >
               <a
                 href={`https://youtube.com/watch?v=${v.youtubeVideoId}`}
@@ -236,7 +236,7 @@ export default function TrendingPage() {
               >
                 <div
                   className="relative"
-                  style={{ paddingBottom: "56.25%", background: "#1a1a1a" }}
+                  style={{ paddingBottom: "56.25%", background: "var(--bg-card)" }}
                 >
                   {v.thumbnailUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -248,7 +248,7 @@ export default function TrendingPage() {
                   ) : (
                     <div
                       className="absolute inset-0 flex items-center justify-center"
-                      style={{ color: "#333" }}
+                      style={{ color: "var(--text-muted)" }}
                     >
                       ▶
                     </div>
@@ -267,7 +267,7 @@ export default function TrendingPage() {
                     className="font-medium mb-1 leading-snug"
                     style={{
                       fontSize: 14,
-                      color: "#fff",
+                      color: "var(--text-primary)",
                       display: "-webkit-box",
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: "vertical" as const,
@@ -278,11 +278,11 @@ export default function TrendingPage() {
                   </p>
                 </a>
 
-                <p style={{ fontSize: 12, color: "#888", marginBottom: 8 }}>{v.channelName}</p>
+                <p style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 8 }}>{v.channelName}</p>
 
                 <div
                   className="flex items-center gap-3 mb-3"
-                  style={{ fontSize: 12, color: "#666" }}
+                  style={{ fontSize: 12, color: "var(--text-secondary)" }}
                 >
                   <span>👁 {fmt(v.viewCount)}</span>
                   <span>{fmtDate(v.publishedAt)}</span>
@@ -327,7 +327,7 @@ export default function TrendingPage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-xs" style={{ color: "#ccc" }}><MarkdownContent content={aiText[v.youtubeVideoId]} /></div>
+                      <div className="text-xs" style={{ color: "var(--text-secondary)" }}><MarkdownContent content={aiText[v.youtubeVideoId]} /></div>
                     )}
                   </div>
                 )}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FeatureCarousel from "./feature-carousel";
+import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 
 const cards = [
   { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
@@ -65,7 +66,7 @@ export default function Home() {
             className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold border-2"
             style={{ borderColor: "#00ff87", color: "#00ff87", background: "rgba(0,255,135,0.08)" }}
           >
-            ✨ Beta — Free for early creators
+            ✨ Now in beta
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight max-w-3xl">
@@ -201,18 +202,18 @@ export default function Home() {
             <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
               <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>FREE</p>
               <div className="flex items-end gap-1 mb-6">
-                  <span className="text-4xl font-black text-white">$0</span>
+                  <span className="text-4xl font-black text-white">${PLANS.free.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
               <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {["1 competitor channel", "30-day history", "Basic outlier feed", "Dashboard & video stats"].map(f => (
+                {PLANS.free.features.map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
                     <span style={{ color: "#00ff87" }}>✓</span> {f}
                   </li>
                 ))}
               </ul>
               <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
-                Get started free
+                {PLANS.free.ctaFree}
               </a>
             </div>
 
@@ -223,25 +224,18 @@ export default function Home() {
               </div>
               <p className="text-sm font-bold mb-2" style={{ color: "#00ff87" }}>PRO</p>
               <div className="flex items-end gap-1 mb-6">
-                <span className="text-4xl font-black text-white">$19</span>
+                <span className="text-4xl font-black text-white">${PLANS.pro.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
               <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {[
-                  "10 competitor channels",
-                  "Full history (unlimited)",
-                  '🧠 AI "Why It Worked" analysis',
-                  "Trending & Rising pages",
-                  "Patterns analysis",
-                  "Channel compare tool",
-                ].map(f => (
+                {PLANS.pro.features.map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#ccc" }}>
                     <span style={{ color: "#00ff87" }}>✓</span> {f}
                   </li>
                 ))}
               </ul>
               <a href="/signup" className="block text-center py-3 rounded-xl font-black transition-transform hover:scale-105" style={{ background: "#00ff87", color: "#000" }}>
-                Start Pro →
+                {PLANS.pro.ctaUpgrade} →
               </a>
             </div>
 
@@ -249,30 +243,24 @@ export default function Home() {
             <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
               <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>GROWTH</p>
               <div className="flex items-end gap-1 mb-6">
-                <span className="text-4xl font-black text-white">$49</span>
+                <span className="text-4xl font-black text-white">${PLANS.growth.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
               <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {[
-                  "Unlimited competitor channels",
-                  "Everything in Pro",
-                  "Priority sync (every 6h)",
-                  "API access (coming soon)",
-                  "Early access to new features",
-                ].map(f => (
+                {PLANS.growth.features.map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
                     <span style={{ color: "#00ff87" }}>✓</span> {f}
                   </li>
                 ))}
               </ul>
               <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
-                Start Growth →
+                {PLANS.growth.ctaUpgrade} →
               </a>
             </div>
           </div>
 
           <p className="text-center mt-8 text-sm" style={{ color: "#444" }}>
-            All plans include a 7-day free trial · No credit card required to start · Cancel anytime
+            {PRICING_FOOTNOTE}
           </p>
         </section>
 
@@ -288,7 +276,7 @@ export default function Home() {
             className="inline-block px-12 py-4 rounded-xl font-black text-black text-xl transition-transform hover:scale-105"
             style={{ background: "#00ff87", boxShadow: "0 0 40px rgba(0,255,135,0.35)" }}
           >
-            Start for free →
+            {PLANS.free.ctaFree} →
           </a>
         </div>
 

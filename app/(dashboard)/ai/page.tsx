@@ -56,7 +56,7 @@ export default function AIPage() {
   }
 
   return (
-    <div className="p-8 max-w-3xl" style={{ color: "#fff" }}>
+    <div className="p-8 max-w-3xl" style={{ color: "var(--text-primary)" }}>
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
@@ -71,14 +71,14 @@ export default function AIPage() {
             <p className="text-sm font-semibold" style={{ color: "#a855f7" }}>Powered by Claude · Built for creators</p>
           </div>
         </div>
-        <p style={{ color: "#666" }}>
+        <p style={{ color: "var(--text-secondary)" }}>
           Ask anything about YouTube growth, video strategy, or what&apos;s working right now. Instant AI answers tuned for 0–100K channels.
         </p>
       </div>
 
       {/* Quick prompts */}
       <div className="mb-6">
-        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "#444" }}>Tap to ask</p>
+        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>Tap to ask</p>
         <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 1fr" }}>
           {PROMPTS.map((p) => (
             <button
@@ -101,7 +101,7 @@ export default function AIPage() {
 
       {/* Custom question */}
       <div className="mb-6">
-        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "#444" }}>Ask your own question</p>
+        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>Ask your own question</p>
         <div className="flex gap-2">
           <input
             value={question}
@@ -109,13 +109,13 @@ export default function AIPage() {
             onKeyDown={(e) => e.key === "Enter" && ask(question)}
             placeholder="e.g. Why do reaction videos outperform original content?"
             className="flex-1 px-4 py-3 rounded-xl text-sm outline-none"
-            style={{ background: "#111", border: "1px solid #2a2a2a", color: "#fff" }}
+            style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
           />
           <button
             onClick={() => ask(question)}
             disabled={loading || !question.trim()}
             className="px-5 py-3 rounded-xl font-black text-sm transition-all hover:scale-105 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "var(--text-primary)" }}
           >
             Ask AI
           </button>
@@ -152,7 +152,7 @@ export default function AIPage() {
 
       {/* Feature cards */}
       <div>
-        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "#444" }}>AI is everywhere in TubeWatch</p>
+        <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>AI is everywhere in TubeWatch</p>
         <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr" }}>
           {[
             { icon: "⭐", title: "Outlier Score", desc: "Hit “Explain” on any video to get a Claude breakdown of why it over- or under-performed", href: "/outlier" },
@@ -168,7 +168,7 @@ export default function AIPage() {
             >
               <div className="text-xl mb-2">{c.icon}</div>
               <div className="font-bold text-sm text-white mb-1">{c.title}</div>
-              <div className="text-xs leading-relaxed" style={{ color: "#555" }}>{c.desc}</div>
+              <div className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{c.desc}</div>
             </a>
           ))}
         </div>

@@ -9,6 +9,18 @@ export const metadata: Metadata = {
   description: "YouTube analytics built for creators who aren't famous yet.",
 };
 
+// Inline script prevents flash of wrong theme on load
+const themeScript = `
+(function() {
+  try {
+    var theme = localStorage.getItem('tw-theme');
+    if (theme === 'light') {
+      document.documentElement.classList.add('light');
+    }
+  } catch(e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -16,6 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
