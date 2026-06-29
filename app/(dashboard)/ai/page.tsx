@@ -1,4 +1,5 @@
 "use client";
+import { MarkdownContent } from "@/components/MarkdownContent";
 import { useState } from "react";
 
 const PROMPTS = [
@@ -142,9 +143,9 @@ export default function AIPage() {
             )}
           </div>
           {answer && (
-            <p className="text-sm leading-7" style={{ color: "#ddd", whiteSpace: "pre-wrap" }}>
-              {answer}
-            </p>
+            <div className="text-sm" style={{ color: "#ddd" }}>
+              <MarkdownContent content={answer} />
+            </div>
           )}
         </div>
       )}

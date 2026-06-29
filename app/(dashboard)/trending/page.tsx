@@ -1,4 +1,5 @@
 "use client"
+import { MarkdownContent } from "@/components/MarkdownContent";
 import { useState, useEffect } from "react"
 
 type VideoItem = {
@@ -326,7 +327,7 @@ export default function TrendingPage() {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs leading-relaxed" style={{ color: "#ccc" }}>{aiText[v.youtubeVideoId]}</p>
+                      <div className="text-xs" style={{ color: "#ccc" }}><MarkdownContent content={aiText[v.youtubeVideoId]} /></div>
                     )}
                   </div>
                 )}

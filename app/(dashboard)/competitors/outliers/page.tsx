@@ -1,4 +1,5 @@
 "use client";
+import { MarkdownContent } from "@/components/MarkdownContent";
 import { useState, useEffect } from "react";
 
 type CompetitorChannel = {
@@ -103,16 +104,6 @@ export default function OutliersPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ videoId, title, viewCount, outlierScore, channelName, publishedAt }),
     });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      setWhyItWorked({
-        videoId,
-        content: data.error ?? "Unable to generate analysis.",
-        loading: false,
-      });
-      return;
-    }
 
     if (!res.body) return;
     const reader = res.body.getReader();
@@ -349,16 +340,9 @@ export default function OutliersPage() {
             {whyItWorked.loading ? (
               <p style={{ color: "#555", fontSize: 13 }}>Analyzing…</p>
             ) : (
-              <p
-                style={{
-                  color: "#ccc",
-                  fontSize: 13,
-                  lineHeight: 1.7,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {whyItWorked.content}
-              </p>
+              <div style={{ color: "#ccc", fontSize: 13 }}>
+                <MarkdownContent content={whyItWorked.content} />
+              </div>
             )}
           </div>
         </div>

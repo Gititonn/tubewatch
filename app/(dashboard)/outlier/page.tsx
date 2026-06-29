@@ -1,4 +1,5 @@
 "use client";
+import { MarkdownContent } from "@/components/MarkdownContent";
 
 import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
@@ -192,8 +193,8 @@ export default function OutlierPage() {
                             className="rounded-lg px-4 py-3 text-sm"
                             style={{ background: "#111", color: "#aaa", border: "1px solid #2a2a2a" }}
                           >
-                            <span style={{ color: "#00ff87" }}>✦ AI Insight: </span>
-                            {insights[v.id]}
+                            <span style={{ color: "#00ff87", fontWeight: 700 }}>✦ AI Insight</span>
+                            <div className="mt-1"><MarkdownContent content={insights[v.id]} /></div>
                           </div>
                         </td>
                       </tr>
