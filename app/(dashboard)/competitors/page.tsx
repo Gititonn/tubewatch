@@ -68,6 +68,18 @@ export default function CompetitorsPage() {
     setLoading(false);
   }
 
+  function openModal() {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowModal(true);
+  }
+
+  function closeModal() {
+    setShowModal(false);
+    setSearchQuery("");
+    setSearchResults([]);
+  }
+
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (!searchQuery.trim()) return;
@@ -129,7 +141,7 @@ export default function CompetitorsPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={openModal}
           className="px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80"
           style={{ background: "#00ff87", color: "#000" }}
         >
@@ -224,7 +236,7 @@ export default function CompetitorsPage() {
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(0,0,0,0.8)" }}
-          onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
+          onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
           <div
             className="w-full max-w-lg rounded-2xl border p-6"
@@ -233,7 +245,7 @@ export default function CompetitorsPage() {
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">Add Competitor Channel</h2>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 style={{ color: "var(--text-muted)" }}
                 className="hover:text-white transition-colors text-xl leading-none"
               >

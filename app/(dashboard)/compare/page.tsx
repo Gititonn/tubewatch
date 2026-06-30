@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ProLockScreen } from "@/components/ProLockScreen";
+import { useUserPlan, isPaid } from "@/lib/use-user-plan";
 
 interface ChannelData {
   id: string;
@@ -74,6 +76,7 @@ export default function ComparePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [upgradeRequired, setUpgradeRequired] = useState(false);
+  const plan = useUserPlan();
 
   async function addChannel() {
     const h = handle.trim().replace(/^@/, "");
@@ -110,15 +113,19 @@ export default function ComparePage() {
     setChannels((prev) => prev.filter((c) => c.id !== id));
   }
 
-  if (upgradeRequired) {
+  // Show the Pro lock up front (before any interaction) for free users.
+  if (plan === null) {
     return (
       <div className="p-4 md:p-8 max-w-7xl">
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", padding: "2rem" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔒</div>
-          <h2 style={{ color: "var(--text-primary)", fontWeight: 800, marginBottom: "0.5rem" }}>Compare Channels is a Pro Feature</h2>
-          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
-          <a href="/billing" style={{ background: "#00ff87", color: "#000", fontWeight: 700, padding: "0.75rem 1.5rem", borderRadius: "0.75rem", textDecoration: "none" }}>Upgrade to Pro →</a>
-        </div>
+        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (upgradeRequired || !isPaid(plan)) {
+    return (
+      <div className="p-4 md:p-8 max-w-7xl">
+        <ProLockScreen feature="Compare Channels" />
       </div>
     );
   }

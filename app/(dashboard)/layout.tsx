@@ -4,6 +4,7 @@ import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import { NavSections } from "./nav-sections";
 import { MobileNav } from "./MobileNav";
 import { ThemeToggle } from "./ThemeToggle";
+import { RouteReset } from "./route-reset";
 
 export const dynamic = "force-dynamic";
 
@@ -60,7 +61,7 @@ export default async function DashboardLayout({
       </aside>
 
       <main className="flex-1 overflow-auto" style={{ background: "var(--bg)" }}>
-        {children}
+        <RouteReset>{children}</RouteReset>
       </main>
     </div>
   );

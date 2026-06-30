@@ -8,16 +8,20 @@ export function NavLink({
   icon,
   badge,
   ai,
+  active,
   children,
 }: {
   href: string;
   icon: string;
   badge?: string;
   ai?: boolean;
+  /** Active state resolved centrally (see resolveActiveHref). Falls back to local match if omitted. */
+  active?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+  const isActive =
+    active ?? (pathname === href || (href !== "/dashboard" && pathname.startsWith(href)));
 
   if (ai) {
     return (

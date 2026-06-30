@@ -167,7 +167,9 @@ export default function OutliersPage() {
           ))}
         </div>
 
-        {!loading && (
+        {/* Only show the real count once channels are tracked — avoids "0 videos"
+            sitting above the sample preview cards. */}
+        {!loading && channels.length > 0 && (
           <span style={{ color: "var(--text-muted)", fontSize: 13, marginLeft: "auto" }}>
             {outliers.length} video{outliers.length !== 1 ? "s" : ""}
           </span>
@@ -208,6 +210,20 @@ export default function OutliersPage() {
               >
                 Add Your First Competitor →
               </a>
+            </div>
+
+            {/* Sample-data label so the muted preview cards below aren't mistaken
+                for the user's real feed. */}
+            <div className="flex items-center gap-2 mb-3">
+              <span
+                className="px-2 py-0.5 rounded-md text-xs font-bold"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
+              >
+                PREVIEW
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                Sample data — add a competitor to see your real Outlier Feed.
+              </span>
             </div>
 
             {/* Ghost preview cards */}

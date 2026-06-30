@@ -51,3 +51,26 @@ export const NAV_BOTTOM: NavItem[] = [
   { href: "/billing", icon: "💳", label: "Billing" },
   { href: "/settings", icon: "⚙", label: "Settings" },
 ];
+
+/** Every nav href, used to resolve the single active item. */
+export const ALL_NAV_HREFS: string[] = [
+  ...NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.href)),
+  ...NAV_BOTTOM.map((i) => i.href),
+];
+
+/**
+ * Returns the single href that should be highlighted for `pathname`, using
+ * longest-prefix matching so a nested route (e.g. /competitors/outliers) wins
+ * over its parent (/competitors) instead of highlighting both.
+ */
+export function resolveActiveHref(pathname: string, hrefs: string[] = ALL_NAV_HREFS): string | null {
+  let best: string | null = null;
+  for (const href of hrefs) {
+    const isMatch =
+      href === "/dashboard"
+        ? pathname === href
+        : pathname === href || pathname.startsWith(href + "/");
+    if (isMatch && (best === null || href.length > best.length)) best = href;
+  }
+  return best;
+}

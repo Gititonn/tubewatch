@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
 
 export const dynamic = "force-dynamic";
@@ -113,7 +114,7 @@ export default async function SettingsPage() {
           <div>
             <div className="text-white font-semibold capitalize">{profile?.plan ?? "free"}</div>
             <div className="text-sm mt-0.5" style={{ color: "#555" }}>
-              {isPro ? "Full access to all features" : "Limited to 50 videos per channel"}
+              {isPro ? "Full access to all features" : PLANS.free.tagline}
             </div>
           </div>
           {isPro ? (
@@ -131,7 +132,7 @@ export default async function SettingsPage() {
                 className="px-4 py-2 rounded-lg font-semibold text-black text-sm transition-opacity hover:opacity-90"
                 style={{ background: "#00ff87" }}
               >
-                Upgrade to Pro · $19/mo
+                Upgrade to Pro · ${PLANS.pro.priceMonthly}/mo
               </button>
             </form>
           )}
@@ -141,10 +142,9 @@ export default async function SettingsPage() {
           <div className="mt-4 pt-4 border-t" style={{ borderColor: "#2a2a2a" }}>
             <p className="text-xs mb-3" style={{ color: "#555" }}>Pro includes:</p>
             <div className="text-sm space-y-1.5" style={{ color: "#888" }}>
-              <div>✓ Unlimited video tracking</div>
-              <div>✓ Unlimited AI insights</div>
-              <div>✓ Daily auto-sync</div>
-              <div>✓ Export CSV reports</div>
+              {PLANS.pro.features.map((f) => (
+                <div key={f}>✓ {f}</div>
+              ))}
             </div>
           </div>
         )}

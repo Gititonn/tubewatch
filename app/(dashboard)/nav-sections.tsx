@@ -1,8 +1,9 @@
 "use client";
 
 import { Fragment } from "react";
+import { usePathname } from "next/navigation";
 import { NavLink } from "./nav-link";
-import { NAV_SECTIONS, NAV_BOTTOM } from "./nav-config";
+import { NAV_SECTIONS, NAV_BOTTOM, resolveActiveHref } from "./nav-config";
 
 /**
  * Renders the full nav (section headers + items + pinned bottom group) from the
@@ -13,6 +14,9 @@ import { NAV_SECTIONS, NAV_BOTTOM } from "./nav-config";
  * which must be `flex flex-col gap-0.5 flex-1` for spacing + mt-auto to work.
  */
 export function NavSections({ aiBadge }: { aiBadge: string }) {
+  const pathname = usePathname();
+  const activeHref = resolveActiveHref(pathname);
+
   return (
     <>
       {NAV_SECTIONS.map((section) => (
@@ -34,6 +38,7 @@ export function NavSections({ aiBadge }: { aiBadge: string }) {
               icon={item.icon}
               ai={item.ai}
               badge={item.ai ? aiBadge : undefined}
+              active={item.href === activeHref}
             >
               {item.label}
             </NavLink>
@@ -43,7 +48,7 @@ export function NavSections({ aiBadge }: { aiBadge: string }) {
 
       <div className="mt-auto pt-4 flex flex-col gap-0.5">
         {NAV_BOTTOM.map((item) => (
-          <NavLink key={item.href} href={item.href} icon={item.icon}>
+          <NavLink key={item.href} href={item.href} icon={item.icon} active={item.href === activeHref}>
             {item.label}
           </NavLink>
         ))}

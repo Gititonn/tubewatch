@@ -1,5 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
+import { ProLockScreen } from "@/components/ProLockScreen";
+import { useUserPlan, isPaid } from "@/lib/use-user-plan";
 
 type PatternResult = {
   name: string;
@@ -44,6 +46,7 @@ export default function PatternsPage() {
   const [selectedChannel, setSelectedChannel] = useState("");
   const [loading, setLoading] = useState(true);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
+  const plan = useUserPlan();
 
   useEffect(() => {
     fetch("/api/competitors/channels")
@@ -73,6 +76,23 @@ export default function PatternsPage() {
   const hasData = data && data.patterns.length > 0;
   const tooFewVideos = data && !hasData && typeof data.totalVideos === "number" && data.totalVideos < 5;
 
+  // Pro-gate up front so the filter controls don't render over the lock screen.
+  if (plan === null) {
+    return (
+      <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
+        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+      </div>
+    );
+  }
+
+  if (upgradeRequired || !isPaid(plan)) {
+    return (
+      <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
+        <ProLockScreen feature="Title & Hook Patterns" />
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
       <div className="mb-8">
@@ -98,14 +118,7 @@ export default function PatternsPage() {
         </select>
       </div>
 
-      {upgradeRequired ? (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", textAlign: "center", padding: "2rem" }}>
-          <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔒</div>
-          <h2 style={{ color: "var(--text-primary)", fontWeight: 800, marginBottom: "0.5rem" }}>Title &amp; Hook Patterns is a Pro Feature</h2>
-          <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>Available on Pro — $19/mo. Unlock unlimited competitors, AI insights, and advanced analytics.</p>
-          <a href="/billing" style={{ background: "#00ff87", color: "#000", fontWeight: 700, padding: "0.75rem 1.5rem", borderRadius: "0.75rem", textDecoration: "none" }}>Upgrade to Pro →</a>
-        </div>
-      ) : loading ? (
+      {loading ? (
         <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
       ) : !hasData ? (
         channels.length === 0 ? (
