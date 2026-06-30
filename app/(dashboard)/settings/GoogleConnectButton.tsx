@@ -23,7 +23,7 @@ export default function GoogleConnectButton({ isConnected }: { isConnected: bool
       {toast && (
         <div
           className="fixed top-6 right-6 px-4 py-3 rounded-xl text-sm font-semibold z-50"
-          style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "white" }}
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
         >
           {toast}
         </div>
@@ -34,7 +34,7 @@ export default function GoogleConnectButton({ isConnected }: { isConnected: bool
         className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm flex-shrink-0 transition-all hover:scale-105"
         style={
           isConnected
-            ? { background: "#1a1a1a", color: "#555", border: "1px solid #2a2a2a" }
+            ? { background: "var(--bg-card)", color: "var(--text-secondary)", border: "1px solid var(--border)" }
             : { background: "#00ff87", color: "#000" }
         }
       >

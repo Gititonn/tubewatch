@@ -79,13 +79,13 @@ export default function AnalyticsChart() {
     return (
       <div
         className="rounded-xl border p-8 text-center"
-        style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}
+        style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
       >
         <div className="text-3xl mb-3">📊</div>
-        <p className="text-white font-semibold mb-1 text-sm">
+        <p className="text-foreground font-semibold mb-1 text-sm">
           Connect Google for live charts
         </p>
-        <p className="text-xs mb-4" style={{ color: "#555" }}>
+        <p className="text-xs mb-4" style={{ color: "var(--text-secondary)" }}>
           Daily views, subscriber growth, and watch time — all in real time.
         </p>
         <a
@@ -102,16 +102,16 @@ export default function AnalyticsChart() {
   return (
     <div
       className="rounded-xl border p-5"
-      style={{ borderColor: "#2a2a2a", background: "#1a1a1a" }}
+      style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
     >
       {/* Header row */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-sm font-semibold text-white">
+          <div className="text-sm font-semibold text-foreground">
             {activeMetric.label} over time
           </div>
           {totals && !loading && (
-            <div className="text-xs mt-0.5" style={{ color: "#555" }}>
+            <div className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
               {fmt(totalVal ?? 0)} total in last {range} days
             </div>
           )}
@@ -125,8 +125,8 @@ export default function AnalyticsChart() {
               onClick={() => setRange(r.days)}
               className="px-2.5 py-1 rounded-lg text-xs font-semibold transition-all"
               style={{
-                background: range === r.days ? "#00ff87" : "#222",
-                color: range === r.days ? "#000" : "#555",
+                background: range === r.days ? "#00ff87" : "var(--bg)",
+                color: range === r.days ? "#000" : "var(--text-secondary)",
               }}
             >
               {r.label}
@@ -143,7 +143,7 @@ export default function AnalyticsChart() {
             onClick={() => setMetric(m.key as typeof metric)}
             className="px-3 py-1 rounded-lg text-xs font-semibold transition-all"
             style={{
-              color: metric === m.key ? m.color : "#555",
+              color: metric === m.key ? m.color : "var(--text-secondary)",
               background: metric === m.key ? m.color + "18" : "transparent",
               border: `1px solid ${metric === m.key ? m.color + "44" : "transparent"}`,
             }}
@@ -156,11 +156,11 @@ export default function AnalyticsChart() {
       {/* Chart */}
       {loading ? (
         <div className="h-40 flex items-center justify-center">
-          <div className="text-sm" style={{ color: "#444" }}>Loading…</div>
+          <div className="text-sm" style={{ color: "var(--text-muted)" }}>Loading…</div>
         </div>
       ) : rows.length === 0 ? (
         <div className="h-40 flex items-center justify-center">
-          <div className="text-sm" style={{ color: "#444" }}>No data for this period</div>
+          <div className="text-sm" style={{ color: "var(--text-muted)" }}>No data for this period</div>
         </div>
       ) : (
         <>
@@ -190,10 +190,10 @@ export default function AnalyticsChart() {
 
           {/* X-axis labels (just first and last date) */}
           <div className="flex justify-between mt-2">
-            <span className="text-xs" style={{ color: "#333" }}>
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
               {rows[0]?.date}
             </span>
-            <span className="text-xs" style={{ color: "#333" }}>
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>
               {rows[rows.length - 1]?.date}
             </span>
           </div>
@@ -204,7 +204,7 @@ export default function AnalyticsChart() {
       {totals && !loading && (
         <div
           className="grid grid-cols-4 gap-3 mt-4 pt-4 border-t"
-          style={{ borderColor: "#222" }}
+          style={{ borderColor: "var(--border)" }}
         >
           {[
             { label: "Views", val: fmt(totals.views) },
@@ -213,10 +213,10 @@ export default function AnalyticsChart() {
             { label: "Watch hours", val: fmt(totals.watchHours) },
           ].map((s) => (
             <div key={s.label}>
-              <div className="text-xs" style={{ color: "#444" }}>{s.label}</div>
+              <div className="text-xs" style={{ color: "var(--text-muted)" }}>{s.label}</div>
               <div
                 className="text-sm font-bold mt-0.5"
-                style={{ color: s.color ?? "white" }}
+                style={{ color: s.color ?? "var(--text-primary)" }}
               >
                 {s.val}
               </div>

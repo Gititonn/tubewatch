@@ -157,9 +157,9 @@ export default function OutliersPage() {
               onClick={() => setMinScore(opt.value)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
               style={{
-                background: minScore === opt.value ? "#00ff87" : "#1a1a1a",
-                color: minScore === opt.value ? "#000" : "#888",
-                border: `1px solid ${minScore === opt.value ? "#00ff87" : "#2a2a2a"}`,
+                background: minScore === opt.value ? "#00ff87" : "var(--bg-card)",
+                color: minScore === opt.value ? "#000" : "var(--text-secondary)",
+                border: `1px solid ${minScore === opt.value ? "#00ff87" : "var(--border)"}`,
               }}
             >
               {opt.label}
@@ -188,7 +188,7 @@ export default function OutliersPage() {
               style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
             >
               <div className="text-6xl mb-4">🔥</div>
-              <h2 className="text-xl font-black text-white mb-3">See Every Video Crushing Its Channel Average</h2>
+              <h2 className="text-xl font-black text-foreground mb-3">See Every Video Crushing Its Channel Average</h2>
               <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
                 The Outlier Feed surfaces competitor videos scoring 3x+ above their channel median — your direct pipeline to proven formats you can adapt.
               </p>
@@ -435,7 +435,7 @@ export default function OutliersPage() {
             <button
               onClick={() => setWhyItWorked(null)}
               style={{ color: "var(--text-muted)" }}
-              className="hover:text-white text-xl leading-none"
+              className="hover:text-foreground text-xl leading-none"
             >
               ×
             </button>

@@ -77,7 +77,7 @@ export default function AIPage() {
             🧠
           </div>
           <div>
-            <h1 className="text-2xl font-black text-white">AI Strategy Coach</h1>
+            <h1 className="text-2xl font-black text-foreground">AI Strategy Coach</h1>
             <p className="text-sm font-semibold" style={{ color: "#a855f7" }}>Powered by the TubeWatch AI Engine · Built for creators</p>
           </div>
         </div>
@@ -98,9 +98,9 @@ export default function AIPage() {
               style={{
                 background: activePrompt === p
                   ? "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(139,92,246,0.1))"
-                  : "rgba(255,255,255,0.03)",
-                border: `1px solid ${activePrompt === p ? "rgba(168,85,247,0.5)" : "#2a2a2a"}`,
-                color: activePrompt === p ? "#e9d5ff" : "#888",
+                  : "var(--bg-card)",
+                border: `1px solid ${activePrompt === p ? "rgba(168,85,247,0.5)" : "var(--border)"}`,
+                color: activePrompt === p ? "var(--text-primary)" : "var(--text-secondary)",
               }}
             >
               {p}
@@ -125,7 +125,7 @@ export default function AIPage() {
             onClick={() => ask(question)}
             disabled={loading || !question.trim()}
             className="px-5 py-3 rounded-xl font-black text-sm transition-all hover:scale-105 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "var(--text-primary)" }}
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
           >
             Ask AI
           </button>
@@ -138,7 +138,7 @@ export default function AIPage() {
           className="rounded-2xl border p-6 mb-8"
           style={{
             borderColor: "rgba(168,85,247,0.3)",
-            background: "linear-gradient(135deg, rgba(168,85,247,0.06) 0%, rgba(10,10,10,1) 60%)",
+            background: "var(--bg-card)",
           }}
         >
           <div className="flex items-center gap-2 mb-4">
@@ -153,7 +153,7 @@ export default function AIPage() {
             )}
           </div>
           {answer && (
-            <div className="text-sm" style={{ color: "#ddd" }}>
+            <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
               <MarkdownContent content={answer} />
             </div>
           )}
@@ -177,7 +177,7 @@ export default function AIPage() {
               style={{ borderColor: "rgba(168,85,247,0.2)", background: "rgba(168,85,247,0.04)" }}
             >
               <div className="text-xl mb-2">{c.icon}</div>
-              <div className="font-bold text-sm text-white mb-1">{c.title}</div>
+              <div className="font-bold text-sm text-foreground mb-1">{c.title}</div>
               <div className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{c.desc}</div>
             </a>
           ))}

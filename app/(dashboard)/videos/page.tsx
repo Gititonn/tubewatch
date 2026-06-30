@@ -27,11 +27,11 @@ export default async function VideosPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <h1 className="text-2xl font-bold text-white mb-6">Videos</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-6">Videos</h1>
 
       {!channel && (
         <p style={{ color: "var(--text-secondary)" }}>
-          <Link href="/connect" className="underline" style={{ color: "#00ff87" }}>Connect a channel</Link> to see your videos.
+          <Link href="/connect" className="underline" style={{ color: "var(--accent)" }}>Connect a channel</Link> to see your videos.
         </p>
       )}
 
@@ -55,7 +55,7 @@ export default async function VideosPage() {
                     {v.thumbnail_url && (
                       <Image src={v.thumbnail_url} alt={v.title ?? ""} width={64} height={36} className="rounded object-cover flex-shrink-0" />
                     )}
-                    <span className="text-white line-clamp-2 max-w-xs">{v.title}</span>
+                    <span className="text-foreground line-clamp-2 max-w-xs">{v.title}</span>
                   </td>
                   <td className="px-4 py-3 text-right" style={{ color: "var(--text-secondary)" }}>{v.view_count?.toLocaleString()}</td>
                   <td className="px-4 py-3 text-right" style={{ color: "var(--text-secondary)" }}>{v.like_count?.toLocaleString()}</td>

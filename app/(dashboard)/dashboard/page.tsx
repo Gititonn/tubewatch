@@ -221,7 +221,7 @@ export default async function DashboardPage() {
           </div>
           <div
             className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-black transition-all hover:scale-105"
-            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "var(--text-primary)" }}
+            style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
           >
             {aiUnlocked ? "Ask AI →" : "Unlock with Pro →"}
           </div>
@@ -268,7 +268,7 @@ export default async function DashboardPage() {
                   <img src={v.thumbnail_url} alt={v.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
                 )}
                 <div className="p-3">
-                  <p className="text-white text-xs font-semibold mb-1 leading-snug"
+                  <p className="text-foreground text-xs font-semibold mb-1 leading-snug"
                     style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                     {v.title}
                   </p>
@@ -307,7 +307,7 @@ export default async function DashboardPage() {
                     <img src={v.thumbnail_url} alt={v.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
                   )}
                   <div className="p-3">
-                    <p className="text-white text-xs font-semibold mb-2 leading-snug"
+                    <p className="text-foreground text-xs font-semibold mb-2 leading-snug"
                       style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
                       {v.title}
                     </p>

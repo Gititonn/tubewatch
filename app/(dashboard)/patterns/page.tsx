@@ -128,7 +128,7 @@ export default function PatternsPage() {
               style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
             >
               <div className="text-6xl mb-4">🎯</div>
-              <h2 className="text-xl font-black text-white mb-3">Decode What Makes Competitors Win</h2>
+              <h2 className="text-xl font-black text-foreground mb-3">Decode What Makes Competitors Win</h2>
               <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
                 Patterns analyzes title formulas, hook structures, and content strategies from channels you track.{" "}
                 The more competitors you add, the sharper the insights.

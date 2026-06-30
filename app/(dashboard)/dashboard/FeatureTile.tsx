@@ -34,7 +34,7 @@ export default function FeatureTile({ href, icon, label, desc, accent, bg, borde
         <div className="font-bold text-sm mb-1" style={{ color: accent }}>
           {label}
         </div>
-        <div className="text-xs leading-relaxed" style={{ color: "#555" }}>
+        <div className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>
           {desc}
         </div>
       </div>

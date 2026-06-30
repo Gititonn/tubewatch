@@ -144,9 +144,9 @@ export default function TrendingPage() {
             onClick={() => setType(tab)}
             className="px-5 py-2 rounded-lg text-sm font-medium"
             style={{
-              background: type === tab ? "#00ff87" : "#1a1a1a",
-              color: type === tab ? "#000" : "#888",
-              border: `1px solid ${type === tab ? "#00ff87" : "#2a2a2a"}`,
+              background: type === tab ? "#00ff87" : "var(--bg-card)",
+              color: type === tab ? "#000" : "var(--text-secondary)",
+              border: `1px solid ${type === tab ? "#00ff87" : "var(--border)"}`,
             }}
           >
             {tab === "videos" ? "Videos" : "Shorts"}
@@ -302,7 +302,7 @@ export default function TrendingPage() {
                     disabled={tracked.has(v.channelId) || tracking.has(v.channelId)}
                     className="flex-1 py-1.5 rounded-lg text-xs font-medium"
                     style={{
-                      background: tracked.has(v.channelId) ? "#1a1a1a" : "#00ff87",
+                      background: tracked.has(v.channelId) ? "var(--bg-card)" : "#00ff87",
                       color: tracked.has(v.channelId) ? "#4ade80" : "#000",
                       border: "1px solid #00ff87",
                       cursor: tracked.has(v.channelId) || tracking.has(v.channelId) ? "default" : "pointer",

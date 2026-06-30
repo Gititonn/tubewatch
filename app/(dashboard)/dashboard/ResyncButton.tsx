@@ -59,13 +59,13 @@ export default function ResyncButton({
         onClick={handleResync}
         disabled={syncing || onCooldown}
         className="text-xs border px-3 py-1.5 rounded-lg transition-colors hover:border-white disabled:opacity-40 disabled:cursor-not-allowed"
-        style={{ borderColor: "#2a2a2a", color: "#888" }}
+        style={{ borderColor: "var(--border)", color: "var(--text-secondary)" }}
         title={onCooldown ? `Next sync available in ${minutesUntilSync()} min` : "Resync now"}
       >
         {syncing ? "Syncing…" : onCooldown ? "⏳ On cooldown" : "↻ Resync"}
       </button>
       {lastSync && (
-        <span className="text-xs" style={{ color: "#3a3a3a" }}>
+        <span className="text-xs" style={{ color: "var(--text-muted)" }}>
           Last sync: {lastSync.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </span>
       )}

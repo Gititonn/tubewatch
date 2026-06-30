@@ -90,7 +90,7 @@ export default function OutlierPage() {
     <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Outlier Score</h1>
+          <h1 className="text-2xl font-bold text-foreground">Outlier Score</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
             How each video performed vs. your channel median.
           </p>
@@ -160,7 +160,7 @@ export default function OutlierPage() {
                               className="rounded object-cover flex-shrink-0"
                             />
                           )}
-                          <span className="text-white truncate">{v.title}</span>
+                          <span className="text-foreground truncate">{v.title}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>

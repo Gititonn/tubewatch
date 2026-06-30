@@ -247,7 +247,7 @@ export default function CompetitorsPage() {
               <button
                 onClick={closeModal}
                 style={{ color: "var(--text-muted)" }}
-                className="hover:text-white transition-colors text-xl leading-none"
+                className="hover:text-foreground transition-colors text-xl leading-none"
               >
                 ×
               </button>
