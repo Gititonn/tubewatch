@@ -1,5 +1,6 @@
 "use client";
 import { MarkdownContent } from "@/components/MarkdownContent";
+import { VideoGridSkeleton } from "@/components/Skeleton";
 import { useState, useEffect } from "react";
 
 type CompetitorChannel = {
@@ -178,7 +179,7 @@ export default function OutliersPage() {
 
       {/* Content */}
       {loading ? (
-        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+        <VideoGridSkeleton count={6} />
       ) : outliers.length === 0 ? (
         channels.length === 0 ? (
           <div>
@@ -309,8 +310,8 @@ export default function OutliersPage() {
               // Outer div — button cannot be nested inside <a> (invalid HTML)
               <div
                 key={v.id}
-                className="rounded-xl border overflow-hidden"
-                style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+                className="rounded-xl border overflow-hidden transition-all duration-200 hover:-translate-y-1"
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
               >
                 {/* Clickable link area */}
                 <a

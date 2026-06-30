@@ -65,3 +65,23 @@ html.light [style*='border: "1px solid #2a2a2a"'] {
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
+
+/* ═══ Loading skeletons (theme-aware shimmer) ═════════════════════════ */
+@keyframes tw-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.tw-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--border) 37%,
+    var(--bg-card) 63%
+  );
+  background-size: 200% 100%;
+  animation: tw-shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tw-skeleton { animation: none; }
+}

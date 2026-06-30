@@ -132,6 +132,29 @@ export default function AIPage() {
         </div>
       </div>
 
+      {/* Welcome / empty state — shown before the first question */}
+      {!loading && !answer && (
+        <div
+          className="rounded-2xl border p-6 mb-8 flex items-start gap-4"
+          style={{
+            borderColor: "rgba(0,255,135,0.25)",
+            background: "linear-gradient(135deg, rgba(0,255,135,0.07) 0%, var(--bg-card) 70%)",
+          }}
+        >
+          <div className="text-3xl flex-shrink-0">👋</div>
+          <div>
+            <h3 className="font-black mb-1" style={{ color: "#00ff87" }}>
+              Your growth strategist is ready
+            </h3>
+            <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
+              Tap a prompt above or ask your own question. Every answer is tuned for small,
+              0–100K channels — no big-audience assumptions, just high-leverage tactics
+              (packaging, thumbnails, organic search) you can run this week.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Answer */}
       {(loading || answer) && (
         <div

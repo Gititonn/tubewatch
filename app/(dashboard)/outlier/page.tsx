@@ -1,8 +1,10 @@
 "use client";
 import { MarkdownContent } from "@/components/MarkdownContent";
+import { TableRowSkeleton } from "@/components/Skeleton";
 
 import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { getOutlierLabel, formatDuration } from "@/lib/outlier";
 import type { Video } from "@/lib/types";
@@ -113,10 +115,37 @@ export default function OutlierPage() {
         </div>
       </div>
 
-      {loading && <p style={{ color: "var(--text-secondary)" }}>Loading videos…</p>}
+      {loading && (
+        <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>
+          <table className="min-w-[820px] w-full text-sm">
+            <tbody>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <TableRowSkeleton key={i} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {!loading && videos.length === 0 && (
-        <p style={{ color: "var(--text-secondary)" }}>No videos yet. Connect and sync a channel first.</p>
+        <div
+          className="rounded-xl border flex flex-col items-center justify-center py-16 text-center"
+          style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+        >
+          <div className="text-6xl mb-4">⭐</div>
+          <h2 className="text-xl font-black text-foreground mb-3">Find the Videos That Beat Your Average</h2>
+          <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
+            Outlier Score ranks each of your videos against your own channel median, so you can
+            see exactly which ones overperformed — then ask the AI Engine why.
+          </p>
+          <Link
+            href="/connect"
+            className="mt-6 inline-block px-5 py-2.5 rounded-lg text-sm font-semibold transition-transform hover:scale-105"
+            style={{ background: "#00ff87", color: "#000", textDecoration: "none" }}
+          >
+            Connect your channel →
+          </Link>
+        </div>
       )}
 
       {filtered.length > 0 && (
@@ -223,17 +252,30 @@ function ScoreBadge({
   score: number | null;
   label: "outlier" | "normal" | "underperformer";
 }) {
-  const styles = {
-    outlier: { background: "rgba(34,197,94,0.15)", color: "#22c55e" },
-    normal: { background: "rgba(136,136,136,0.15)", color: "var(--text-secondary)" },
-    underperformer: { background: "rgba(239,68,68,0.15)", color: "#ef4444" },
-  };
+  // Tier by the actual multiplier so 3× and 5× breakouts read at a glance.
+  let style: React.CSSProperties;
+  let prefix = "";
+  if (score === null) {
+    style = { background: "rgba(136,136,136,0.12)", color: "var(--text-secondary)", border: "1px solid var(--border)" };
+  } else if (score >= 5) {
+    style = { background: "rgba(255,68,68,0.18)", color: "#ff6b6b", border: "1px solid rgba(255,68,68,0.45)", boxShadow: "0 0 12px rgba(255,68,68,0.25)" };
+    prefix = "🔥 ";
+  } else if (score >= 3) {
+    style = { background: "rgba(255,170,0,0.18)", color: "#ffb020", border: "1px solid rgba(255,170,0,0.4)" };
+    prefix = "⭐ ";
+  } else if (label === "outlier") {
+    style = { background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" };
+  } else if (label === "underperformer") {
+    style = { background: "rgba(239,68,68,0.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.25)" };
+  } else {
+    style = { background: "rgba(136,136,136,0.12)", color: "var(--text-secondary)", border: "1px solid var(--border)" };
+  }
   return (
     <span
-      className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold"
-      style={styles[label]}
+      className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
+      style={style}
     >
-      {score !== null ? `${score}×` : "—"}
+      {score !== null ? `${prefix}${score}×` : "—"}
     </span>
   );
 }
