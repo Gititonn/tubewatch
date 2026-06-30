@@ -17,6 +17,7 @@ export default function AIPage() {
   const [loading, setLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
+  const [locked, setLocked] = useState(false);
 
   // Auto-run a question passed via ?q= (e.g. from the dashboard starter chips).
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function AIPage() {
     setLoading(true);
     setStreaming(false);
     setAnswer("");
+    setLocked(false);
     setActivePrompt(q);
 
     try {
@@ -43,6 +45,13 @@ export default function AIPage() {
       });
 
       if (!res.ok) {
+        // Free plan → show a real example of what Pro unlocks instead of a
+        // dead-end error. An honest "taste before the paywall".
+        if (res.status === 402) {
+          setLocked(true);
+          setLoading(false);
+          return;
+        }
         const data = await res.json().catch(() => ({}));
         setAnswer(data.error ?? "Something went wrong. Try again.");
         setLoading(false);
@@ -138,7 +147,7 @@ export default function AIPage() {
       </div>
 
       {/* Welcome / empty state — shown before the first question */}
-      {!loading && !answer && (
+      {!loading && !answer && !locked && (
         <div
           className="rounded-2xl border p-6 mb-8 flex items-start gap-4"
           style={{
@@ -186,6 +195,53 @@ export default function AIPage() {
               {streaming && <span className="tw-stream-cursor" aria-hidden="true" />}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Locked preview — free users see a real example answer + upgrade path */}
+      {locked && (
+        <div
+          className="rounded-2xl border p-6 mb-8 relative overflow-hidden"
+          style={{
+            borderColor: "rgba(168,85,247,0.35)",
+            background: "linear-gradient(135deg, rgba(168,85,247,0.08) 0%, var(--bg-card) 70%)",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-base">🧠</span>
+            <span className="text-sm font-black" style={{ color: "#a855f7" }}>TubeWatch AI Engine</span>
+            <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>
+              EXAMPLE
+            </span>
+          </div>
+
+          {/* Sample answer in the real AI Engine style, partially faded to tease the upgrade */}
+          <div className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
+            <p className="mb-3">
+              For a small channel, the win is <strong style={{ color: "var(--text-primary)" }}>borrowing search demand you can actually rank for</strong>.
+              Instead of broad titles, target a specific question people already type, then front-load the payoff in the
+              first 3 words so it survives the suggested-feed crop.
+            </p>
+            <p className="font-bold mb-1" style={{ color: "var(--text-primary)" }}>Your Move:</p>
+            <ul className="space-y-1">
+              <li>• Rewrite your last title as a specific question a beginner would search.</li>
+              <li>• A/B two thumbnails with one big readable word each.</li>
+            </ul>
+          </div>
+
+          {/* Fade + upgrade gate */}
+          <div className="mt-5 pt-5" style={{ borderTop: "1px solid var(--border)" }}>
+            <p className="text-sm mb-3" style={{ color: "var(--text-secondary)" }}>
+              That&apos;s a sample. Unlock the AI Engine to ask <strong style={{ color: "var(--text-primary)" }}>your own</strong> questions about your channel — unlimited on Pro.
+            </p>
+            <a
+              href="/billing"
+              className="inline-block px-5 py-2.5 rounded-xl text-sm font-black transition-transform hover:scale-105"
+              style={{ background: "linear-gradient(135deg, #a855f7, #7c3aed)", color: "#fff" }}
+            >
+              Unlock with Pro →
+            </a>
+          </div>
         </div>
       )}
 

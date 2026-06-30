@@ -3,16 +3,16 @@ import FeatureCarousel from "./feature-carousel";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 
 const cards = [
-  { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🖼️", title: "The thumbnail that changed everything", views: "1.2M views", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "💬", title: "Honest review: is it actually worth it?", views: "23K views", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
-  { emoji: "📈", title: "How I grew 10K subs in 60 days", views: "312K views", badge: "⭐ Viral", badgeColor: "#8b5cf6", bg: "#120a1a" },
-  { emoji: "🎤", title: "Q&A: your questions answered!", views: "18K views", badge: "😴 Below avg", badgeColor: "#666", bg: "#111" },
-  { emoji: "🎬", title: "Behind the scenes of my studio setup", views: "445K views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🎯", title: "The video formula that actually works", views: "671K views", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "🏆", title: "100K subscribers! How we got here", views: "89K views", badge: "⭐ Milestone", badgeColor: "#ffaa00", bg: "#1a150a" },
-  { emoji: "🍕", title: "I only ate one food for a week", views: "2.1M views", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🎮", title: "Playing games I've never tried before", views: "156K views", badge: "📈 Growing", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", duration: "12:08", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🖼️", title: "The thumbnail that changed everything", views: "1.2M views", duration: "8:47", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "💬", title: "Honest review: is it actually worth it?", views: "23K views", duration: "15:32", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
+  { emoji: "📈", title: "How I grew 10K subs in 60 days", views: "312K views", duration: "10:21", badge: "⭐ Viral", badgeColor: "#8b5cf6", bg: "#120a1a" },
+  { emoji: "🎤", title: "Q&A: your questions answered!", views: "18K views", duration: "22:54", badge: "😴 Below avg", badgeColor: "#666", bg: "#111" },
+  { emoji: "🎬", title: "Behind the scenes of my studio setup", views: "445K views", duration: "6:13", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🎯", title: "The video formula that actually works", views: "671K views", duration: "9:05", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "🏆", title: "100K subscribers! How we got here", views: "89K views", duration: "14:39", badge: "⭐ Milestone", badgeColor: "#ffaa00", bg: "#1a150a" },
+  { emoji: "🍕", title: "I only ate one food for a week", views: "2.1M views", duration: "18:02", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🎮", title: "Playing games I've never tried before", views: "156K views", duration: "27:46", badge: "📈 Growing", badgeColor: "#00ff87", bg: "#0a1a0f" },
 ];
 
 const features = [
@@ -23,6 +23,33 @@ const features = [
   { icon: "🏷️", label: "Tag Insights" },
   { icon: "⚡", label: "Real-time Data" },
 ];
+
+function PlanFeatures({ features, color }: { features: string[]; color: string }) {
+  return (
+    <ul className="flex flex-col gap-3 mb-8 flex-1">
+      {features.map((f) => {
+        const soon = / \(coming soon\)$/i.test(f);
+        const label = f.replace(/ \(coming soon\)$/i, "");
+        return (
+          <li key={f} className="flex items-center gap-2 text-sm" style={{ color: soon ? "#666" : color }}>
+            <span style={{ color: soon ? "#666" : "#00ff87" }}>{soon ? "○" : "✓"}</span>
+            <span>
+              {label}
+              {soon && (
+                <span
+                  className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full align-middle"
+                  style={{ background: "#ffffff10", color: "#888", border: "1px solid #ffffff20" }}
+                >
+                  SOON
+                </span>
+              )}
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export default function Home() {
   const doubled = [...cards, ...cards];
@@ -153,7 +180,7 @@ export default function Home() {
                       background: "rgba(0,0,0,0.75)", borderRadius: "4px",
                       padding: "2px 5px", fontSize: "10px", color: "#fff", fontWeight: 700,
                     }}>
-                      ▶ 4:32
+                      ▶ {card.duration}
                     </div>
                   </div>
                   <div className="p-3">
@@ -205,13 +232,7 @@ export default function Home() {
                   <span className="text-4xl font-black text-white">${PLANS.free.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
-              <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {PLANS.free.features.map(f => (
-                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
-                    <span style={{ color: "#00ff87" }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
+              <PlanFeatures features={PLANS.free.features} color="#aaa" />
               <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
                 {PLANS.free.ctaFree}
               </a>
@@ -227,13 +248,7 @@ export default function Home() {
                 <span className="text-4xl font-black text-white">${PLANS.pro.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
-              <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {PLANS.pro.features.map(f => (
-                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#ccc" }}>
-                    <span style={{ color: "#00ff87" }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
+              <PlanFeatures features={PLANS.pro.features} color="#ccc" />
               <a href="/signup" className="block text-center py-3 rounded-xl font-black transition-transform hover:scale-105" style={{ background: "#00ff87", color: "#000" }}>
                 {PLANS.pro.ctaUpgrade} →
               </a>
@@ -246,13 +261,7 @@ export default function Home() {
                 <span className="text-4xl font-black text-white">${PLANS.growth.priceMonthly}</span>
                 <span className="mb-1" style={{ color: "#555" }}>/mo</span>
               </div>
-              <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {PLANS.growth.features.map(f => (
-                  <li key={f} className="flex items-center gap-2 text-sm" style={{ color: "#aaa" }}>
-                    <span style={{ color: "#00ff87" }}>✓</span> {f}
-                  </li>
-                ))}
-              </ul>
+              <PlanFeatures features={PLANS.growth.features} color="#aaa" />
               <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
                 {PLANS.growth.ctaUpgrade} →
               </a>

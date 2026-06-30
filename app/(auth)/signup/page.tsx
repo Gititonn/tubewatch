@@ -6,14 +6,28 @@ import { createClient } from "@/lib/supabase/client";
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Passwords don't match.");
+      return;
+    }
+    if (!agreed) {
+      setError("Please agree to the Terms and Privacy Policy to continue.");
+      return;
+    }
+    setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signUp({
       email,
@@ -82,11 +96,45 @@ export default function SignupPage() {
               placeholder="Min 8 characters"
             />
           </div>
+          <div>
+            <label className="block text-sm mb-1" style={{ color: "#888" }}>Confirm password</label>
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+              minLength={8}
+              className="w-full px-4 py-2.5 rounded-lg text-white text-sm outline-none transition-all"
+              style={{
+                background: "#1a1a1a",
+                border: `1px solid ${confirm && confirm !== password ? "#ef4444" : "#2a2a2a"}`,
+              }}
+              placeholder="Re-enter password"
+            />
+            {confirm && confirm !== password && (
+              <p className="text-xs mt-1 text-red-400">Passwords don&apos;t match.</p>
+            )}
+          </div>
+          <label className="flex items-start gap-2 text-xs" style={{ color: "#888" }}>
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-0.5"
+              style={{ accentColor: "#00ff87" }}
+            />
+            <span>
+              I agree to the{" "}
+              <Link href="/terms" target="_blank" className="hover:underline" style={{ color: "#00ff87" }}>Terms of Service</Link>
+              {" "}and{" "}
+              <Link href="/privacy" target="_blank" className="hover:underline" style={{ color: "#00ff87" }}>Privacy Policy</Link>.
+            </span>
+          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-2.5 rounded-lg font-semibold text-black text-sm transition-opacity hover:opacity-90 disabled:opacity-50"
+            disabled={loading || !agreed}
+            className="w-full py-2.5 rounded-lg font-semibold text-black text-sm transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: "#00ff87" }}
           >
             {loading ? "Creating account…" : "Create account"}

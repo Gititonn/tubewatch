@@ -60,7 +60,7 @@ export const PLANS: Record<Plan, PlanDef> = {
     tagline: "Perfect for scaling an established side-income stream.",
     ctaUpgrade: "Upgrade to Growth",
     features: [
-      "Unlimited AI Strategy + Deep Video Audits & Custom AI Blueprints",
+      "Unlimited AI strategy + deep per-video audits & monthly content plans",
       "Everything in Pro",
       "Priority sync (6h vs 24h)",
       "API access (coming soon)",

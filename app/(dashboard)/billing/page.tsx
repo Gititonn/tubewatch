@@ -9,20 +9,46 @@ type BillingStatus = {
   stripe_subscription_id: string | null;
 };
 
+function CtaSkeleton() {
+  // Keeps the card height stable while billing status loads, instead of
+  // blanking the whole page behind a "Loading…" line on the checkout screen.
+  return (
+    <div
+      className="w-full rounded-lg animate-pulse"
+      style={{ background: "var(--border)", height: 36 }}
+      aria-hidden
+    />
+  );
+}
+
 function FeatureList({ features }: { features: string[] }) {
   return (
     <ul className="mt-4 space-y-2">
       {features.map((f) => {
+        // Honest rendering: features tagged "(coming soon)" don't get a green
+        // check — they show a muted dot + SOON tag so we never imply a shipped feature.
+        const soon = / \(coming soon\)$/i.test(f);
+        const label = f.replace(/ \(coming soon\)$/i, "");
         // Emphasize the AI Strategy Coach line — it's the headline upgrade reason.
         const isAI = f.includes("AI Strategy Coach");
         return (
           <li
             key={f}
             className="flex items-start gap-2 text-sm"
-            style={{ color: isAI ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: isAI ? 700 : 400 }}
+            style={{ color: soon ? "var(--text-muted)" : isAI ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: isAI ? 700 : 400 }}
           >
-            <span style={{ color: "#00ff87", flexShrink: 0 }}>✓</span>
-            {f}
+            <span style={{ color: soon ? "var(--text-muted)" : "#00ff87", flexShrink: 0 }}>{soon ? "○" : "✓"}</span>
+            <span>
+              {label}
+              {soon && (
+                <span
+                  className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full align-middle"
+                  style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-muted)", border: "1px solid var(--border)" }}
+                >
+                  SOON
+                </span>
+              )}
+            </span>
           </li>
         );
       })}
@@ -69,11 +95,7 @@ export default function BillingPage() {
         </div>
       )}
 
-      {loading ? (
-        <div className="text-sm" style={{ color: "var(--text-secondary)" }}>Loading billing status…</div>
-      ) : (
-        <>
-          <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
+      <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
             {/* Free Plan */}
             <div
               className="rounded-xl p-6 flex flex-col"
@@ -137,7 +159,7 @@ export default function BillingPage() {
               <p className="mt-1 text-xs leading-relaxed" style={{ color: "#00ff87" }}>{PLANS.pro.tagline}</p>
               <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
-                {currentPlan === "pro" ? (
+                {loading ? <CtaSkeleton /> : currentPlan === "pro" ? (
                   <a
                     href="/api/stripe/portal"
                     className="block w-full py-2 rounded-lg text-sm text-center font-medium"
@@ -190,7 +212,7 @@ export default function BillingPage() {
               <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{PLANS.growth.tagline}</p>
               <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
-                {currentPlan === "growth" ? (
+                {loading ? <CtaSkeleton /> : currentPlan === "growth" ? (
                   <a
                     href="/api/stripe/portal"
                     className="block w-full py-2 rounded-lg text-sm text-center font-medium"
@@ -222,8 +244,6 @@ export default function BillingPage() {
               </a>
             </div>
           )}
-        </>
-      )}
     </div>
   );
 }

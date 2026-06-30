@@ -236,7 +236,7 @@ export default async function DashboardPage() {
         ].map((p) => (
           <Link
             key={p}
-            href={aiUnlocked ? `/ai?q=${encodeURIComponent(p)}` : "/billing"}
+            href={`/ai?q=${encodeURIComponent(p)}`}
             className="px-3.5 py-2 rounded-full text-xs font-semibold transition-all hover:scale-[1.03]"
             style={{
               background: "rgba(168,85,247,0.08)",
