@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ProLockScreen } from "@/components/ProLockScreen";
+import ProLockScreen from "@/components/ProLockScreen";
 import { useUserPlan, isPaid } from "@/lib/use-user-plan";
 
 interface ChannelData {
@@ -125,7 +125,7 @@ export default function ComparePage() {
   if (upgradeRequired || !isPaid(plan)) {
     return (
       <div className="p-4 md:p-8 max-w-7xl">
-        <ProLockScreen feature="Compare Channels" />
+        <ProLockScreen />
       </div>
     );
   }

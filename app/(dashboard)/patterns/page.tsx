@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ProLockScreen } from "@/components/ProLockScreen";
+import ProLockScreen from "@/components/ProLockScreen";
 import { useUserPlan, isPaid } from "@/lib/use-user-plan";
 
 type PatternResult = {
@@ -88,7 +88,7 @@ export default function PatternsPage() {
   if (upgradeRequired || !isPaid(plan)) {
     return (
       <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
-        <ProLockScreen feature="Title & Hook Patterns" />
+        <ProLockScreen />
       </div>
     );
   }

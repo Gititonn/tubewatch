@@ -1,11 +1,13 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { FeedbackButton } from "./FeedbackButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "TubeWatch â€” YouTube analytics for small creators",
+  title: "TubeWatch — YouTube analytics for small creators",
   description: "YouTube analytics built for creators who aren't famous yet.",
 };
 
@@ -31,8 +33,15 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        {/* Tally feedback widget — auto-fills logged-in user email via hidden field */}
+        <FeedbackButton />
+        <Script
+          src="https://tally.so/widgets/embed.js"
+          strategy="afterInteractive"
+        />
+      </body>
     </html>
   );
 }
-

@@ -260,7 +260,7 @@ export default function OutliersPage() {
                     <div className="p-3">
                       <p className="font-medium mb-2 leading-snug" style={{ fontSize: 14, color: "var(--text-primary)" }}>{v.title}</p>
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "#2a2a2a" }}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: "var(--border)" }}>
                           {v.channel[0]}
                         </div>
                         <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{v.channel}</span>
@@ -376,7 +376,7 @@ export default function OutliersPage() {
                       ) : (
                         <div
                           className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                          style={{ background: "#2a2a2a" }}
+                          style={{ background: "var(--border)" }}
                         >
                           {ch?.channel_name?.[0] ?? "?"}
                         </div>

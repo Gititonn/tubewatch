@@ -139,7 +139,7 @@ export default async function SettingsPage() {
           )}
         </div>
 
-        {!isPaid(userPlan) && (
+        {!isPro && (
           <div className="mt-4 pt-4 border-t" style={{ borderColor: "#2a2a2a" }}>
             <p className="text-xs mb-3" style={{ color: "#555" }}>Pro includes:</p>
             <div className="text-sm space-y-1.5" style={{ color: "#888" }}>
