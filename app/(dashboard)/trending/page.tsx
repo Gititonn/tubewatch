@@ -1,5 +1,6 @@
 "use client"
 import { MarkdownContent } from "@/components/MarkdownContent";
+import { VideoGridSkeleton } from "@/components/Skeleton";
 import { useState, useEffect } from "react"
 
 type VideoItem = {
@@ -201,7 +202,7 @@ export default function TrendingPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+        <VideoGridSkeleton count={8} />
       ) : error ? (
         <div
           className="rounded-xl border flex flex-col items-center justify-center py-20 text-center"

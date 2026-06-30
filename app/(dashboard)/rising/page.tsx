@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { VideoGridSkeleton } from "@/components/Skeleton";
 
 type CompetitorChannel = {
   id: string;
@@ -181,7 +182,7 @@ export default function RisingPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "var(--text-muted)", paddingTop: 48, textAlign: "center" }}>Loading…</div>
+        <VideoGridSkeleton count={6} />
       ) : videos.length === 0 ? (
         <div>
           {/* Rich empty state */}
