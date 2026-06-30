@@ -15,6 +15,7 @@ export default function AIPage() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
 
   // Auto-run a question passed via ?q= (e.g. from the dashboard starter chips).
@@ -30,6 +31,7 @@ export default function AIPage() {
   async function ask(q: string) {
     if (!q.trim()) return;
     setLoading(true);
+    setStreaming(false);
     setAnswer("");
     setActivePrompt(q);
 
@@ -52,6 +54,7 @@ export default function AIPage() {
       const decoder = new TextDecoder();
       let full = "";
       setLoading(false);
+      setStreaming(true);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -59,8 +62,10 @@ export default function AIPage() {
         full += decoder.decode(value, { stream: true });
         setAnswer(full);
       }
+      setStreaming(false);
     } catch {
       setLoading(false);
+      setStreaming(false);
       setAnswer("Something went wrong. Try again.");
     }
   }
@@ -178,6 +183,7 @@ export default function AIPage() {
           {answer && (
             <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
               <MarkdownContent content={answer} />
+              {streaming && <span className="tw-stream-cursor" aria-hidden="true" />}
             </div>
           )}
         </div>
