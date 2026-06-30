@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import { NavSections } from "./nav-sections";
@@ -20,7 +20,7 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // AI Coach is a paid feature — label it honestly so free users see an upsell,
+  // AI Coach is a paid feature â€” label it honestly so free users see an upsell,
   // not a "NEW" freebie that 402s on click.
   const aiUnlocked = isPaidPlan(await getUserPlan(supabase, user.id));
   const aiBadge = aiUnlocked ? "NEW" : "PRO";
@@ -66,3 +66,4 @@ export default async function DashboardLayout({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Fragment } from "react";
 import { usePathname } from "next/navigation";
@@ -56,3 +56,4 @@ export function NavSections({ aiBadge }: { aiBadge: string }) {
     </>
   );
 }
+
