@@ -1,3 +1,4 @@
+﻿import { isPaid } from '@/lib/use-user-plan';
 import { createClient } from "@/lib/supabase/server";
 import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
@@ -68,7 +69,7 @@ export default async function SettingsPage() {
                   Connect Google for Analytics
                 </div>
                 <div className="text-xs leading-relaxed" style={{ color: "#555" }}>
-                  Unlocks daily view trends, subscriber growth charts, and watch time data —
+                  Unlocks daily view trends, subscriber growth charts, and watch time data â€”
                   the same kind of time-series graphs Viewstats shows. We only request
                   read-only access.
                 </div>
@@ -85,9 +86,9 @@ export default async function SettingsPage() {
             style={{ borderColor: "#2a2a2a" }}
           >
             {[
-              { icon: "📈", label: "Daily views chart" },
-              { icon: "👥", label: "Subscriber trends" },
-              { icon: "⏱️", label: "Watch time hours" },
+              { icon: "ðŸ“ˆ", label: "Daily views chart" },
+              { icon: "ðŸ‘¥", label: "Subscriber trends" },
+              { icon: "â±ï¸", label: "Watch time hours" },
             ].map((f) => (
               <div
                 key={f.label}
@@ -132,18 +133,18 @@ export default async function SettingsPage() {
                 className="px-4 py-2 rounded-lg font-semibold text-black text-sm transition-opacity hover:opacity-90"
                 style={{ background: "#00ff87" }}
               >
-                Upgrade to Pro · ${PLANS.pro.priceMonthly}/mo
+                Upgrade to Pro Â· ${PLANS.pro.priceMonthly}/mo
               </button>
             </form>
           )}
         </div>
 
-        {!isPro && (
+        {!isPaid(userPlan) && (
           <div className="mt-4 pt-4 border-t" style={{ borderColor: "#2a2a2a" }}>
             <p className="text-xs mb-3" style={{ color: "#555" }}>Pro includes:</p>
             <div className="text-sm space-y-1.5" style={{ color: "#888" }}>
               {PLANS.pro.features.map((f) => (
-                <div key={f}>✓ {f}</div>
+                <div key={f}>âœ“ {f}</div>
               ))}
             </div>
           </div>
@@ -152,3 +153,4 @@ export default async function SettingsPage() {
     </div>
   );
 }
+
