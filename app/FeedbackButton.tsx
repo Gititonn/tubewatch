@@ -3,17 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-/**
- * Floating feedback button powered by Tally.so.
- *
- * HOW TO ACTIVATE:
- * 1. Create your form at tally.so (see README for recommended blocks)
- * 2. Publish it — the URL will be tally.so/r/XXXXXX
- * 3. Copy that 6-character ID and replace YOUR_FORM_ID below
- * 4. In Tally, add a "Hidden Field" block and name it: user_email
- *    → TubeWatch will auto-fill it with the logged-in user's email
- */
-const TALLY_FORM_ID = "YOUR_FORM_ID"; // ← replace this
+// Tally form ID — auto-fills logged-in user's email via the user_email hidden field
+const TALLY_FORM_ID = "PdgGMd";
 
 export function FeedbackButton() {
   const [email, setEmail] = useState<string | null>(null);
@@ -29,7 +20,7 @@ export function FeedbackButton() {
   }, []);
 
   // Don't render until we know whether the user is logged in
-  if (!ready || TALLY_FORM_ID === "YOUR_FORM_ID") return null;
+  if (!ready) return null;
 
   return (
     <button

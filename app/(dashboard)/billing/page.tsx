@@ -12,12 +12,20 @@ type BillingStatus = {
 function FeatureList({ features }: { features: string[] }) {
   return (
     <ul className="mt-4 space-y-2">
-      {features.map((f) => (
-        <li key={f} className="flex items-start gap-2 text-sm" style={{ color: "#ccc" }}>
-          <span style={{ color: "#00ff87", flexShrink: 0 }}>✓</span>
-          {f}
-        </li>
-      ))}
+      {features.map((f) => {
+        // Emphasize the AI Strategy Coach line — it's the headline upgrade reason.
+        const isAI = f.includes("AI Strategy Coach");
+        return (
+          <li
+            key={f}
+            className="flex items-start gap-2 text-sm"
+            style={{ color: isAI ? "#fff" : "#ccc", fontWeight: isAI ? 700 : 400 }}
+          >
+            <span style={{ color: "#00ff87", flexShrink: 0 }}>✓</span>
+            {f}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -65,7 +73,7 @@ export default function BillingPage() {
         <div className="text-sm" style={{ color: "#888" }}>Loading billing status…</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
             {/* Free Plan */}
             <div
               className="rounded-xl p-6 flex flex-col"
@@ -86,6 +94,7 @@ export default function BillingPage() {
                 )}
               </div>
               <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.free.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <p className="mt-1 text-xs" style={{ color: "#888" }}>{PLANS.free.tagline}</p>
               <FeatureList features={PLANS.free.features} />
               <div className="mt-auto pt-6">
                 <div
@@ -97,14 +106,22 @@ export default function BillingPage() {
               </div>
             </div>
 
-            {/* Pro Plan */}
+            {/* Pro Plan — visual anchor: glowing brand border, lifted scale, top badge */}
             <div
-              className="rounded-xl p-6 flex flex-col"
+              className="rounded-xl p-6 flex flex-col relative z-10"
               style={{
                 background: "#141414",
-                border: `1px solid ${currentPlan === "pro" ? "#00ff87" : "#2a2a2a"}`,
+                border: "1px solid #00ff87",
+                transform: "scale(1.03)",
+                boxShadow: "0 0 28px rgba(0,255,135,0.28), 0 0 0 1px rgba(0,255,135,0.4)",
               }}
             >
+              <span
+                className="absolute left-1/2 -translate-x-1/2 -top-3 whitespace-nowrap text-xs font-bold px-3 py-1 rounded-full"
+                style={{ background: "#00ff87", color: "#000", boxShadow: "0 2px 10px rgba(0,255,135,0.4)" }}
+              >
+                Most Popular for Growing Creators
+              </span>
               <div className="flex items-center justify-between">
                 <h2 className="text-base font-semibold" style={{ color: "#fff" }}>Pro</h2>
                 {currentPlan === "pro" && (
@@ -117,6 +134,7 @@ export default function BillingPage() {
                 )}
               </div>
               <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <p className="mt-1 text-xs leading-relaxed" style={{ color: "#00ff87" }}>{PLANS.pro.tagline}</p>
               <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
                 {currentPlan === "pro" ? (
@@ -169,6 +187,7 @@ export default function BillingPage() {
                 )}
               </div>
               <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <p className="mt-1 text-xs leading-relaxed" style={{ color: "#888" }}>{PLANS.growth.tagline}</p>
               <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
                 {currentPlan === "growth" ? (

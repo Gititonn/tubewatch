@@ -1,6 +1,6 @@
 "use client";
 import { MarkdownContent } from "@/components/MarkdownContent";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const PROMPTS = [
   "What title formats are getting the most clicks right now?",
@@ -16,6 +16,16 @@ export default function AIPage() {
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
+
+  // Auto-run a question passed via ?q= (e.g. from the dashboard starter chips).
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q && q.trim()) {
+      setQuestion(q);
+      ask(q);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function ask(q: string) {
     if (!q.trim()) return;
@@ -68,7 +78,7 @@ export default function AIPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-white">AI Strategy Coach</h1>
-            <p className="text-sm font-semibold" style={{ color: "#a855f7" }}>Powered by Claude · Built for creators</p>
+            <p className="text-sm font-semibold" style={{ color: "#a855f7" }}>Powered by the TubeWatch AI Engine · Built for creators</p>
           </div>
         </div>
         <p style={{ color: "var(--text-secondary)" }}>
@@ -133,7 +143,7 @@ export default function AIPage() {
         >
           <div className="flex items-center gap-2 mb-4">
             <span className="text-base">🧠</span>
-            <span className="text-sm font-black" style={{ color: "#a855f7" }}>Claude</span>
+            <span className="text-sm font-black" style={{ color: "#a855f7" }}>TubeWatch AI Engine</span>
             {loading && (
               <span className="flex gap-1 ml-1">
                 {[0,1,2].map(i => (
@@ -155,7 +165,7 @@ export default function AIPage() {
         <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--text-muted)" }}>AI is everywhere in TubeWatch</p>
         <div className="grid gap-3" style={{ gridTemplateColumns: "1fr 1fr" }}>
           {[
-            { icon: "⭐", title: "Outlier Score", desc: "Hit “Explain” on any video to get a Claude breakdown of why it over- or under-performed", href: "/outlier" },
+            { icon: "⭐", title: "Outlier Score", desc: "Hit “Explain” on any video to get an AI Engine breakdown of why it over- or under-performed", href: "/outlier" },
             { icon: "🔥", title: "Competitor Outliers", desc: "See why competitor videos exploded with one-click AI analysis", href: "/competitors/outliers" },
             { icon: "📈", title: "Trending Analysis", desc: "Spot what’s blowing up and understand the patterns behind it", href: "/trending" },
             { icon: "🎯", title: "Pattern Detection", desc: "AI detects title formulas and content strategies from your tracked channels", href: "/patterns" },

@@ -100,11 +100,11 @@ export default async function DashboardPage() {
             background: "linear-gradient(135deg, rgba(0,255,135,0.06) 0%, #111 100%)",
           }}
         >
-          <div className="text-3xl">📺</div>
+          <div className="text-3xl">🎯</div>
           <div className="flex-1">
-            <div className="font-black text-white mb-0.5">Connect your YouTube channel</div>
+            <div className="font-black text-white mb-0.5">Stop guessing what to film.</div>
             <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              Add YOUR channel to see your outlier scores, revenue estimates, and personal stats on top of this feed.
+              Discover low-competition, high-outlier topics in your niche before they peak. Connect your channel to layer your own stats on top.
             </div>
           </div>
           <Link
@@ -212,11 +212,11 @@ export default async function DashboardPage() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-black text-white">AI Strategy Coach</span>
+              <span className="font-black text-white">TubeWatch AI Engine</span>
               <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>{aiUnlocked ? "NEW" : "PRO"}</span>
             </div>
             <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              Ask Claude anything — title strategies, why videos go viral, how to grow faster.
+              Ask the TubeWatch AI Engine anything — title strategies, why videos go viral, how to grow faster.
             </div>
           </div>
           <div
@@ -227,6 +227,27 @@ export default async function DashboardPage() {
           </div>
         </div>
       </Link>
+
+      {/* Starter prompts — quick, high-value ways into the AI Engine */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {[
+          "Analyze why a competitor just had a view spike",
+          "Suggest 3 title variations for a video optimized for CTR",
+        ].map((p) => (
+          <Link
+            key={p}
+            href={aiUnlocked ? `/ai?q=${encodeURIComponent(p)}` : "/billing"}
+            className="px-3.5 py-2 rounded-full text-xs font-semibold transition-all hover:scale-[1.03]"
+            style={{
+              background: "rgba(168,85,247,0.08)",
+              border: "1px solid rgba(168,85,247,0.3)",
+              color: "#c084fc",
+            }}
+          >
+            ✨ {p}
+          </Link>
+        ))}
+      </div>
 
       {/* TRENDING NOW */}
       {trendingCache && trendingCache.length > 0 && (
@@ -317,7 +338,7 @@ export default async function DashboardPage() {
             { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
             { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#4ade80", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
             { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
-            { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask Claude your YouTube strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
+            { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask the TubeWatch AI Engine your strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
             { href: "/videos", icon: "▶️", label: "All Videos", desc: "Full library + outlier scores", accent: "#888", border: "rgba(255,255,255,0.1)", bg: "rgba(255,255,255,0.03)" },
           ].map((t) => (
             <Link key={t.href} href={t.href}>

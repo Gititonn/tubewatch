@@ -34,14 +34,14 @@ const REGIONS = [
   { label: "BR", value: "BR" },
 ]
 
+// Creator-niche filters. Values are YouTube videoCategoryIds; Finance maps to
+// Education (27), the closest assignable category YouTube exposes for it.
 const CATEGORIES = [
   { label: "All", value: "" },
+  { label: "Tech", value: "28" },
   { label: "Gaming", value: "20" },
-  { label: "Music", value: "10" },
-  { label: "Entertainment", value: "24" },
-  { label: "How-to", value: "26" },
-  { label: "Sports", value: "17" },
-  { label: "News", value: "25" },
+  { label: "Finance", value: "27" },
+  { label: "DIY/How-To", value: "26" },
 ]
 
 export default function TrendingPage() {
@@ -154,42 +154,50 @@ export default function TrendingPage() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3 mb-6 flex-wrap">
-        <select
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          className="px-3 py-2 rounded-lg text-sm outline-none"
-          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
-        >
-          {REGIONS.map((r) => (
-            <option key={r.value} value={r.value}>
-              {r.label}
-            </option>
-          ))}
-        </select>
+      {/* Niche filter — the primary way creators narrow trending to their lane */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <span className="text-xs font-black uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+            Filter by niche
+          </span>
+          <div className="flex items-center gap-3">
+            <select
+              value={region}
+              onChange={(e) => setRegion(e.target.value)}
+              className="px-3 py-2 rounded-lg text-sm outline-none"
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+            >
+              {REGIONS.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+            {!loading && !error && (
+              <span style={{ color: "var(--text-muted)", fontSize: 13 }}>
+                {videos.length} video{videos.length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
+        </div>
 
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-2 flex-wrap">
           {CATEGORIES.map((cat) => (
             <button
               key={cat.value}
               onClick={() => setCategory(cat.value)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium"
+              className="px-4 py-2 rounded-full text-sm font-bold transition-all hover:scale-[1.03]"
               style={{
-                background: category === cat.value ? "#00ff87" : "#1a1a1a",
-                color: category === cat.value ? "#000" : "#888",
-                border: `1px solid ${category === cat.value ? "#00ff87" : "#2a2a2a"}`,
+                background: category === cat.value ? "#00ff87" : "var(--bg-card)",
+                color: category === cat.value ? "#000" : "var(--text-secondary)",
+                border: `1px solid ${category === cat.value ? "#00ff87" : "var(--border)"}`,
+                boxShadow: category === cat.value ? "0 0 16px rgba(0,255,135,0.25)" : "none",
               }}
             >
               {cat.label}
             </button>
           ))}
         </div>
-
-        {!loading && !error && (
-          <span style={{ color: "var(--text-muted)", fontSize: 13, marginLeft: "auto" }}>
-            {videos.length} video{videos.length !== 1 ? "s" : ""}
-          </span>
-        )}
       </div>
 
       {loading ? (

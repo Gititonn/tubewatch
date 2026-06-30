@@ -17,10 +17,13 @@ export type NavSection = {
 };
 
 export const NAV_SECTIONS: NavSection[] = [
+  // Top group surfaces the two killer workspaces (Outlier Feed + AI Coach)
+  // right under Dashboard so creators reach them without scanning sub-menus.
   {
     items: [
       { href: "/dashboard", icon: "⊞", label: "Dashboard" },
-      { href: "/videos", icon: "▶", label: "Videos" },
+      { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed" },
+      { href: "/ai", icon: "🧠", label: "AI Coach", ai: true },
     ],
   },
   {
@@ -29,7 +32,6 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/trending", icon: "📈", label: "Trending" },
       { href: "/rising", icon: "🚀", label: "Rising" },
       { href: "/competitors", icon: "⚡", label: "Competitors" },
-      { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed" },
     ],
   },
   {
@@ -38,11 +40,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/outlier", icon: "⭐", label: "Outlier Score" },
       { href: "/patterns", icon: "🎯", label: "Patterns" },
       { href: "/compare", icon: "⚖", label: "Compare" },
+      { href: "/videos", icon: "▶", label: "Videos" },
     ],
-  },
-  {
-    label: "AI",
-    items: [{ href: "/ai", icon: "🧠", label: "AI Coach", ai: true }],
   },
 ];
 
