@@ -19,7 +19,7 @@ function FeatureList({ features }: { features: string[] }) {
           <li
             key={f}
             className="flex items-start gap-2 text-sm"
-            style={{ color: isAI ? "#fff" : "#ccc", fontWeight: isAI ? 700 : 400 }}
+            style={{ color: isAI ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: isAI ? 700 : 400 }}
           >
             <span style={{ color: "#00ff87", flexShrink: 0 }}>✓</span>
             {f}
@@ -55,8 +55,8 @@ export default function BillingPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2" style={{ color: "#fff" }}>Billing</h1>
-      <p className="text-sm mb-8" style={{ color: "#888" }}>
+      <h1 className="text-2xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Billing</h1>
+      <p className="text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
         Manage your TubeWatch subscription.
       </p>
 
@@ -70,7 +70,7 @@ export default function BillingPage() {
       )}
 
       {loading ? (
-        <div className="text-sm" style={{ color: "#888" }}>Loading billing status…</div>
+        <div className="text-sm" style={{ color: "var(--text-secondary)" }}>Loading billing status…</div>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
@@ -78,12 +78,12 @@ export default function BillingPage() {
             <div
               className="rounded-xl p-6 flex flex-col"
               style={{
-                background: "#141414",
+                background: "var(--bg-card)",
                 border: `1px solid ${currentPlan === "free" ? "#00ff87" : "#2a2a2a"}`,
               }}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold" style={{ color: "#fff" }}>Free</h2>
+                <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Free</h2>
                 {currentPlan === "free" && (
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full"
@@ -93,13 +93,13 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.free.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
-              <p className="mt-1 text-xs" style={{ color: "#888" }}>{PLANS.free.tagline}</p>
+              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${PLANS.free.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>/mo</span></p>
+              <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>{PLANS.free.tagline}</p>
               <FeatureList features={PLANS.free.features} />
               <div className="mt-auto pt-6">
                 <div
                   className="w-full py-2 rounded-lg text-sm text-center"
-                  style={{ background: "#1a1a1a", color: "#555", cursor: "default" }}
+                  style={{ background: "#1a1a1a", color: "var(--text-muted)", cursor: "default" }}
                 >
                   Free forever
                 </div>
@@ -110,7 +110,7 @@ export default function BillingPage() {
             <div
               className="rounded-xl p-6 flex flex-col relative z-10"
               style={{
-                background: "#141414",
+                background: "var(--bg-card)",
                 border: "1px solid #00ff87",
                 transform: "scale(1.03)",
                 boxShadow: "0 0 28px rgba(0,255,135,0.28), 0 0 0 1px rgba(0,255,135,0.4)",
@@ -123,7 +123,7 @@ export default function BillingPage() {
                 Most Popular for Growing Creators
               </span>
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold" style={{ color: "#fff" }}>Pro</h2>
+                <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Pro</h2>
                 {currentPlan === "pro" && (
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full"
@@ -133,7 +133,7 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
+              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>/mo</span></p>
               <p className="mt-1 text-xs leading-relaxed" style={{ color: "#00ff87" }}>{PLANS.pro.tagline}</p>
               <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
@@ -148,7 +148,7 @@ export default function BillingPage() {
                 ) : currentPlan === "growth" ? (
                   <div
                     className="w-full py-2 rounded-lg text-sm text-center"
-                    style={{ background: "#1a1a1a", color: "#555", cursor: "default" }}
+                    style={{ background: "#1a1a1a", color: "var(--text-muted)", cursor: "default" }}
                   >
                     Downgrade via portal
                   </div>
@@ -171,12 +171,12 @@ export default function BillingPage() {
             <div
               className="rounded-xl p-6 flex flex-col"
               style={{
-                background: "#141414",
+                background: "var(--bg-card)",
                 border: `1px solid ${currentPlan === "growth" ? "#00ff87" : "#2a2a2a"}`,
               }}
             >
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold" style={{ color: "#fff" }}>Growth</h2>
+                <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Growth</h2>
                 {currentPlan === "growth" && (
                   <span
                     className="text-xs font-medium px-2 py-0.5 rounded-full"
@@ -186,8 +186,8 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "#fff" }}>${PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "#888" }}>/mo</span></p>
-              <p className="mt-1 text-xs leading-relaxed" style={{ color: "#888" }}>{PLANS.growth.tagline}</p>
+              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>/mo</span></p>
+              <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{PLANS.growth.tagline}</p>
               <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
                 {currentPlan === "growth" ? (
@@ -215,7 +215,7 @@ export default function BillingPage() {
           </div>
 
           {isPaid && (
-            <div className="mt-6 text-sm" style={{ color: "#888" }}>
+            <div className="mt-6 text-sm" style={{ color: "var(--text-secondary)" }}>
               Need to cancel or change payment method?{" "}
               <a href="/api/stripe/portal" style={{ color: "#00ff87" }}>
                 Open billing portal →

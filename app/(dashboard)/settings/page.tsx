@@ -1,5 +1,4 @@
-﻿import { isPaid } from '@/lib/use-user-plan';
-import { createClient } from "@/lib/supabase/server";
+﻿import { createClient } from "@/lib/supabase/server";
 import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
 
