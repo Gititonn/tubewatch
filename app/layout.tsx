@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "TubeWatch — YouTube analytics for small creators",
+  title: "TubeWatch â€” YouTube analytics for small creators",
   description: "YouTube analytics built for creators who aren't famous yet.",
 };
 
@@ -35,3 +35,4 @@ export default function RootLayout({
     </html>
   );
 }
+
