@@ -3,6 +3,7 @@ import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import Link from "next/link";
 import Image from "next/image";
 import ResyncButton from "./ResyncButton";
+import DisconnectChannelButton from "../settings/DisconnectChannelButton";
 
 export const dynamic = "force-dynamic";
 
@@ -152,11 +153,17 @@ export default async function DashboardPage() {
                 {fmt(channel.subscriber_count ?? 0)} subscribers &middot; {videos.length} videos
               </div>
             </div>
-            <ResyncButton
-              channelDbId={channel.id}
-              youtubeChannelId={channel.youtube_channel_id}
-              lastSyncedAt={channel.last_synced_at ?? null}
-            />
+            <div className="flex items-start gap-2 relative z-10">
+              <ResyncButton
+                channelDbId={channel.id}
+                youtubeChannelId={channel.youtube_channel_id}
+                lastSyncedAt={channel.last_synced_at ?? null}
+              />
+              <DisconnectChannelButton
+                channelId={channel.id}
+                channelName={channel.channel_name ?? "this channel"}
+              />
+            </div>
           </div>
 
           {/* Personal stats */}

@@ -38,7 +38,7 @@ export default async function DashboardLayout({
         style={{ borderColor: "var(--border)", background: "var(--bg-sidebar)" }}
       >
         <div className="mb-8 px-2">
-          <Link href="/" className="text-lg font-black tracking-tight">
+          <Link href="/dashboard" className="text-lg font-black tracking-tight">
             <span style={{ color: "#ff3333" }}>Tube</span>
             <span style={{ color: "var(--accent)" }}>Watch</span>
           </Link>
