@@ -1,8 +1,18 @@
-﻿import { createClient } from "@/lib/supabase/server";
+﻿import Link from "next/link";
+import Image from "next/image";
+import { createClient } from "@/lib/supabase/server";
+import { isPaidPlan } from "@/lib/plan";
 import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
+import DisconnectChannelButton from "./DisconnectChannelButton";
 
 export const dynamic = "force-dynamic";
+
+function fmt(n: number) {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + "M";
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + "K";
+  return n.toLocaleString();
+}
 
 export default async function SettingsPage() {
   const supabase = createClient();
@@ -20,7 +30,13 @@ export default async function SettingsPage() {
     .eq("user_id", user!.id)
     .single();
 
-  const isPro = profile?.plan === "pro";
+  const { data: channels } = await supabase
+    .from("channels")
+    .select("*")
+    .eq("user_id", user!.id)
+    .order("created_at", { ascending: true });
+
+  const isPro = isPaidPlan(profile?.plan ?? "free");
   const isGoogleConnected = !!googleToken;
 
   return (
@@ -36,6 +52,76 @@ export default async function SettingsPage() {
           Account
         </h2>
         <div className="text-foreground text-sm">{user?.email}</div>
+      </section>
+
+      {/* Connected Channels */}
+      <section
+        className="rounded-xl border p-6 mb-4"
+        style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+            Connected Channels
+          </h2>
+          <Link
+            href="/connect"
+            className="text-xs font-semibold"
+            style={{ color: "var(--accent)" }}
+          >
+            + Connect another
+          </Link>
+        </div>
+
+        {!channels || channels.length === 0 ? (
+          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+            No channels connected yet.{" "}
+            <Link href="/connect" style={{ color: "var(--accent)" }}>Connect one</Link> to see it on your dashboard.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {channels.map((c, i) => (
+              <div
+                key={c.id}
+                className="flex items-center gap-3 p-3 rounded-lg"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                {c.channel_thumbnail ? (
+                  <Image
+                    src={c.channel_thumbnail}
+                    alt={c.channel_name ?? "Channel"}
+                    width={36}
+                    height={36}
+                    className="rounded-full flex-shrink-0"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full flex-shrink-0" style={{ background: "var(--border)" }} />
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold text-foreground truncate flex items-center gap-2">
+                    {c.channel_name ?? c.youtube_channel_id}
+                    {i === 0 && (
+                      <span
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: "#00ff8720", color: "#00ff87" }}
+                      >
+                        SHOWN ON DASHBOARD
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs" style={{ color: "var(--text-muted)" }}>
+                    {fmt(c.subscriber_count ?? 0)} subscribers
+                  </div>
+                </div>
+                <DisconnectChannelButton channelId={c.id} channelName={c.channel_name ?? "this channel"} />
+              </div>
+            ))}
+          </div>
+        )}
+        {channels && channels.length > 1 && (
+          <p className="text-xs mt-3" style={{ color: "var(--text-muted)" }}>
+            Only the first channel you connected shows on your dashboard. Disconnect it to promote the next one.
+          </p>
+        )}
       </section>
 
       {/* Google Analytics Connection */}

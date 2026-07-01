@@ -29,6 +29,7 @@ export default function OutlierPage() {
         .from("channels")
         .select("id")
         .eq("user_id", user.id)
+        .order("created_at", { ascending: true })
         .limit(1);
 
       const ch = channels?.[0];
