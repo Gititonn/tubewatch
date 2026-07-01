@@ -68,6 +68,18 @@ export async function syncChannel(
 
   if (error) return { error: error.message, status: 500 };
 
+  // Best-effort: capture a point-in-time view snapshot per video so we build the
+  // time series needed for future first-48h velocity scoring. Never fail the
+  // sync over this (e.g. if the migration hasn't landed yet).
+  const { error: snapErr } = await supabase.from("video_snapshots").insert(
+    withScores.map((v) => ({
+      channel_id: channelDbId,
+      youtube_video_id: v.youtube_video_id,
+      view_count: v.view_count,
+    }))
+  );
+  if (snapErr) console.warn("video_snapshots insert skipped:", snapErr.message);
+
   await supabase
     .from("channels")
     .update({ last_synced_at: new Date().toISOString() })

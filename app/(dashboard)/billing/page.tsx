@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PLANS } from "@/lib/plans";
+import { PLANS, annualPrice } from "@/lib/plans";
 
 type BillingStatus = {
   plan: "free" | "pro" | "growth";
@@ -60,6 +60,7 @@ export default function BillingPage() {
   const [status, setStatus] = useState<BillingStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [upgraded, setUpgraded] = useState(false);
+  const [annual, setAnnual] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -94,6 +95,26 @@ export default function BillingPage() {
           Your plan has been upgraded successfully!
         </div>
       )}
+
+      <div className="flex items-center justify-center gap-3 mb-8">
+        <span style={{ color: !annual ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: 600, fontSize: 14 }}>Monthly</span>
+        <button
+          onClick={() => setAnnual((a) => !a)}
+          role="switch"
+          aria-checked={annual}
+          aria-label="Toggle annual billing"
+          className="relative rounded-full transition-colors"
+          style={{ width: 48, height: 26, background: annual ? "#00ff87" : "var(--border)" }}
+        >
+          <span
+            className="absolute rounded-full transition-transform"
+            style={{ top: 3, left: 3, width: 20, height: 20, background: "#fff", transform: annual ? "translateX(22px)" : "translateX(0)" }}
+          />
+        </button>
+        <span style={{ color: annual ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: 600, fontSize: 14 }}>
+          Annual <span style={{ color: "#00ff87" }}>· 2 months free</span>
+        </span>
+      </div>
 
       <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
             {/* Free Plan */}
@@ -155,7 +176,7 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>/mo</span></p>
+              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${annual ? annualPrice(PLANS.pro) : PLANS.pro.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>{annual ? "/yr" : "/mo"}</span></p>
               <p className="mt-1 text-xs leading-relaxed" style={{ color: "#00ff87" }}>{PLANS.pro.tagline}</p>
               <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
@@ -177,6 +198,7 @@ export default function BillingPage() {
                 ) : (
                   <form action="/api/stripe/checkout" method="POST">
                     <input type="hidden" name="plan" value="pro" />
+                    <input type="hidden" name="cycle" value={annual ? "annual" : "monthly"} />
                     <button
                       type="submit"
                       className="w-full py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
@@ -208,7 +230,7 @@ export default function BillingPage() {
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>/mo</span></p>
+              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${annual ? annualPrice(PLANS.growth) : PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>{annual ? "/yr" : "/mo"}</span></p>
               <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{PLANS.growth.tagline}</p>
               <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
@@ -223,6 +245,7 @@ export default function BillingPage() {
                 ) : (
                   <form action="/api/stripe/checkout" method="POST">
                     <input type="hidden" name="plan" value="growth" />
+                    <input type="hidden" name="cycle" value={annual ? "annual" : "monthly"} />
                     <button
                       type="submit"
                       className="w-full py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"

@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { YoutubeTranscript } from "youtube-transcript";
 import { createClient } from "@/lib/supabase/server";
-import { getUserPlan, isPaidPlan } from "@/lib/plan";
+import { getUserPlan } from "@/lib/plan";
+import { consumeAiCall } from "@/lib/entitlements";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -14,11 +15,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!isPaidPlan(await getUserPlan(supabase, user.id))) {
-    return NextResponse.json(
-      { error: "Upgrade to a paid plan to use AI insights." },
-      { status: 402 }
-    );
+  const gate = await consumeAiCall(supabase, user.id, await getUserPlan(supabase, user.id));
+  if (!gate.ok) {
+    return NextResponse.json({ error: gate.error }, { status: gate.status });
   }
 
   const { videoId, title, viewCount, outlierScore, channelName, publishedAt } =

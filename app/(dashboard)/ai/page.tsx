@@ -96,7 +96,7 @@ export default function AIPage() {
           </div>
         </div>
         <p style={{ color: "var(--text-secondary)" }}>
-          Ask anything about YouTube growth, video strategy, or what&apos;s working right now. Instant AI answers tuned for 0–100K channels.
+          Ask anything about YouTube growth, video strategy, or what&apos;s working right now. Instant AI answers tuned for growing creators (roughly 1K–100K subs).
         </p>
       </div>
 
@@ -161,9 +161,9 @@ export default function AIPage() {
               Your growth strategist is ready
             </h3>
             <p className="text-sm" style={{ color: "var(--text-secondary)", lineHeight: 1.6 }}>
-              Tap a prompt above or ask your own question. Every answer is tuned for small,
-              0–100K channels — no big-audience assumptions, just high-leverage tactics
-              (packaging, thumbnails, organic search) you can run this week.
+              Tap a prompt above or ask your own question. Every answer is tuned for growing
+              creators (roughly 1K–100K subs) — no big-audience assumptions, just high-leverage
+              tactics (packaging, thumbnails, organic search) you can run this week.
             </p>
           </div>
         </div>

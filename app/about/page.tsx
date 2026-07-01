@@ -10,7 +10,7 @@ export default function AboutPage() {
       <div className="max-w-2xl mx-auto">
         <Link href="/" className="text-sm hover:underline" style={{ color: "#00ff87" }}>← TubeWatch</Link>
         <h1 className="text-3xl font-black text-white mt-6 mb-2">About TubeWatch</h1>
-        <p className="text-sm mb-8" style={{ color: "#666" }}>YouTube analytics built for creators who aren&apos;t famous yet.</p>
+        <p className="text-sm mb-8" style={{ color: "#666" }}>Find the breakout videos in your niche before you make your next one.</p>
 
         <section className="space-y-6 text-sm leading-relaxed">
           <div>
@@ -18,18 +18,20 @@ export default function AboutPage() {
             <p>
               Most YouTube analytics tools are built for channels that have already made it — millions of
               subscribers, a full-time editing team, a manager checking the numbers every morning. TubeWatch
-              is built for everyone else: the 0–100K subscriber creator posting consistently, trying to figure
-              out which of their videos actually worked and why, with a fraction of the time and budget.
+              is built for the growing creator (roughly 1K–100K subs) who&apos;s serious about the channel and
+              needs one thing above all: to know what to make next. So we start with the videos already
+              winning in your niche — not just your own back-catalog.
             </p>
           </div>
           <div>
             <h2 className="text-white font-bold mb-2">What TubeWatch does</h2>
             <p>
-              TubeWatch scores every video against your own channel&apos;s median performance, so you can spot
-              outliers — the videos that dramatically over- or under-performed — instead of just staring at raw
-              view counts. From there it layers on competitor tracking, trending and rising-video feeds, title
-              pattern analysis, and an AI coach that can explain why a specific video worked and suggest what to
-              try next.
+              TubeWatch tracks the competitors in your niche and surfaces their outliers — the videos pulling
+              views far faster than the channel&apos;s norm — so you can see what&apos;s working before everyone else
+              copies it. It scores videos on an age-adjusted velocity basis (views-per-day vs. the channel
+              median), not raw totals, so fresh breakouts show up early instead of months late. From there it
+              layers on rising and trending feeds, title pattern analysis, and an AI coach that explains why a
+              video worked and turns it into your next upload.
             </p>
           </div>
           <div>

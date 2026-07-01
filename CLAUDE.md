@@ -1,6 +1,6 @@
 # TubeWatch
 
-YouTube analytics SaaS for creators with 0–100K subscribers. Tagline: "Built for creators who aren't famous yet."
+YouTube analytics SaaS for growing creators (roughly 1K–100K subscribers). Positioning: find the breakout videos in your niche before you make your next one — competitor-outlier detection + AI next-video coaching. Outlier score is age-adjusted velocity (views-per-day vs. channel median), not raw views ÷ median.
 
 ## Stack
 - Next.js 14 App Router + TypeScript + Tailwind CSS

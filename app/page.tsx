@@ -17,12 +17,12 @@ const cards = [
 ];
 
 const features = [
-  { icon: "🔥", label: "Outlier Detection" },
-  { icon: "📊", label: "View Analytics" },
-  { icon: "📬", label: "Weekly Digest" },
-  { icon: "📈", label: "Growth Tracking" },
-  { icon: "🏷️", label: "Tag Insights" },
-  { icon: "⚡", label: "Real-time Data" },
+  { icon: "🔎", label: "Competitor Outlier Radar" },
+  { icon: "🧠", label: "AI Next-Video Coach" },
+  { icon: "📈", label: "Rising & Trending" },
+  { icon: "🧩", label: "Niche Patterns" },
+  { icon: "⚖️", label: "Channel Compare" },
+  { icon: "⚡", label: "Instant Any-Channel Sync" },
 ];
 
 function PlanFeatures({ features, color }: { features: string[]; color: string }) {
@@ -98,15 +98,16 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight max-w-3xl">
-            YouTube analytics built for creators who{" "}
+            Find the breakout videos in your niche{" "}
             <span style={{ color: "#00ff87", textShadow: "0 0 40px rgba(0,255,135,0.45)" }}>
-              aren&apos;t famous yet.
+              before you make your next one.
             </span>
           </h1>
 
           <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
-            Spot your breakout videos before they blow up. Built for channels with{" "}
-            <strong style={{ color: "#ccc" }}>0–100K subscribers.</strong>
+            TubeWatch surfaces the videos quietly overperforming across the channels you compete
+            with — then your AI coach turns them into your next upload. Built for{" "}
+            <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap">
@@ -280,9 +281,9 @@ export default function Home() {
         {/* BOTTOM CTA */}
         <div className="text-center pb-24 px-4">
           <div className="inline-block mb-4 text-4xl">🎬</div>
-          <p className="text-3xl font-black text-white mb-2">Ready to find your breakout video?</p>
+          <p className="text-3xl font-black text-white mb-2">Ready to find your next breakout — before you film it?</p>
           <p className="mb-8 text-lg" style={{ color: "#666" }}>
-            Join creators already using TubeWatch to grow smarter.
+            See what&apos;s already winning in your niche, then make your version.
           </p>
           <a
             href="/signup"

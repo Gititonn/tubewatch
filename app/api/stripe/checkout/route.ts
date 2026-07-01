@@ -19,15 +19,21 @@ export async function POST(request: Request) {
 
   const contentType = request.headers.get("content-type") ?? "";
   let planParam: string | undefined;
+  let cycleParam: string | undefined;
   if (contentType.includes("application/json")) {
-    const body = await request.json() as { plan?: string };
+    const body = await request.json() as { plan?: string; cycle?: string };
     planParam = body.plan;
+    cycleParam = body.cycle;
   } else {
     const formData = await request.formData();
     planParam = formData.get("plan")?.toString();
+    cycleParam = formData.get("cycle")?.toString();
   }
   const plan: Plan = planParam === "growth" ? "growth" : "pro";
   const planConfig = STRIPE_PLAN_CONFIG[plan];
+  const annual = cycleParam === "annual";
+  const unitAmount = annual ? planConfig.unit_amount_annual : planConfig.unit_amount;
+  const interval: "year" | "month" = annual ? "year" : "month";
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -56,17 +62,23 @@ export async function POST(request: Request) {
     customer: customerId,
     mode: "subscription",
     payment_method_types: ["card"],
+    // Let customers enter launch/discount codes (LAUNCH20, etc.) at checkout.
+    // Without this, Stripe never shows the promo field and no code can be redeemed.
+    allow_promotion_codes: true,
     line_items: [
       {
         price_data: {
           currency: "usd",
           product_data: { name: planConfig.name },
-          unit_amount: planConfig.unit_amount,
-          recurring: { interval: "month" },
+          unit_amount: unitAmount,
+          recurring: { interval },
         },
         quantity: 1,
       },
     ],
+    // Stamp the plan onto the subscription so the webhook resolves it from
+    // metadata rather than fragile amount-matching (survives price changes).
+    subscription_data: { metadata: { supabase_user_id: user.id, plan } },
     success_url: `${origin}/billing?upgraded=true`,
     cancel_url: `${origin}/billing`,
     metadata: { supabase_user_id: user.id, plan },

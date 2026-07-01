@@ -1,14 +1,28 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServiceClient } from "@/lib/supabase/server";
+import { STRIPE_PLAN_CONFIG } from "@/lib/plans";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-06-24.dahlia" });
 }
 
-function planFromUnitAmount(unitAmount: number): "pro" | "growth" | "free" {
-  if (unitAmount === 1900) return "pro";
-  if (unitAmount === 4900) return "growth";
+/**
+ * Resolve a plan from a subscription. Prefer the plan we stamped into
+ * subscription metadata at checkout (survives price changes and annual vs.
+ * monthly); fall back to matching the charged amount against the current
+ * config (monthly, or annual = 10× monthly). Never hardcode cents — that
+ * silently downgraded paying customers the last time prices changed.
+ */
+function planFromSubscription(sub: Stripe.Subscription): "pro" | "growth" | "free" {
+  const metaPlan = sub.metadata?.plan;
+  if (metaPlan === "pro" || metaPlan === "growth") return metaPlan;
+
+  const amount = sub.items.data[0]?.price?.unit_amount ?? 0;
+  for (const key of ["pro", "growth"] as const) {
+    const monthly = STRIPE_PLAN_CONFIG[key].unit_amount;
+    if (amount === monthly || amount === monthly * 10) return key;
+  }
   return "free";
 }
 
@@ -48,8 +62,7 @@ export async function POST(request: Request) {
 
   if (event.type === "customer.subscription.updated") {
     const subscription = event.data.object as Stripe.Subscription;
-    const unitAmount = subscription.items.data[0]?.price?.unit_amount ?? 0;
-    const plan = planFromUnitAmount(unitAmount);
+    const plan = planFromSubscription(subscription);
     await supabase
       .from("profiles")
       .update({ plan, stripe_subscription_id: subscription.id })

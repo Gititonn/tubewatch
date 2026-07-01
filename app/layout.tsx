@@ -7,8 +7,8 @@ import { FeedbackButton } from "./FeedbackButton";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "TubeWatch — YouTube analytics for small creators",
-  description: "YouTube analytics built for creators who aren't famous yet.",
+  title: "TubeWatch — find the breakout videos in your niche",
+  description: "See the videos quietly overperforming across the channels you compete with, then turn them into your next upload. Built for growing creators (roughly 1K–100K subs).",
 };
 
 // Inline script prevents flash of wrong theme on load

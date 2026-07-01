@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getUserPlan, isPaidPlan } from "@/lib/plan";
+import { getUserPlan } from "@/lib/plan";
+import { planLimits } from "@/lib/entitlements";
 
 export async function GET() {
   const supabase = createClient();
@@ -24,17 +25,18 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const plan = await getUserPlan(supabase, user.id);
-  if (!isPaidPlan(plan)) {
-    const { count } = await supabase
-      .from("competitor_channels")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
-    if ((count ?? 0) >= 1) {
-      return NextResponse.json(
-        { error: "Free plan is limited to 1 competitor channel. Upgrade to Pro for unlimited." },
-        { status: 402 }
-      );
-    }
+  const limit = planLimits(plan).competitorLimit;
+  const { count } = await supabase
+    .from("competitor_channels")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+  if ((count ?? 0) >= limit) {
+    return NextResponse.json(
+      {
+        error: `Your plan allows up to ${limit} competitor channel${limit === 1 ? "" : "s"}. Upgrade to track more.`,
+      },
+      { status: 402 }
+    );
   }
 
   const body = await request.json();

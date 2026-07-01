@@ -95,8 +95,7 @@ export default function OutlierPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Outlier Score</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-            Every video you&apos;ve posted, scored against your own channel&apos;s median views —
-            find out what&apos;s actually working, then ask the AI Engine why.
+            Views-per-day vs. your channel median — age-adjusted, so fresh breakouts show up early.
           </p>
         </div>
         <div className="flex gap-2">
@@ -141,10 +140,11 @@ export default function OutlierPage() {
           style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
         >
           <div className="text-6xl mb-4">⭐</div>
-          <h2 className="text-xl font-black text-foreground mb-3">Find the Videos That Beat Your Average</h2>
+          <h2 className="text-xl font-black text-foreground mb-3">Catch Your Breakouts Early</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
-            Outlier Score ranks each of your videos against your own channel median, so you can
-            see exactly which ones overperformed — then ask the AI Engine why.
+            Outlier Score ranks each video by how fast it&apos;s pulling views (age-adjusted) against
+            your channel median — so a fresh breakout surfaces early, not months later — then ask
+            the AI Engine why it worked.
           </p>
           <Link
             href="/connect"
