@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import { NavSections } from "./nav-sections";
 
@@ -22,10 +23,10 @@ export function MobileNav({ aiBadge = "NEW" }: { aiBadge?: string }) {
         className="sticky top-0 z-40 flex items-center justify-between px-4 h-14 border-b"
         style={{ background: "var(--bg-sidebar)", borderColor: "var(--border)" }}
       >
-        <span className="text-lg font-black tracking-tight">
+        <Link href="/" className="text-lg font-black tracking-tight">
           <span style={{ color: "#ff3333" }}>Tube</span>
           <span style={{ color: "var(--accent)" }}>Watch</span>
-        </span>
+        </Link>
         <button
           onClick={() => setOpen(true)}
           aria-label="Open navigation menu"
@@ -58,10 +59,10 @@ export function MobileNav({ aiBadge = "NEW" }: { aiBadge?: string }) {
         aria-hidden={!open}
       >
         <div className="mb-8 px-2 flex items-center justify-between">
-          <span className="text-lg font-black tracking-tight">
+          <Link href="/" className="text-lg font-black tracking-tight" onClick={() => setOpen(false)}>
             <span style={{ color: "#ff3333" }}>Tube</span>
             <span style={{ color: "var(--accent)" }}>Watch</span>
-          </span>
+          </Link>
           <button
             onClick={() => setOpen(false)}
             aria-label="Close navigation menu"

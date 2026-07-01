@@ -1,4 +1,5 @@
 ﻿import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import { NavSections } from "./nav-sections";
@@ -38,10 +39,10 @@ export default async function DashboardLayout({
         style={{ borderColor: "var(--border)", background: "var(--bg-sidebar)" }}
       >
         <div className="mb-8 px-2">
-          <span className="text-lg font-black tracking-tight">
+          <Link href="/" className="text-lg font-black tracking-tight">
             <span style={{ color: "#ff3333" }}>Tube</span>
             <span style={{ color: "var(--accent)" }}>Watch</span>
-          </span>
+          </Link>
         </div>
         <nav className="flex flex-col gap-0.5 flex-1">
           <NavSections aiBadge={aiBadge} />

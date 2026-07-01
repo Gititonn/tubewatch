@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getChannelByHandle } from "@/lib/youtube";
+import { syncChannel } from "@/lib/sync";
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -37,7 +38,6 @@ export async function POST(request: Request) {
         channel_name: snippet?.title ?? null,
         channel_thumbnail: snippet?.thumbnails?.default?.url ?? null,
         subscriber_count: stats?.subscriberCount ? parseInt(stats.subscriberCount) : null,
-        last_synced_at: new Date().toISOString(),
       },
       { onConflict: "user_id,youtube_channel_id" }
     )
@@ -48,17 +48,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Await sync so the dashboard has videos immediately after redirect.
-  // The sync route uses a service-role client and needs no auth cookie.
-  const origin = new URL(request.url).origin;
+  // Sync videos immediately so the dashboard has data after redirect.
+  // Call the shared sync function directly (service-role, in-process) instead
+  // of hitting our own /api/youtube/sync over HTTP — that internal fetch never
+  // carried the caller's auth cookie, so it 401'd silently on every connect and
+  // last_synced_at got stamped here regardless, leaving Resync stuck on a false
+  // cooldown with zero videos synced.
   try {
-    await fetch(`${origin}/api/youtube/sync`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ channelDbId: upserted.id, youtubeChannelId: channel.id }),
-    });
+    await syncChannel(upserted.id, channel.id!, { enforceCooldown: false });
   } catch {
-    // Non-fatal: channel is saved, user can Resync manually.
+    // Non-fatal: channel is saved, user can Resync manually once the cooldown clears.
   }
 
   return NextResponse.json({ success: true, channel: upserted });

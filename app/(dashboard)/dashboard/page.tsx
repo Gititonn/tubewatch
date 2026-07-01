@@ -97,12 +97,12 @@ export default async function DashboardPage() {
           className="rounded-2xl border p-5 mb-8 flex items-center gap-5"
           style={{
             borderColor: "rgba(0,255,135,0.25)",
-            background: "linear-gradient(135deg, rgba(0,255,135,0.06) 0%, #111 100%)",
+            background: "linear-gradient(135deg, rgba(0,255,135,0.06) 0%, var(--bg-card) 100%)",
           }}
         >
           <div className="text-3xl">🎯</div>
           <div className="flex-1">
-            <div className="font-black text-white mb-0.5">Stop guessing what to film.</div>
+            <div className="font-black text-foreground mb-0.5">Stop guessing what to film.</div>
             <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
               Discover low-competition, high-outlier topics in your niche before they peak. Connect your channel to layer your own stats on top.
             </div>
@@ -200,7 +200,7 @@ export default async function DashboardPage() {
           className="rounded-2xl border p-5 mb-6 flex items-center gap-4 cursor-pointer transition-all hover:scale-[1.01]"
           style={{
             borderColor: "rgba(168,85,247,0.35)",
-            background: "linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(139,92,246,0.04) 60%, #111 100%)",
+            background: "linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(139,92,246,0.04) 60%, var(--bg-card) 100%)",
             boxShadow: "0 0 30px rgba(168,85,247,0.08)",
           }}
         >
@@ -212,7 +212,7 @@ export default async function DashboardPage() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="font-black text-white">TubeWatch AI Engine</span>
+              <span className="font-black text-foreground">TubeWatch AI Engine</span>
               <span className="text-xs font-black px-2 py-0.5 rounded-full" style={{ background: "rgba(168,85,247,0.25)", color: "#c084fc" }}>{aiUnlocked ? "NEW" : "PRO"}</span>
             </div>
             <div className="text-sm" style={{ color: "var(--text-secondary)" }}>
@@ -415,7 +415,7 @@ function SectionHeader({ label, href }: { label: string; href?: string }) {
 function StatCard({ label, value, icon, accent, sub }: { label: string; value: string; icon: string; accent: string; sub?: string }) {
   return (
     <div className="rounded-xl border p-4 flex flex-col gap-1 min-w-0"
-      style={{ borderColor: "var(--border)", background: `linear-gradient(135deg, ${accent}08 0%, #111 100%)` }}>
+      style={{ borderColor: "var(--border)", background: `linear-gradient(135deg, ${accent}08 0%, var(--bg-card) 100%)` }}>
       <div className="flex items-center gap-2">
         <span className="text-sm flex-shrink-0">{icon}</span>
         <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: "var(--text-muted)" }}>{label}</span>

@@ -33,9 +33,9 @@ export default function ConnectPage() {
 
   return (
     <div className="p-8 max-w-lg">
-      <h1 className="text-2xl font-bold text-foreground mb-2">Connect your channel</h1>
+      <h1 className="text-2xl font-bold text-foreground mb-2">Connect any channel</h1>
       <p className="text-sm mb-8" style={{ color: "var(--text-secondary)" }}>
-        Enter your YouTube channel handle or URL to get started.
+        Enter any YouTube channel handle or URL — yours or a competitor's — to get started.
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
