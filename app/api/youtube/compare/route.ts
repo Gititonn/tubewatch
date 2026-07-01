@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getChannelByHandle, getChannelVideos } from "@/lib/youtube";
+import { getChannelByHandle, getChannelVideos, YouTubeApiError } from "@/lib/youtube";
 import { calculateOutlierScores } from "@/lib/outlier";
 import type { Video } from "@/lib/types";
 import { createClient } from "@/lib/supabase/server";
@@ -96,6 +96,9 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error("Compare error:", err);
+    if (err instanceof YouTubeApiError) {
+      return NextResponse.json({ error: err.message }, { status: err.reason === "quota_exceeded" ? 503 : err.status });
+    }
     return NextResponse.json({ error: "Failed to fetch channel" }, { status: 500 });
   }
 }

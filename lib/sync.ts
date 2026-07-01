@@ -1,5 +1,5 @@
 import { createServiceClient } from "@/lib/supabase/server";
-import { getChannelVideos, parseDurationToSeconds } from "@/lib/youtube";
+import { getChannelVideos, parseDurationToSeconds, YouTubeApiError } from "@/lib/youtube";
 import { calculateOutlierScores } from "@/lib/outlier";
 import type { Video } from "@/lib/types";
 
@@ -41,7 +41,19 @@ export async function syncChannel(
     }
   }
 
-  const ytVideos = await getChannelVideos(youtubeChannelId);
+  let ytVideos;
+  try {
+    ytVideos = await getChannelVideos(youtubeChannelId);
+  } catch (err) {
+    // Return, don't throw: this fn is called both directly (manual resync,
+    // where an uncaught throw would 500 with no message) and via
+    // Promise.allSettled in the daily cron (where a throw was previously
+    // invisible as a bare "rejected" settlement with no error detail).
+    if (err instanceof YouTubeApiError) {
+      return { error: err.message, status: err.reason === "quota_exceeded" ? 503 : err.status };
+    }
+    return { error: "Couldn't reach YouTube. Please try again.", status: 503 };
+  }
   if (!ytVideos || ytVideos.length === 0) return { synced: 0 };
 
   const rawVideos: Omit<Video, "id" | "updated_at">[] = ytVideos.map((v) => ({

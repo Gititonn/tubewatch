@@ -15,19 +15,20 @@ export function planLimits(plan: Plan) {
 
 type SB = ReturnType<typeof createClient>;
 
-/** First instant of the month after `from` (UTC). */
-function startOfNextMonth(from: Date): Date {
-  return new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + 1, 1));
-}
-
 export type ConsumeResult =
   | { ok: true; remaining: number }
   | { ok: false; error: string; status: number };
 
 /**
  * Consume one AI call for the user, resetting the counter at the start of each
- * calendar month. Read-modify-write on the user's own profile row (RLS-safe);
- * good enough at current scale — a rare concurrent double-spend is harmless.
+ * calendar month. Delegates to the `consume_ai_call` Postgres function, which
+ * takes a row lock and does the check-and-increment as one atomic unit.
+ *
+ * This used to be a read-modify-write in application code (select used count,
+ * check limit, then update) — a classic check-then-act race: two concurrent
+ * requests could both read "4 used, limit 5," both pass the check, and both
+ * write 5, letting a user go over their monthly cap. The DB function closes
+ * that window.
  */
 export async function consumeAiCall(
   supabase: SB,
@@ -39,36 +40,24 @@ export async function consumeAiCall(
     return { ok: false, error: "Upgrade to a paid plan to use the AI coach.", status: 402 };
   }
 
-  const { data } = await supabase
-    .from("profiles")
-    .select("ai_calls_used, ai_calls_reset_at")
-    .eq("id", userId)
+  const { data, error } = await supabase
+    .rpc("consume_ai_call", { p_user_id: userId, p_limit: limit })
     .single();
 
-  const now = new Date();
-  let used: number = data?.ai_calls_used ?? 0;
-  let resetAt = data?.ai_calls_reset_at ? new Date(data.ai_calls_reset_at) : null;
-
-  if (!resetAt || now >= resetAt) {
-    used = 0;
-    resetAt = startOfNextMonth(now);
+  if (error || !data) {
+    return { ok: false, error: "Couldn't check your AI usage — try again.", status: 500 };
   }
 
-  if (used >= limit) {
+  const { ok, used, reset_at } = data as { ok: boolean; used: number; reset_at: string };
+
+  if (!ok) {
     const upsell = plan === "growth" ? "" : "Upgrade for a higher cap, or your allowance ";
     return {
       ok: false,
-      error: `You've used all ${limit} AI answers this month. ${upsell}resets ${resetAt
-        .toISOString()
-        .slice(0, 10)}.`,
+      error: `You've used all ${limit} AI answers this month. ${upsell}resets ${reset_at.slice(0, 10)}.`,
       status: 429,
     };
   }
 
-  await supabase
-    .from("profiles")
-    .update({ ai_calls_used: used + 1, ai_calls_reset_at: resetAt.toISOString() })
-    .eq("id", userId);
-
-  return { ok: true, remaining: limit - used - 1 };
+  return { ok: true, remaining: limit - used };
 }

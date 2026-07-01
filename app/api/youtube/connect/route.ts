@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getChannelByHandle } from "@/lib/youtube";
+import { getChannelByHandle, YouTubeApiError } from "@/lib/youtube";
 import { syncChannel } from "@/lib/sync";
 
 export async function POST(request: Request) {
@@ -17,7 +17,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Handle is required" }, { status: 400 });
   }
 
-  const channel = await getChannelByHandle(handle);
+  let channel;
+  try {
+    channel = await getChannelByHandle(handle);
+  } catch (err) {
+    if (err instanceof YouTubeApiError) {
+      return NextResponse.json({ error: err.message }, { status: err.reason === "quota_exceeded" ? 503 : err.status });
+    }
+    return NextResponse.json({ error: "Couldn't reach YouTube. Please try again." }, { status: 503 });
+  }
 
   if (!channel) {
     return NextResponse.json(

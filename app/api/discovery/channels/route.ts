@@ -33,6 +33,17 @@ export async function GET(request: Request) {
   return NextResponse.json({ channels });
 }
 
+// Quality bar for the shared pool. Found live: a 1-subscriber, near-zero-view
+// test channel got added in under a minute with no gate at all. This doesn't
+// stop a determined bad actor, but it stops accidental/casual junk (and the
+// kind of "add whatever the search returned" flow this app itself does).
+const MIN_SUBSCRIBERS = 200;
+const MIN_VIDEOS = 5;
+
+// Per-contributor rate limit on NEW discovery channels (not edits to existing
+// ones) — caps how fast one account can flood the shared pool.
+const MAX_CONTRIBUTIONS_PER_DAY = 5;
+
 export async function POST(request: Request) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -66,11 +77,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ channel, alreadyExisted: true });
   }
 
+  if ((subscriberCount ?? 0) < MIN_SUBSCRIBERS || (videoCount ?? 0) < MIN_VIDEOS) {
+    return NextResponse.json(
+      {
+        error: `This channel is too small to add to the shared discovery pool (needs ${MIN_SUBSCRIBERS}+ subscribers and ${MIN_VIDEOS}+ videos). You can still track it as your own competitor from the Competitors page.`,
+      },
+      { status: 422 }
+    );
+  }
+
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count: recentContributions } = await supabase
+    .from("competitor_channels")
+    .select("id", { count: "exact", head: true })
+    .eq("contributed_by", user.id)
+    .eq("is_discovery", true)
+    .gte("created_at", dayAgo);
+
+  if ((recentContributions ?? 0) >= MAX_CONTRIBUTIONS_PER_DAY) {
+    return NextResponse.json(
+      { error: `You've added ${MAX_CONTRIBUTIONS_PER_DAY} channels to the shared pool today — try again tomorrow.` },
+      { status: 429 }
+    );
+  }
+
   const { data: channel, error } = await supabase
     .from("competitor_channels")
     .insert({
       user_id: null,
       is_discovery: true,
+      contributed_by: user.id,
       youtube_channel_id: channelId,
       channel_name: name,
       channel_handle: handle ?? null,

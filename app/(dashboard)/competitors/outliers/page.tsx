@@ -74,6 +74,10 @@ export default function OutliersPage() {
   // above (found live: searching under "Gaming" mis-tagged an unrelated
   // channel as gaming just because that pill was still selected).
   const [ytCategoryPicks, setYtCategoryPicks] = useState<Record<string, ChannelCategory>>({});
+  // Surfaces the discovery-pool API's 422 (too small) / 429 (rate limited)
+  // messages — previously a rejected add just re-enabled the button with no
+  // explanation at all.
+  const [addChannelError, setAddChannelError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [whyItWorked, setWhyItWorked] = useState<{
     videoId: string;
@@ -127,6 +131,7 @@ export default function OutliersPage() {
     channelId: string; name: string; handle: string | null; thumbnail: string | null; subscriberCount: number; videoCount: number;
   }) {
     setAddingChannelId(result.channelId);
+    setAddChannelError(null);
     const addRes = await fetch("/api/discovery/channels", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -145,6 +150,8 @@ export default function OutliersPage() {
       await fetch(`/api/competitors/channels/${addData.channel.id}/sync`, { method: "POST" });
       fetch("/api/discovery/channels").then((r) => r.json()).then((d) => setDiscoveryChannels(d.channels ?? []));
       await loadOutliers();
+    } else if (addData.error) {
+      setAddChannelError(addData.error);
     }
     setAddingChannelId(null);
   }
@@ -461,6 +468,14 @@ export default function OutliersPage() {
               </div>
             ) : (
               <p style={{ color: "var(--text-muted)", fontSize: 13, textAlign: "center" }}>No YouTube channels found for that search either.</p>
+            )}
+            {addChannelError && (
+              <div
+                className="mt-3 rounded-lg px-3 py-2.5 text-sm"
+                style={{ background: "rgba(255,90,90,0.1)", border: "1px solid rgba(255,90,90,0.3)", color: "#ff8a8a" }}
+              >
+                {addChannelError}
+              </div>
             )}
           </div>
         ) : (

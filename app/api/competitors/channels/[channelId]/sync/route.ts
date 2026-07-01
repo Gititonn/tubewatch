@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getChannelVideos, parseDurationToSeconds } from "@/lib/youtube";
+import { getChannelVideos, parseDurationToSeconds, YouTubeApiError } from "@/lib/youtube";
+import { calculateOutlierScores } from "@/lib/outlier";
 
 export async function POST(
   _request: Request,
@@ -26,7 +27,15 @@ export async function POST(
     return NextResponse.json({ error: "Channel not found" }, { status: 404 });
   }
 
-  const ytVideos = await getChannelVideos(competitorChannel.youtube_channel_id, 50);
+  let ytVideos;
+  try {
+    ytVideos = await getChannelVideos(competitorChannel.youtube_channel_id, 50);
+  } catch (err) {
+    if (err instanceof YouTubeApiError) {
+      return NextResponse.json({ error: err.message }, { status: err.reason === "quota_exceeded" ? 503 : err.status });
+    }
+    return NextResponse.json({ error: "Couldn't reach YouTube. Please try again." }, { status: 503 });
+  }
 
   if (!ytVideos || ytVideos.length === 0) {
     return NextResponse.json({ synced: 0 });
@@ -48,15 +57,19 @@ export async function POST(
     fetched_at: new Date().toISOString(),
   }));
 
+  // Same scoring function used for the caller's own channel and the discovery
+  // pool (lib/outlier.ts) — age-normalized velocity, not raw views ÷ median.
+  // Previously this route computed a separate, cruder ratio, so the same "Nx"
+  // badge meant two different things depending on which pool a video came
+  // from. One formula everywhere now.
+  const withScores = calculateOutlierScores(rawVideos);
+
+  // median_views stays a simple raw-view median — it's a display stat on the
+  // Competitors page ("Median: X views"), not the scoring input.
   const views = rawVideos.map((v) => v.view_count).sort((a, b) => a - b);
   const mid = Math.floor(views.length / 2);
   const median =
     views.length % 2 !== 0 ? views[mid] : (views[mid - 1] + views[mid]) / 2;
-
-  const withScores = rawVideos.map((v) => ({
-    ...v,
-    outlier_score: median > 0 ? parseFloat((v.view_count / median).toFixed(2)) : 0,
-  }));
 
   const { error: upsertError } = await supabase
     .from("competitor_videos")

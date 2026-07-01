@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient, createServiceClient } from "@/lib/supabase/server"
 import { google } from "googleapis"
-import { parseDurationToSeconds } from "@/lib/youtube"
+import { parseDurationToSeconds, withYouTubeRetry, YouTubeApiError } from "@/lib/youtube"
 
 const youtube = google.youtube({ version: "v3", auth: process.env.YOUTUBE_API_KEY })
 
@@ -50,13 +50,15 @@ export async function GET(request: Request) {
   }
 
   try {
-    const res = await youtube.videos.list({
-      part: ["snippet", "statistics", "contentDetails"],
-      chart: "mostPopular",
-      regionCode,
-      videoCategoryId: categoryId || undefined,
-      maxResults: 50,
-    })
+    const res = await withYouTubeRetry(() =>
+      youtube.videos.list({
+        part: ["snippet", "statistics", "contentDetails"],
+        chart: "mostPopular",
+        regionCode,
+        videoCategoryId: categoryId || undefined,
+        maxResults: 50,
+      })
+    )
 
     const items = res.data.items ?? []
 
@@ -105,6 +107,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ videos })
   } catch (err: unknown) {
+    if (err instanceof YouTubeApiError) {
+      return NextResponse.json({ error: err.message }, { status: err.reason === "quota_exceeded" ? 503 : err.status })
+    }
     const message = err instanceof Error ? err.message : "YouTube API error"
     return NextResponse.json({ error: message }, { status: 500 })
   }
