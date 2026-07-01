@@ -308,6 +308,7 @@ export default async function Home() {
           style={{ borderColor: "#1a1a1a", color: "#666" }}
         >
           <span>© 2026 TubeWatch</span>
+          <Link href="/leaderboard" className="hover:text-white transition-colors">Leaderboards</Link>
           <Link href="/about" className="hover:text-white transition-colors">About</Link>
           <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
