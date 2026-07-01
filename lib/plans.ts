@@ -46,7 +46,7 @@ export const PLANS: Record<Plan, PlanDef> = {
   pro: {
     id: "pro",
     name: "Pro",
-    priceMonthly: 29,
+    priceMonthly: 19,
     paid: true,
     highlight: true,
     aiCallsPerMonth: 300,
@@ -65,7 +65,7 @@ export const PLANS: Record<Plan, PlanDef> = {
   growth: {
     id: "growth",
     name: "Growth",
-    priceMonthly: 79,
+    priceMonthly: 49,
     paid: true,
     aiCallsPerMonth: 1500,
     competitorLimit: 25,

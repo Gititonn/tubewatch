@@ -257,41 +257,9 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* TRENDING NOW */}
-      {trendingCache && trendingCache.length > 0 && (
-        <div className="mb-10">
-          <SectionHeader href="/trending" label="Trending Now on YouTube" />
-          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
-            {trendingCache.slice(0, 8).map((v) => (
-              <a
-                key={v.youtube_video_id}
-                href={`https://www.youtube.com/watch?v=${v.youtube_video_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-xl border overflow-hidden block transition-all hover:border-blue-500/40 hover:scale-[1.02]"
-                style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
-              >
-                {v.thumbnail_url && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={v.thumbnail_url} alt={v.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
-                )}
-                <div className="p-3">
-                  <p className="text-foreground text-xs font-semibold mb-1 leading-snug"
-                    style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                    {v.title}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fmt(v.view_count ?? 0)} views</span>
-                    <span className="text-xs" style={{ color: "#3b82f6" }}>{v.channel_name}</span>
-                  </div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* COMPETITOR OUTLIERS — global feed */}
+      {/* COMPETITOR OUTLIERS — global feed. Hero feature: leads ahead of generic
+          YouTube-wide trending so the product experience matches the pitch
+          ("find the breakout videos in your niche") on the very first screen. */}
       {outlierVideos && outlierVideos.length > 0 && (
         <div className="mb-10">
           <SectionHeader href="/competitors/outliers" label="Outlier Videos This Week" />
@@ -334,19 +302,53 @@ export default async function DashboardPage() {
         </div>
       )}
 
+      {/* TRENDING NOW — generic YouTube-wide signal, kept but demoted below the niche outlier feed */}
+      {trendingCache && trendingCache.length > 0 && (
+        <div className="mb-10">
+          <SectionHeader href="/trending" label="Trending Now on YouTube" />
+          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
+            {trendingCache.slice(0, 8).map((v) => (
+              <a
+                key={v.youtube_video_id}
+                href={`https://www.youtube.com/watch?v=${v.youtube_video_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl border overflow-hidden block transition-all hover:border-blue-500/40 hover:scale-[1.02]"
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
+              >
+                {v.thumbnail_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={v.thumbnail_url} alt={v.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
+                )}
+                <div className="p-3">
+                  <p className="text-foreground text-xs font-semibold mb-1 leading-snug"
+                    style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
+                    {v.title}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{fmt(v.view_count ?? 0)} views</span>
+                    <span className="text-xs" style={{ color: "#3b82f6" }}>{v.channel_name}</span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Explore feature tiles */}
       <div className="mb-8">
         <SectionHeader label="Explore" />
         <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))" }}>
           {[
-            { href: "/trending", icon: "📈", label: "Trending Now", desc: "What's blowing up right now", accent: "#3b82f6", border: "rgba(59,130,246,0.25)", bg: "rgba(59,130,246,0.07)" },
-            { href: "/rising", icon: "🚀", label: "Rising Videos", desc: "Spot hits before they peak", accent: "#a855f7", border: "rgba(168,85,247,0.25)", bg: "rgba(168,85,247,0.07)" },
-            { href: "/competitors", icon: "⚡", label: "Competitors", desc: "Track rival channels", accent: "#f59e0b", border: "rgba(245,158,11,0.25)", bg: "rgba(245,158,11,0.07)" },
             { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed", desc: "Videos crushing their average", accent: "#ef4444", border: "rgba(239,68,68,0.25)", bg: "rgba(239,68,68,0.07)" },
-            { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
+            { href: "/competitors", icon: "⚡", label: "Competitors", desc: "Track rival channels", accent: "#f59e0b", border: "rgba(245,158,11,0.25)", bg: "rgba(245,158,11,0.07)" },
             { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#4ade80", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
-            { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
             { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask the TubeWatch AI Engine your strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
+            { href: "/rising", icon: "🚀", label: "Rising Videos", desc: "Spot hits before they peak", accent: "#a855f7", border: "rgba(168,85,247,0.25)", bg: "rgba(168,85,247,0.07)" },
+            { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
+            { href: "/trending", icon: "📈", label: "Trending Now", desc: "What's blowing up right now", accent: "#3b82f6", border: "rgba(59,130,246,0.25)", bg: "rgba(59,130,246,0.07)" },
+            { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
             { href: "/videos", icon: "▶️", label: "All Videos", desc: "Full library + outlier scores", accent: "#888", border: "rgba(255,255,255,0.1)", bg: "rgba(255,255,255,0.03)" },
           ].map((t) => (
             <Link key={t.href} href={t.href}>

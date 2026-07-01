@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import FeatureCarousel from "./feature-carousel";
 import ComparisonSection from "./comparison-section";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
+import { createClient } from "@/lib/supabase/server";
 
 const cards = [
   { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", duration: "12:08", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
@@ -52,7 +54,13 @@ function PlanFeatures({ features, color }: { features: string[]; color: string }
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) redirect("/dashboard");
+
   const doubled = [...cards, ...cards];
 
   return (
