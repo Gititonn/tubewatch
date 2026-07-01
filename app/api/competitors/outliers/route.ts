@@ -8,6 +8,7 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const channelId = searchParams.get("channelId");
+  const category = searchParams.get("category");
   const minScore = parseFloat(searchParams.get("minScore") ?? "1");
   const limit = parseInt(searchParams.get("limit") ?? "50");
 
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
     .eq("user_id", user.id);
 
   if (channelId) channelQuery = channelQuery.eq("id", channelId);
+  if (category) channelQuery = channelQuery.eq("category", category);
 
   const { data: userChannels, error: chError } = await channelQuery;
   if (chError) return NextResponse.json({ error: chError.message }, { status: 500 });
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
 
   const { data: outliers, error } = await supabase
     .from("competitor_videos")
-    .select(`*, competitor_channels(id, channel_name, thumbnail_url, youtube_channel_id)`)
+    .select(`*, competitor_channels(id, channel_name, thumbnail_url, youtube_channel_id, category)`)
     .in("competitor_channel_id", channelIds)
     .gte("outlier_score", minScore)
     .order("outlier_score", { ascending: false })

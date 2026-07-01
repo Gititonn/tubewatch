@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
 
 type CompetitorChannel = {
   id: string;
@@ -12,6 +13,7 @@ type CompetitorChannel = {
   median_views: number | null;
   last_synced_at: string | null;
   created_at: string;
+  category: ChannelCategory | null;
 };
 
 type SearchResult = {
@@ -50,6 +52,8 @@ export default function CompetitorsPage() {
   const [adding, setAdding] = useState<string | null>(null);
   const [syncing, setSyncing] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [updatingCategory, setUpdatingCategory] = useState<string | null>(null);
+  const [pendingCategory, setPendingCategory] = useState<ChannelCategory>("other");
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -71,6 +75,7 @@ export default function CompetitorsPage() {
   function openModal() {
     setSearchQuery("");
     setSearchResults([]);
+    setPendingCategory("other");
     setShowModal(true);
   }
 
@@ -102,6 +107,7 @@ export default function CompetitorsPage() {
         thumbnail: result.thumbnail,
         subscriberCount: result.subscriberCount,
         videoCount: result.videoCount,
+        category: pendingCategory,
       }),
     });
     const data = await res.json();
@@ -129,6 +135,17 @@ export default function CompetitorsPage() {
     await fetch(`/api/competitors/channels?id=${channelId}`, { method: "DELETE" });
     await loadChannels();
     setDeleting(null);
+  }
+
+  async function handleCategoryChange(channelId: string, category: ChannelCategory) {
+    setUpdatingCategory(channelId);
+    await fetch("/api/competitors/channels", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: channelId, category }),
+    });
+    await loadChannels();
+    setUpdatingCategory(null);
   }
 
   return (
@@ -198,7 +215,7 @@ export default function CompetitorsPage() {
                   )}
                 </div>
                 <div
-                  className="flex gap-4 text-xs"
+                  className="flex gap-4 text-xs flex-wrap"
                   style={{ color: "var(--text-secondary)" }}
                 >
                   <span>{fmt(ch.subscriber_count)} subs</span>
@@ -207,6 +224,21 @@ export default function CompetitorsPage() {
                   <span>Synced {timeAgo(ch.last_synced_at)}</span>
                 </div>
               </div>
+
+              <select
+                value={ch.category ?? "other"}
+                disabled={updatingCategory === ch.id}
+                onChange={(e) => handleCategoryChange(ch.id, e.target.value as ChannelCategory)}
+                className="px-2.5 py-1.5 rounded-lg text-xs font-medium outline-none flex-shrink-0 disabled:opacity-40"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+                title="Niche category — used to filter the Outlier Feed"
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.emoji} {c.label}
+                  </option>
+                ))}
+              </select>
 
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
@@ -253,7 +285,7 @@ export default function CompetitorsPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSearch} className="flex gap-2 mb-4">
+            <form onSubmit={handleSearch} className="flex gap-2 mb-3">
               <input
                 ref={searchRef}
                 value={searchQuery}
@@ -275,6 +307,24 @@ export default function CompetitorsPage() {
                 {searching ? "…" : "Search"}
               </button>
             </form>
+
+            <div className="mb-4">
+              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-muted)" }}>
+                Niche category (used to filter the Outlier Feed)
+              </label>
+              <select
+                value={pendingCategory}
+                onChange={(e) => setPendingCategory(e.target.value as ChannelCategory)}
+                className="w-full px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.emoji} {c.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             {searchResults.length > 0 && (
               <div className="flex flex-col gap-2">

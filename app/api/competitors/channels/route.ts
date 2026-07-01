@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { channelId, name, handle, thumbnail, subscriberCount, videoCount } = body;
+  const { channelId, name, handle, thumbnail, subscriberCount, videoCount, category } = body;
 
   if (!channelId || !name) {
     return NextResponse.json({ error: "Missing channelId or name" }, { status: 400 });
@@ -57,9 +57,33 @@ export async function POST(request: Request) {
         thumbnail_url: thumbnail ?? null,
         subscriber_count: subscriberCount ?? null,
         video_count: videoCount ?? null,
+        category: category ?? "other",
       },
       { onConflict: "user_id,youtube_channel_id" }
     )
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ channel });
+}
+
+export async function PATCH(request: Request) {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id, category } = await request.json();
+  if (!id || !category) {
+    return NextResponse.json({ error: "Missing id or category" }, { status: 400 });
+  }
+
+  const { data: channel, error } = await supabase
+    .from("competitor_channels")
+    .update({ category })
+    .eq("id", id)
+    .eq("user_id", user.id)
     .select()
     .single();
 

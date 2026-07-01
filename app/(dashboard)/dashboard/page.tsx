@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ResyncButton from "./ResyncButton";
 import DisconnectChannelButton from "../settings/DisconnectChannelButton";
+import OutlierFeedWidget from "./OutlierFeedWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -78,17 +79,6 @@ export default async function DashboardPage() {
     .gte("fetched_at", twoHoursAgo)
     .order("view_count", { ascending: false })
     .limit(8);
-
-  // Competitor outliers (global, not per-user)
-  const { data: outlierVideos } = await serviceClient
-    .from("competitor_videos")
-    .select(`
-      id, title, youtube_video_id, thumbnail_url, view_count, outlier_score, published_at,
-      competitor_channels ( channel_name, thumbnail_url )
-    `)
-    .gte("outlier_score", 3)
-    .order("outlier_score", { ascending: false })
-    .limit(6);
 
   return (
     <div className="p-6 max-w-6xl" style={{ color: "var(--text-primary)" }}>
@@ -202,6 +192,15 @@ export default async function DashboardPage() {
       )}
 
 
+      {/* COMPETITOR OUTLIERS — per-user, category-filterable. THE hero feature:
+          featured directly under the channel header, ahead of the AI upsell
+          and generic trending, so it's the first substantive thing every
+          user — brand new or returning — sees after signing in. Client
+          component so category pills can filter without a page reload; also
+          fixes the old server query, which had no user_id scoping and showed
+          every tracked channel's outliers to every signed-in user. */}
+      <OutlierFeedWidget />
+
       {/* AI Strategy Card — always shown; free users are sent to billing, not a 402 */}
       <Link href={aiUnlocked ? "/ai" : "/billing"}>
         <div
@@ -256,51 +255,6 @@ export default async function DashboardPage() {
           </Link>
         ))}
       </div>
-
-      {/* COMPETITOR OUTLIERS — global feed. Hero feature: leads ahead of generic
-          YouTube-wide trending so the product experience matches the pitch
-          ("find the breakout videos in your niche") on the very first screen. */}
-      {outlierVideos && outlierVideos.length > 0 && (
-        <div className="mb-10">
-          <SectionHeader href="/competitors/outliers" label="Outlier Videos This Week" />
-          <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>
-            {outlierVideos.map((v) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const ch = Array.isArray(v.competitor_channels) ? v.competitor_channels[0] : (v.competitor_channels as any);
-              const score = v.outlier_score ?? 0;
-              const scoreColor = score >= 10 ? "#ff4444" : score >= 5 ? "#ffaa00" : "#4ade80";
-              return (
-                <a
-                  key={v.id}
-                  href={`https://www.youtube.com/watch?v=${v.youtube_video_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-xl border overflow-hidden block transition-all hover:border-red-500/40 hover:scale-[1.02]"
-                  style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
-                >
-                  {v.thumbnail_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={v.thumbnail_url} alt={v.title} className="w-full object-cover" style={{ aspectRatio: "16/9" }} />
-                  )}
-                  <div className="p-3">
-                    <p className="text-foreground text-xs font-semibold mb-2 leading-snug"
-                      style={{ display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>
-                      {v.title}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs" style={{ color: "var(--text-muted)" }}>{ch?.channel_name ?? ""}</span>
-                      <span className="text-xs font-black px-1.5 py-0.5 rounded"
-                        style={{ color: scoreColor, background: scoreColor + "20" }}>
-                        {score.toFixed(1)}x
-                      </span>
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {/* TRENDING NOW — generic YouTube-wide signal, kept but demoted below the niche outlier feed */}
       {trendingCache && trendingCache.length > 0 && (

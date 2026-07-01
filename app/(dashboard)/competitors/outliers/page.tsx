@@ -2,10 +2,12 @@
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { VideoGridSkeleton } from "@/components/Skeleton";
 import { useState, useEffect } from "react";
+import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
 
 type CompetitorChannel = {
   id: string;
   channel_name: string;
+  category: ChannelCategory | null;
 };
 
 type OutlierVideo = {
@@ -56,6 +58,7 @@ export default function OutliersPage() {
   const [outliers, setOutliers] = useState<OutlierVideo[]>([]);
   const [channels, setChannels] = useState<CompetitorChannel[]>([]);
   const [selectedChannel, setSelectedChannel] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<ChannelCategory | "">("");
   const [minScore, setMinScore] = useState(3);
   const [loading, setLoading] = useState(true);
   const [whyItWorked, setWhyItWorked] = useState<{
@@ -73,12 +76,13 @@ export default function OutliersPage() {
 
   useEffect(() => {
     loadOutliers();
-  }, [selectedChannel, minScore]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedChannel, selectedCategory, minScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadOutliers() {
     setLoading(true);
     const params = new URLSearchParams({ minScore: minScore.toString(), limit: "50" });
     if (selectedChannel) params.set("channelId", selectedChannel);
+    if (selectedCategory) params.set("category", selectedCategory);
     const res = await fetch(`/api/competitors/outliers?${params}`);
     const data = await res.json();
     setOutliers(data.outliers ?? []);
@@ -130,6 +134,44 @@ export default function OutliersPage() {
           Competitor videos that massively outperformed their channel&apos;s average.
         </p>
       </div>
+
+      {/* Category pills — filter to a single niche so unrelated tracked
+          channels (e.g. a movie-trailer channel) don't drown out the rest. */}
+      {(() => {
+        const availableCategories = Array.from(
+          new Set(channels.map((c) => c.category ?? "other"))
+        ) as ChannelCategory[];
+        if (availableCategories.length <= 1) return null;
+        return (
+          <div className="flex gap-1.5 mb-4 flex-wrap">
+            <button
+              onClick={() => setSelectedCategory("")}
+              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+              style={{
+                background: selectedCategory === "" ? "#00ff87" : "var(--bg-card)",
+                color: selectedCategory === "" ? "#000" : "var(--text-secondary)",
+                border: `1px solid ${selectedCategory === "" ? "#00ff87" : "var(--border)"}`,
+              }}
+            >
+              All niches
+            </button>
+            {CATEGORIES.filter((c) => availableCategories.includes(c.id)).map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setSelectedCategory(c.id)}
+                className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+                style={{
+                  background: selectedCategory === c.id ? "#00ff87" : "var(--bg-card)",
+                  color: selectedCategory === c.id ? "#000" : "var(--text-secondary)",
+                  border: `1px solid ${selectedCategory === c.id ? "#00ff87" : "var(--border)"}`,
+                }}
+              >
+                {c.emoji} {c.label}
+              </button>
+            ))}
+          </div>
+        );
+      })()}
 
       {/* Filter bar */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
