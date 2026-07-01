@@ -121,7 +121,7 @@ export default function OutlierFeedWidget() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="🔍 Search outlier videos by topic…"
+          placeholder="🔍 Search tracked outlier videos by topic…"
           className="w-full px-3.5 py-2 rounded-lg text-sm outline-none"
           style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
         />
@@ -214,7 +214,11 @@ export default function OutlierFeedWidget() {
           </div>
         ) : videos.length === 0 ? (
           <div className="rounded-xl border p-6 text-center text-sm" style={{ borderColor: "var(--border)", background: "var(--bg-card)", color: "var(--text-muted)" }}>
-            No outliers in this category yet — try a lower score threshold on the full feed, or check back after the next sync.
+            {search.trim() ? (
+              <>Nothing tracked matches that search yet. <a href="/competitors/outliers" className="underline" style={{ color: "#ff4444" }}>Open the full feed</a> to search YouTube directly and add a channel.</>
+            ) : (
+              "No outliers in this category yet — try a lower score threshold on the full feed, or check back after the next sync."
+            )}
           </div>
         ) : (
           <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}>

@@ -62,6 +62,13 @@ export default function OutliersPage() {
   const [selectedCategory, setSelectedCategory] = useState<ChannelCategory | "">("");
   const [search, setSearch] = useState("");
   const [minScore, setMinScore] = useState(3);
+  // Fallback for when the topic search comes up empty against already-synced
+  // outliers: a real YouTube channel search, so the box never dead-ends.
+  const [ytResults, setYtResults] = useState<
+    { channelId: string; name: string; handle: string | null; thumbnail: string | null; subscriberCount: number; videoCount: number }[]
+  >([]);
+  const [ytSearching, setYtSearching] = useState(false);
+  const [addingChannelId, setAddingChannelId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [whyItWorked, setWhyItWorked] = useState<{
     videoId: string;
@@ -88,14 +95,53 @@ export default function OutliersPage() {
 
   async function loadOutliers() {
     setLoading(true);
+    setYtResults([]);
     const params = new URLSearchParams({ minScore: minScore.toString(), limit: "50" });
     if (selectedChannel) params.set("channelId", selectedChannel);
     if (selectedCategory) params.set("category", selectedCategory);
     if (search.trim()) params.set("q", search.trim());
     const res = await fetch(`/api/competitors/outliers?${params}`);
     const data = await res.json();
-    setOutliers(data.outliers ?? []);
+    const results = data.outliers ?? [];
+    setOutliers(results);
     setLoading(false);
+
+    // The topic box only searches videos we've already synced. If a real
+    // search term comes up empty there, fall back to a live YouTube channel
+    // search so the box doesn't just dead-end.
+    if (search.trim().length > 1 && results.length === 0) {
+      setYtSearching(true);
+      const ytRes = await fetch(`/api/competitors/search?q=${encodeURIComponent(search.trim())}`);
+      const ytData = await ytRes.json();
+      setYtResults(ytData.results ?? []);
+      setYtSearching(false);
+    }
+  }
+
+  async function handleAddDiscoveryChannel(result: {
+    channelId: string; name: string; handle: string | null; thumbnail: string | null; subscriberCount: number; videoCount: number;
+  }) {
+    setAddingChannelId(result.channelId);
+    const addRes = await fetch("/api/discovery/channels", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId: result.channelId,
+        name: result.name,
+        handle: result.handle,
+        thumbnail: result.thumbnail,
+        subscriberCount: result.subscriberCount,
+        videoCount: result.videoCount,
+        category: selectedCategory || "other",
+      }),
+    });
+    const addData = await addRes.json();
+    if (addData.channel) {
+      await fetch(`/api/competitors/channels/${addData.channel.id}/sync`, { method: "POST" });
+      fetch("/api/discovery/channels").then((r) => r.json()).then((d) => setDiscoveryChannels(d.channels ?? []));
+      await loadOutliers();
+    }
+    setAddingChannelId(null);
   }
 
   async function handleWhyItWorked(
@@ -148,7 +194,7 @@ export default function OutliersPage() {
       <input
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="🔍 Search outlier videos by topic…"
+        placeholder="🔍 Search tracked outlier videos by topic — or search YouTube directly if nothing matches…"
         className="w-full px-3.5 py-2 rounded-lg text-sm outline-none mb-4"
         style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
       />
@@ -347,6 +393,57 @@ export default function OutliersPage() {
                 );
               })}
             </div>
+          </div>
+        ) : search.trim().length > 1 ? (
+          <div>
+            <div
+              className="rounded-xl border flex flex-col items-center justify-center py-10 text-center mb-6"
+              style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+            >
+              <div className="text-3xl mb-3">🔍</div>
+              <p className="font-semibold mb-1">No synced outliers match &quot;{search}&quot;</p>
+              <p style={{ color: "var(--text-muted)", fontSize: 14, maxWidth: 420 }}>
+                We only search videos already tracked. Here&apos;s what we found searching YouTube directly for channels — add one to start scoring its videos.
+              </p>
+            </div>
+            {ytSearching ? (
+              <p style={{ color: "var(--text-muted)", fontSize: 13, textAlign: "center" }}>Searching YouTube…</p>
+            ) : ytResults.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {ytResults.map((r) => (
+                  <div
+                    key={r.channelId}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5"
+                    style={{ background: "var(--bg-card)", border: "1px solid var(--border)" }}
+                  >
+                    {r.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={r.thumbnail} alt={r.name} className="w-10 h-10 rounded-full flex-shrink-0 object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold" style={{ background: "var(--border)" }}>
+                        {(r.name ?? "?")[0]}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{r.name}</div>
+                      <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                        {r.subscriberCount >= 1_000_000 ? (r.subscriberCount / 1_000_000).toFixed(1) + "M" : r.subscriberCount >= 1_000 ? (r.subscriberCount / 1_000).toFixed(1) + "K" : r.subscriberCount} subscribers
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleAddDiscoveryChannel(r)}
+                      disabled={addingChannelId === r.channelId}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-80 disabled:opacity-40 flex-shrink-0"
+                      style={{ background: "#00ff87", color: "#000" }}
+                    >
+                      {addingChannelId === r.channelId ? "Adding…" : "Add & track"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: "var(--text-muted)", fontSize: 13, textAlign: "center" }}>No YouTube channels found for that search either.</p>
+            )}
           </div>
         ) : (
           <div
