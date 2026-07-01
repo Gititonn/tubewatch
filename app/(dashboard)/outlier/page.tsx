@@ -91,11 +91,12 @@ export default function OutlierPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Outlier Score</h1>
           <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-            How each video performed vs. your channel median.
+            Every video you&apos;ve posted, scored against your own channel&apos;s median views —
+            find out what&apos;s actually working, then ask the AI Engine why.
           </p>
         </div>
         <div className="flex gap-2">
@@ -116,9 +117,15 @@ export default function OutlierPage() {
         </div>
       </div>
 
+      <div className="mb-6 flex flex-wrap gap-x-6 gap-y-1 text-xs" style={{ color: "var(--text-muted)" }}>
+        <span><span style={{ color: "#22c55e" }}>●</span> &gt;2.0× your median = Outlier 🚀</span>
+        <span><span style={{ color: "var(--text-secondary)" }}>●</span> 0.5–2.0× = Normal</span>
+        <span><span style={{ color: "#ef4444" }}>●</span> &lt;0.5× = Underperformer 📉</span>
+      </div>
+
       {loading && (
         <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>
-          <table className="min-w-[820px] w-full text-sm">
+          <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
             <tbody>
               {Array.from({ length: 6 }).map((_, i) => (
                 <TableRowSkeleton key={i} />
@@ -151,22 +158,22 @@ export default function OutlierPage() {
 
       {filtered.length > 0 && (
         <div className="rounded-xl border overflow-x-auto" style={{ borderColor: "var(--border)" }}>
-          <table className="min-w-[820px] w-full text-sm">
+          <table className="w-full text-sm" style={{ tableLayout: "fixed" }}>
             <colgroup>
               <col className="w-auto" />
-              <col style={{ width: "110px" }} />
+              <col style={{ width: "120px" }} />
               <col style={{ width: "100px" }} />
               <col style={{ width: "90px" }} />
-              <col style={{ width: "140px" }} />
+              <col style={{ width: "70px" }} />
               <col style={{ width: "100px" }} />
             </colgroup>
             <thead>
               <tr style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-card)" }}>
                 <th className="text-left px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Video</th>
-                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>Published</th>
-                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Views</th>
-                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Duration</th>
                 <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>Outlier Score</th>
+                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Views</th>
+                <th className="text-right px-4 py-3 font-medium whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>Published</th>
+                <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--text-secondary)" }}>Duration</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -179,7 +186,7 @@ export default function OutlierPage() {
                       style={{ borderBottom: insights[v.id] ? "none" : "1px solid var(--border)" }}
                       className="hover:bg-white/[0.02]"
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 overflow-hidden">
                         <div className="flex items-center gap-3 min-w-0">
                           {v.thumbnail_url && (
                             <Image
@@ -193,17 +200,17 @@ export default function OutlierPage() {
                           <span className="text-foreground truncate">{v.title}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
-                        {v.published_at ? new Date(v.published_at).toLocaleDateString() : "—"}
+                      <td className="px-4 py-3 text-right">
+                        <ScoreBadge score={v.outlier_score} label={label} />
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
                         {v.view_count.toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
-                        {formatDuration(v.duration_seconds)}
+                        {v.published_at ? new Date(v.published_at).toLocaleDateString() : "—"}
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <ScoreBadge score={v.outlier_score} label={label} />
+                      <td className="px-4 py-3 text-right whitespace-nowrap" style={{ color: "var(--text-secondary)" }}>
+                        {formatDuration(v.duration_seconds)}
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -236,12 +243,6 @@ export default function OutlierPage() {
           </table>
         </div>
       )}
-
-      <div className="mt-6 flex gap-6 text-xs" style={{ color: "var(--text-muted)" }}>
-        <span><span style={{ color: "#22c55e" }}>●</span> &gt;2.0× = Outlier 🚀</span>
-        <span><span style={{ color: "var(--text-secondary)" }}>●</span> 0.5–2.0× = Normal</span>
-        <span><span style={{ color: "#ef4444" }}>●</span> &lt;0.5× = Underperformer 📉</span>
-      </div>
     </div>
   );
 }
