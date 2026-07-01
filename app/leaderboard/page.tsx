@@ -24,11 +24,9 @@ export default async function LeaderboardIndex() {
     .eq("is_discovery", true);
 
   const rows = channels ?? [];
-  const idsByCategory: Record<string, string[]> = {};
   const statsByCategory: Record<string, { channelCount: number; totalSubs: number }> = {};
   for (const c of rows) {
     const cat = c.category ?? "other";
-    idsByCategory[cat] = [...(idsByCategory[cat] ?? []), c.id];
     const s = statsByCategory[cat] ?? { channelCount: 0, totalSubs: 0 };
     s.channelCount += 1;
     s.totalSubs += c.subscriber_count ?? 0;
@@ -36,7 +34,7 @@ export default async function LeaderboardIndex() {
   }
 
   const allIds = rows.map((c) => c.id);
-  let topScoreByCategory: Record<string, number> = {};
+  const topScoreByCategory: Record<string, number> = {};
   if (allIds.length > 0) {
     const { data: videos } = await supabase
       .from("competitor_videos")
