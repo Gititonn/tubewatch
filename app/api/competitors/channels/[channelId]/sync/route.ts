@@ -12,11 +12,14 @@ export async function POST(
 
   const { channelId } = params;
 
+  // A channel is syncable if the caller owns it, or it's a shared discovery
+  // channel (curated, not owned by anyone in particular — any signed-in user
+  // can trigger a resync since the RLS policy already makes it readable to all).
   const { data: competitorChannel, error: chError } = await supabase
     .from("competitor_channels")
     .select("*")
     .eq("id", channelId)
-    .eq("user_id", user.id)
+    .or(`user_id.eq.${user.id},is_discovery.eq.true`)
     .single();
 
   if (chError || !competitorChannel) {

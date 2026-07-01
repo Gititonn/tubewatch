@@ -57,8 +57,10 @@ const MIN_SCORE_OPTIONS = [
 export default function OutliersPage() {
   const [outliers, setOutliers] = useState<OutlierVideo[]>([]);
   const [channels, setChannels] = useState<CompetitorChannel[]>([]);
+  const [discoveryChannels, setDiscoveryChannels] = useState<CompetitorChannel[]>([]);
   const [selectedChannel, setSelectedChannel] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<ChannelCategory | "">("");
+  const [search, setSearch] = useState("");
   const [minScore, setMinScore] = useState(3);
   const [loading, setLoading] = useState(true);
   const [whyItWorked, setWhyItWorked] = useState<{
@@ -72,17 +74,24 @@ export default function OutliersPage() {
     fetch("/api/competitors/channels")
       .then((r) => r.json())
       .then((d) => setChannels(d.channels ?? []));
+    // Discovery pool — the shared, category-tagged channels that populate
+    // the feed even for niches this user hasn't personally tracked.
+    fetch("/api/discovery/channels")
+      .then((r) => r.json())
+      .then((d) => setDiscoveryChannels(d.channels ?? []));
   }, []);
 
   useEffect(() => {
-    loadOutliers();
-  }, [selectedChannel, selectedCategory, minScore]); // eslint-disable-line react-hooks/exhaustive-deps
+    const t = setTimeout(loadOutliers, 300); // debounce search typing
+    return () => clearTimeout(t);
+  }, [selectedChannel, selectedCategory, search, minScore]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadOutliers() {
     setLoading(true);
     const params = new URLSearchParams({ minScore: minScore.toString(), limit: "50" });
     if (selectedChannel) params.set("channelId", selectedChannel);
     if (selectedCategory) params.set("category", selectedCategory);
+    if (search.trim()) params.set("q", search.trim());
     const res = await fetch(`/api/competitors/outliers?${params}`);
     const data = await res.json();
     setOutliers(data.outliers ?? []);
@@ -135,11 +144,23 @@ export default function OutliersPage() {
         </p>
       </div>
 
+      {/* Search — matches video title, across both tracked and discovery channels */}
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="🔍 Search outlier videos by topic…"
+        className="w-full px-3.5 py-2 rounded-lg text-sm outline-none mb-4"
+        style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+      />
+
       {/* Category pills — filter to a single niche so unrelated tracked
-          channels (e.g. a movie-trailer channel) don't drown out the rest. */}
+          channels (e.g. a movie-trailer channel) don't drown out the rest.
+          Includes both this user's tracked channels and the shared discovery
+          pool, so a niche shows up here before the user has tracked anything
+          in it themselves. */}
       {(() => {
         const availableCategories = Array.from(
-          new Set(channels.map((c) => c.category ?? "other"))
+          new Set([...channels, ...discoveryChannels].map((c) => c.category ?? "other"))
         ) as ChannelCategory[];
         if (availableCategories.length <= 1) return null;
         return (
@@ -212,7 +233,7 @@ export default function OutliersPage() {
 
         {/* Only show the real count once channels are tracked — avoids "0 videos"
             sitting above the sample preview cards. */}
-        {!loading && channels.length > 0 && (
+        {!loading && (channels.length > 0 || discoveryChannels.length > 0) && (
           <span style={{ color: "var(--text-muted)", fontSize: 13, marginLeft: "auto" }}>
             {outliers.length} video{outliers.length !== 1 ? "s" : ""}
           </span>
@@ -223,7 +244,7 @@ export default function OutliersPage() {
       {loading ? (
         <VideoGridSkeleton count={6} />
       ) : outliers.length === 0 ? (
-        channels.length === 0 ? (
+        channels.length === 0 && discoveryChannels.length === 0 ? (
           <div>
             {/* Rich empty state — no competitors tracked */}
             <div

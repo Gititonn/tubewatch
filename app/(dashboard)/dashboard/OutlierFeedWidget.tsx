@@ -38,21 +38,28 @@ export default function OutlierFeedWidget() {
   const [videos, setVideos] = useState<OutlierVideo[]>([]);
   const [availableCategories, setAvailableCategories] = useState<ChannelCategory[]>([]);
   const [category, setCategory] = useState<ChannelCategory | "">("");
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [hasAnyChannel, setHasAnyChannel] = useState(true);
   const [checkedChannels, setCheckedChannels] = useState(false);
 
   useEffect(() => {
-    fetch("/api/competitors/channels")
-      .then((r) => r.json())
-      .then((d: { channels?: CompetitorChannel[] }) => {
-        const cats = Array.from(
-          new Set((d.channels ?? []).map((c) => c.category ?? "other"))
-        ) as ChannelCategory[];
-        setAvailableCategories(cats);
-        setHasAnyChannel((d.channels?.length ?? 0) > 0);
-        setCheckedChannels(true);
-      });
+    // Categories come from BOTH the user's own tracked channels and the
+    // shared discovery pool, so all niches are selectable even if the user
+    // hasn't personally tracked anything in them yet.
+    Promise.all([
+      fetch("/api/competitors/channels").then((r) => r.json()),
+      fetch("/api/discovery/channels").then((r) => r.json()),
+    ]).then(([owned, discovery]: [{ channels?: CompetitorChannel[] }, { channels?: CompetitorChannel[] }]) => {
+      const ownedChannels = owned.channels ?? [];
+      const discoveryChannels = discovery.channels ?? [];
+      const cats = Array.from(
+        new Set([...ownedChannels, ...discoveryChannels].map((c) => c.category ?? "other"))
+      ) as ChannelCategory[];
+      setAvailableCategories(cats);
+      setHasAnyChannel(ownedChannels.length + discoveryChannels.length > 0);
+      setCheckedChannels(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -63,11 +70,15 @@ export default function OutlierFeedWidget() {
     setLoading(true);
     const params = new URLSearchParams({ minScore: "3", limit: "6" });
     if (category) params.set("category", category);
-    fetch(`/api/competitors/outliers?${params}`)
-      .then((r) => r.json())
-      .then((d) => setVideos(d.outliers ?? []))
-      .finally(() => setLoading(false));
-  }, [category, hasAnyChannel]);
+    if (search.trim()) params.set("q", search.trim());
+    const t = setTimeout(() => {
+      fetch(`/api/competitors/outliers?${params}`)
+        .then((r) => r.json())
+        .then((d) => setVideos(d.outliers ?? []))
+        .finally(() => setLoading(false));
+    }, 300); // debounce search typing
+    return () => clearTimeout(t);
+  }, [category, search, hasAnyChannel]);
 
   return (
     <div
@@ -106,8 +117,18 @@ export default function OutlierFeedWidget() {
         </a>
       </div>
 
+      <div className="mt-4 relative z-10">
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="🔍 Search outlier videos by topic…"
+          className="w-full px-3.5 py-2 rounded-lg text-sm outline-none"
+          style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+        />
+      </div>
+
       {availableCategories.length > 1 && (
-        <div className="flex gap-1.5 mt-4 mb-1 flex-wrap relative z-10">
+        <div className="flex gap-1.5 mt-3 mb-1 flex-wrap relative z-10">
           <button
             onClick={() => setCategory("")}
             className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
