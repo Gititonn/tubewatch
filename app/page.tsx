@@ -289,6 +289,17 @@ export default function Home() {
           </a>
         </div>
 
+        {/* FOOTER */}
+        <footer
+          className="flex items-center justify-center gap-6 py-8 px-4 border-t text-sm"
+          style={{ borderColor: "#1a1a1a", color: "#666" }}
+        >
+          <span>© 2026 TubeWatch</span>
+          <Link href="/about" className="hover:text-white transition-colors">About</Link>
+          <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+        </footer>
+
       </main>
     </>
   );

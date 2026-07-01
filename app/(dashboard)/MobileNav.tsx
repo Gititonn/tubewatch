@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ThemeToggle } from "./ThemeToggle";
 import { NavSections } from "./nav-sections";
 
 export function MobileNav({ aiBadge = "NEW" }: { aiBadge?: string }) {
@@ -76,20 +75,6 @@ export function MobileNav({ aiBadge = "NEW" }: { aiBadge?: string }) {
         <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto">
           <NavSections aiBadge={aiBadge} />
         </nav>
-
-        <div className="mt-3 mb-2">
-          <ThemeToggle />
-        </div>
-
-        <form action="/api/auth/signout" method="POST">
-          <button
-            type="submit"
-            className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Sign out
-          </button>
-        </form>
       </div>
     </>
   );

@@ -43,19 +43,18 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/videos", icon: "▶", label: "Videos" },
     ],
   },
-];
-
-/** Pinned to the bottom of the nav (pushed down with mt-auto). */
-export const NAV_BOTTOM: NavItem[] = [
-  { href: "/billing", icon: "💳", label: "Billing" },
-  { href: "/settings", icon: "⚙", label: "Settings" },
+  // Last in the list (not pinned/pushed to the bottom of the sidebar) — flows
+  // right after Analyze like any other section.
+  {
+    items: [
+      { href: "/billing", icon: "💳", label: "Billing" },
+      { href: "/settings", icon: "⚙", label: "Settings" },
+    ],
+  },
 ];
 
 /** Every nav href, used to resolve the single active item. */
-export const ALL_NAV_HREFS: string[] = [
-  ...NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.href)),
-  ...NAV_BOTTOM.map((i) => i.href),
-];
+export const ALL_NAV_HREFS: string[] = NAV_SECTIONS.flatMap((s) => s.items.map((i) => i.href));
 
 /**
  * Returns the single href that should be highlighted for `pathname`, using

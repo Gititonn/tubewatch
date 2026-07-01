@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserPlan, isPaidPlan } from "@/lib/plan";
 import { NavSections } from "./nav-sections";
 import { MobileNav } from "./MobileNav";
-import { ThemeToggle } from "./ThemeToggle";
 import { RouteReset } from "./route-reset";
 
 export const dynamic = "force-dynamic";
@@ -47,18 +46,6 @@ export default async function DashboardLayout({
         <nav className="flex flex-col gap-0.5 flex-1">
           <NavSections aiBadge={aiBadge} />
         </nav>
-        <div className="mt-3 mb-2">
-          <ThemeToggle />
-        </div>
-        <form action="/api/auth/signout" method="POST">
-          <button
-            type="submit"
-            className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors hover:bg-white/5"
-            style={{ color: "var(--text-muted)" }}
-          >
-            Sign out
-          </button>
-        </form>
       </aside>
 
       <main className="flex-1 overflow-auto" style={{ background: "var(--bg)" }}>

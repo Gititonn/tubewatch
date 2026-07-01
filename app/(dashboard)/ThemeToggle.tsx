@@ -26,25 +26,11 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label="Toggle theme"
       title={isLight ? "Switch to dark mode" : "Switch to light mode"}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
-        padding: "6px 12px",
-        borderRadius: 8,
-        border: "1px solid var(--border)",
-        background: "transparent",
-        cursor: "pointer",
-        transition: "background 0.15s",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+      className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors hover:bg-white/5"
+      style={{ color: "var(--text-secondary)", background: "transparent" }}
     >
-      <span style={{ fontSize: 11, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 600 }}>
-        Theme
-      </span>
-      <span style={{ fontSize: 14 }}>{isLight ? "☀️" : "🌙"}</span>
+      <span>{isLight ? "☀️" : "🌙"}</span>
+      <span>{isLight ? "Light mode" : "Dark mode"}</span>
     </button>
   );
 }
