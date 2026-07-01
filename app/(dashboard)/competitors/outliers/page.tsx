@@ -69,6 +69,11 @@ export default function OutliersPage() {
   >([]);
   const [ytSearching, setYtSearching] = useState(false);
   const [addingChannelId, setAddingChannelId] = useState<string | null>(null);
+  // Per-result category pick for the YouTube fallback — must NOT silently
+  // inherit whichever category pill happens to be active in the filter bar
+  // above (found live: searching under "Gaming" mis-tagged an unrelated
+  // channel as gaming just because that pill was still selected).
+  const [ytCategoryPicks, setYtCategoryPicks] = useState<Record<string, ChannelCategory>>({});
   const [loading, setLoading] = useState(true);
   const [whyItWorked, setWhyItWorked] = useState<{
     videoId: string;
@@ -132,7 +137,7 @@ export default function OutliersPage() {
         thumbnail: result.thumbnail,
         subscriberCount: result.subscriberCount,
         videoCount: result.videoCount,
-        category: selectedCategory || "other",
+        category: ytCategoryPicks[result.channelId] || "other",
       }),
     });
     const addData = await addRes.json();
@@ -430,6 +435,19 @@ export default function OutliersPage() {
                         {r.subscriberCount >= 1_000_000 ? (r.subscriberCount / 1_000_000).toFixed(1) + "M" : r.subscriberCount >= 1_000 ? (r.subscriberCount / 1_000).toFixed(1) + "K" : r.subscriberCount} subscribers
                       </div>
                     </div>
+                    <select
+                      value={ytCategoryPicks[r.channelId] ?? "other"}
+                      onChange={(e) =>
+                        setYtCategoryPicks((prev) => ({ ...prev, [r.channelId]: e.target.value as ChannelCategory }))
+                      }
+                      className="px-2 py-1.5 rounded-lg text-xs outline-none flex-shrink-0"
+                      style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+                      title="Niche category for this channel"
+                    >
+                      {CATEGORIES.map((c) => (
+                        <option key={c.id} value={c.id}>{c.emoji} {c.label}</option>
+                      ))}
+                    </select>
                     <button
                       onClick={() => handleAddDiscoveryChannel(r)}
                       disabled={addingChannelId === r.channelId}
