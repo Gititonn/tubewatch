@@ -1,5 +1,6 @@
 import Link from "next/link";
 import FeatureCarousel from "./feature-carousel";
+import ComparisonSection from "./comparison-section";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 
 const cards = [
@@ -216,6 +217,9 @@ export default function Home() {
 
         {/* FEATURE CAROUSEL */}
         <FeatureCarousel />
+
+        {/* COMPARISON VS OTHER TOOLS */}
+        <ComparisonSection />
 
         {/* PRICING */}
         <section className="px-4 pb-24 max-w-5xl mx-auto w-full">
