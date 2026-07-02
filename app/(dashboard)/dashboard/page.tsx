@@ -5,6 +5,7 @@ import Image from "next/image";
 import ResyncButton from "./ResyncButton";
 import DisconnectChannelButton from "../settings/DisconnectChannelButton";
 import OutlierFeedWidget from "./OutlierFeedWidget";
+import ViewTrendsWidget from "./ViewTrendsWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -200,6 +201,10 @@ export default async function DashboardPage() {
           fixes the old server query, which had no user_id scoping and showed
           every tracked channel's outliers to every signed-in user. */}
       <OutlierFeedWidget />
+
+      {/* Channel-level view-trend charts (P2.4) — own-channel view-count series
+          from video_snapshots. Self-hides for users with no channel connected. */}
+      <ViewTrendsWidget />
 
       {/* AI Strategy Card — always shown; free users are sent to billing, not a 402 */}
       <Link href={aiUnlocked ? "/ai" : "/billing"}>

@@ -25,6 +25,19 @@ type SearchResult = {
   videoCount: number;
 };
 
+type Suggestion = {
+  channelId: string;
+  name: string;
+  handle: string | null;
+  thumbnail: string | null;
+  subscriberCount: number;
+  videoCount: number;
+  medianViews: number | null;
+  category: ChannelCategory | null;
+  reason: string;
+  source: "pool" | "youtube";
+};
+
 function fmt(n: number | null): string {
   if (n == null) return "—";
   if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
@@ -54,10 +67,13 @@ export default function CompetitorsPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [updatingCategory, setUpdatingCategory] = useState<string | null>(null);
   const [pendingCategory, setPendingCategory] = useState<ChannelCategory>("other");
+  const [similar, setSimilar] = useState<Suggestion[]>([]);
+  const [trackingSimilar, setTrackingSimilar] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadChannels();
+    loadSimilar();
   }, []);
 
   useEffect(() => {
@@ -70,6 +86,41 @@ export default function CompetitorsPage() {
     const data = await res.json();
     setChannels(data.channels ?? []);
     setLoading(false);
+  }
+
+  // Algorithmic "similar channels you could track" (P2.2). Recomputes whenever
+  // the tracked set changes, since suggestions are derived from it.
+  async function loadSimilar() {
+    const res = await fetch("/api/competitors/similar");
+    const data = await res.json();
+    setSimilar(data.similar ?? []);
+  }
+
+  async function handleTrackSimilar(s: Suggestion) {
+    setTrackingSimilar(s.channelId);
+    const res = await fetch("/api/competitors/channels", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId: s.channelId,
+        name: s.name,
+        handle: s.handle,
+        thumbnail: s.thumbnail,
+        subscriberCount: s.subscriberCount,
+        videoCount: s.videoCount,
+        category: s.category ?? "other",
+      }),
+    });
+    const data = await res.json();
+    if (data.channel) {
+      // Optimistically drop it from the shelf, then refresh both lists.
+      setSimilar((prev) => prev.filter((x) => x.channelId !== s.channelId));
+      await loadChannels();
+      fetch(`/api/competitors/channels/${data.channel.id}/sync`, { method: "POST" })
+        .then(() => loadChannels());
+      loadSimilar();
+    }
+    setTrackingSimilar(null);
   }
 
   function openModal() {
@@ -116,6 +167,7 @@ export default function CompetitorsPage() {
       setSearchQuery("");
       setSearchResults([]);
       await loadChannels();
+      loadSimilar();
       // Kick off initial sync in background
       fetch(`/api/competitors/channels/${data.channel.id}/sync`, { method: "POST" })
         .then(() => loadChannels());
@@ -134,6 +186,7 @@ export default function CompetitorsPage() {
     setDeleting(channelId);
     await fetch(`/api/competitors/channels?id=${channelId}`, { method: "DELETE" });
     await loadChannels();
+    loadSimilar();
     setDeleting(null);
   }
 
@@ -260,6 +313,64 @@ export default function CompetitorsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Similar channels you could track (P2.2) — algorithmic suggestions
+          from the discovery pool in your niches, topped up from YouTube when
+          the pool is thin. Hidden until there's something to show. */}
+      {!loading && similar.length > 0 && (
+        <div className="mt-10">
+          <div className="mb-3">
+            <h2 className="text-lg font-bold">Similar channels you could track</h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: 13 }}>
+              {channels.length > 0
+                ? "Matched to the niches and subscriber tier you already follow."
+                : "Popular channels in each niche to get you started."}
+            </p>
+          </div>
+          <div
+            className="grid gap-3"
+            style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}
+          >
+            {similar.map((s) => (
+              <div
+                key={s.channelId}
+                className="flex items-center gap-3 rounded-xl border px-4 py-3"
+                style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+              >
+                {s.thumbnail ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={s.thumbnail}
+                    alt={s.name}
+                    className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold"
+                    style={{ background: "var(--border)" }}
+                  >
+                    {(s.name ?? "?")[0]}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">{s.name}</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                    {fmt(s.subscriberCount)} subs · {s.reason}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleTrackSimilar(s)}
+                  disabled={trackingSimilar === s.channelId}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-opacity hover:opacity-80 disabled:opacity-40 flex-shrink-0"
+                  style={{ background: "#00ff87", color: "#000" }}
+                >
+                  {trackingSimilar === s.channelId ? "Adding…" : "Track"}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
