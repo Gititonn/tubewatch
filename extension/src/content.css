@@ -21,6 +21,10 @@
   letter-spacing: 0.2px;
 }
 
+.tw-badge-score { color: var(--tw-color, #00ff87); }
+.tw-badge-views { color: #fff; opacity: 0.9; font-weight: 600; }
+.tw-badge-views::before { content: "·"; margin: 0 3px; opacity: 0.5; }
+
 /* Demo badges read slightly muted so they aren't mistaken for live data. */
 .tw-outlier-badge.tw-demo {
   opacity: 0.82;

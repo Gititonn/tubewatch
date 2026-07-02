@@ -28,6 +28,11 @@
       "js": ["src/api.js", "src/content.js", "src/watchpanel.js"],
       "css": ["src/content.css", "src/watchpanel.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.tubewatchhq.com/*"],
+      "js": ["src/connect.js"],
+      "run_at": "document_idle"
     }
   ]
 }

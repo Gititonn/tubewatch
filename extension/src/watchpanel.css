@@ -71,6 +71,26 @@
   margin-top: 2px;
 }
 
+.tw-wp-track {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px;
+  border: none;
+  border-radius: 8px;
+  background: #00ff87;
+  color: #000;
+  font: 800 13px/1 "Roboto", "Inter", system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.tw-wp-track:hover:not(:disabled) { transform: scale(1.02); }
+.tw-wp-track:disabled { cursor: default; }
+.tw-wp-track.tw-wp-tracking {
+  background: rgba(0, 255, 135, 0.12);
+  color: #00ff87;
+  border: 1px solid rgba(0, 255, 135, 0.4);
+}
+
 .tw-wp-note {
   margin-top: 12px;
   font-size: 11px;

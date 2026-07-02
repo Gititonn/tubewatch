@@ -16,6 +16,12 @@
     return "#00ff87";
   }
 
+  function fmtCount(n) {
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+    if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
+    return String(n);
+  }
+
   function videoIdFromHref(href) {
     if (!href) return null;
     const m = href.match(/[?&]v=([^&]+)/);
@@ -29,7 +35,7 @@
     const videoId = videoIdFromHref(anchor.getAttribute("href") || anchor.href);
     if (!videoId) return;
 
-    const { score, demo } = await window.TubeWatchAPI.getOutlierScore(videoId);
+    const { score, demo, data } = await window.TubeWatchAPI.getOutlierScore(videoId);
     if (score == null) return;
 
     // The thumbnail anchor needs a positioning context for the absolute badge.
@@ -38,7 +44,13 @@
     const badge = document.createElement("div");
     badge.className = BADGE_CLASS + (demo ? " tw-demo" : "");
     badge.style.setProperty("--tw-color", scoreColor(score));
-    badge.textContent = `🔥 ${score.toFixed(1)}x`;
+    // Show the real view count next to our derived multiplier, so the score is
+    // always displayed alongside the underlying API metric (YouTube API ToS
+    // §III.E.4.h). Demo badges have no real data, so they show the score only.
+    const views = data && data.view_count != null ? fmtCount(data.view_count) : null;
+    badge.innerHTML =
+      `<span class="tw-badge-score">🔥 ${score.toFixed(1)}x</span>` +
+      (views ? `<span class="tw-badge-views">${views}</span>` : "");
     badge.title = demo
       ? "TubeWatch demo score — add your API key to enable live outlier scores"
       : "TubeWatch outlier score (age-adjusted vs. channel median)";
@@ -60,11 +72,20 @@
     const btn = document.createElement("button");
     btn.className = "tw-track-btn";
     btn.textContent = "＋ Track on TubeWatch";
-    btn.addEventListener("click", () => {
-      // v1: deep-link into TubeWatch's competitors flow. A direct one-click add
-      // via the API awaits the auth decision (see README.md).
-      const handle = location.pathname.replace(/^\//, "");
-      window.open(`https://www.tubewatchhq.com/competitors?add=${encodeURIComponent(handle)}`, "_blank");
+    btn.addEventListener("click", async () => {
+      const handle = location.pathname.replace(/^\//, "").split("/")[0];
+      btn.disabled = true;
+      btn.textContent = "Tracking…";
+      const res = await window.TubeWatchAPI.trackChannel({ handle });
+      if (res.ok) {
+        btn.textContent = "✓ Tracking";
+      } else if (res.error === "no-key") {
+        btn.textContent = "Add API key first";
+        window.open("https://www.tubewatchhq.com/settings", "_blank");
+      } else {
+        btn.disabled = false;
+        btn.textContent = res.status === 402 ? "Limit reached — upgrade" : "Track failed — retry";
+      }
     });
     actions.prepend(btn);
   }

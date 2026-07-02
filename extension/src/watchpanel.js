@@ -73,8 +73,25 @@
         ${statCell("Views/hr", fmt(vph))}
         ${statCell("Published", fmtDate(d.published_at))}
       </div>
+      ${!demo && d.youtube_channel_id ? '<button class="tw-wp-track" type="button">＋ Track channel</button>' : ""}
       ${demo ? '<div class="tw-wp-note">Connect your API key in TubeWatch → Settings for live scores &amp; stats.</div>' : ""}
     `;
+
+    const trackBtn = panel.querySelector(".tw-wp-track");
+    if (trackBtn) {
+      trackBtn.addEventListener("click", async () => {
+        trackBtn.disabled = true;
+        trackBtn.textContent = "Tracking…";
+        const res = await window.TubeWatchAPI.trackChannel({ channelId: d.youtube_channel_id });
+        if (res.ok) {
+          trackBtn.textContent = "✓ Tracking";
+          trackBtn.classList.add("tw-wp-tracking");
+        } else {
+          trackBtn.disabled = false;
+          trackBtn.textContent = res.status === 402 ? "Limit reached — upgrade" : "Track failed — retry";
+        }
+      });
+    }
   }
 
   let lastVideoId = null;

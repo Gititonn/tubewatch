@@ -80,5 +80,23 @@
     });
   }
 
-  globalThis.TubeWatchAPI = { getOutlierScore, getApiKey };
+  // Add a channel to the user's tracked competitors (key-authenticated).
+  // opts = { channelId } (from the watch panel) or { handle } (from a channel page).
+  async function trackChannel(opts) {
+    const apiKey = await getApiKey();
+    if (!apiKey) return { ok: false, error: "no-key" };
+    try {
+      const res = await fetch(`${API_BASE}/api/extension/track`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify(opts || {}),
+      });
+      const data = await res.json().catch(() => ({}));
+      return { ok: res.ok, status: res.status, ...data };
+    } catch {
+      return { ok: false, error: "network" };
+    }
+  }
+
+  globalThis.TubeWatchAPI = { getOutlierScore, getApiKey, trackChannel };
 })();

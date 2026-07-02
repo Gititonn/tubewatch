@@ -153,6 +153,14 @@ export async function getChannelVideos(channelId: string, maxResults = 50) {
   return videosRes.data.items ?? [];
 }
 
+/** Fetch a single channel's snippet + statistics by channel id. */
+export async function getChannelById(channelId: string) {
+  const res = await withYouTubeRetry(() =>
+    youtube.channels.list({ part: ["snippet", "statistics"], id: [channelId] })
+  );
+  return res.data.items?.[0] ?? null;
+}
+
 /**
  * Fetch stats for arbitrary videos by id (batched ≤50 per call). Powers the
  * browser-extension / search-any-channel on-demand scoring path, where the
