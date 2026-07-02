@@ -154,6 +154,27 @@ export async function getChannelVideos(channelId: string, maxResults = 50) {
 }
 
 /**
+ * Fetch stats for arbitrary videos by id (batched ≤50 per call). Powers the
+ * browser-extension / search-any-channel on-demand scoring path, where the
+ * video ids come from whatever the user is browsing rather than a channel.
+ */
+export async function getVideosByIds(ids: string[]) {
+  const out: Awaited<ReturnType<typeof getChannelVideos>> = [];
+  for (let i = 0; i < ids.length; i += 50) {
+    const batch = ids.slice(i, i + 50);
+    if (batch.length === 0) continue;
+    const res = await withYouTubeRetry(() =>
+      youtube.videos.list({
+        part: ["snippet", "statistics", "contentDetails"],
+        id: batch,
+      })
+    );
+    if (res.data.items) out.push(...res.data.items);
+  }
+  return out;
+}
+
+/**
  * Channel-name search (used by the "search YouTube directly" fallback when
  * a topic search comes up empty against already-synced outliers). Previously
  * lived duplicated in app/api/competitors/search/route.ts with its own

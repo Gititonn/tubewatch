@@ -1,0 +1,44 @@
+/* TubeWatch extension — on-page styling. Namespaced with `tw-` so it can't
+   collide with YouTube's own classes. */
+
+.tw-outlier-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font: 700 11px/1.2 "Roboto", "Inter", system-ui, sans-serif;
+  color: var(--tw-color, #00ff87);
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid var(--tw-color, #00ff87);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  pointer-events: none;
+  letter-spacing: 0.2px;
+}
+
+/* Demo badges read slightly muted so they aren't mistaken for live data. */
+.tw-outlier-badge.tw-demo {
+  opacity: 0.82;
+  border-style: dashed;
+}
+
+.tw-track-btn {
+  margin-right: 8px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  border: none;
+  background: #00ff87;
+  color: #000;
+  font: 700 13px/1 "Roboto", "Inter", system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.tw-track-btn:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}

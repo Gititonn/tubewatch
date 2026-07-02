@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { getChannelVideos, parseDurationToSeconds, YouTubeApiError } from "@/lib/youtube";
 import { calculateOutlierScores } from "@/lib/outlier";
 
@@ -77,6 +77,19 @@ export async function POST(
 
   if (upsertError) {
     return NextResponse.json({ error: upsertError.message }, { status: 500 });
+  }
+
+  // Append a point-in-time view snapshot per video (best-effort). Previously
+  // the upsert above overwrote yesterday's numbers, discarding the free view-
+  // velocity history for the largest pool of videos we have. video_view_history
+  // is RLS-locked, so use the service client and never fail the sync over it.
+  try {
+    const svc = createServiceClient();
+    await svc.from("video_view_history").insert(
+      rawVideos.map((v) => ({ youtube_video_id: v.youtube_video_id, view_count: v.view_count }))
+    );
+  } catch (e) {
+    console.warn("video_view_history insert skipped:", e);
   }
 
   await supabase

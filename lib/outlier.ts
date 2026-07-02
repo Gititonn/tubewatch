@@ -83,6 +83,33 @@ export function calculateOutlierScores<T extends ScorableVideo>(videos: T[]): T[
   });
 }
 
+/**
+ * The channel's median views-per-day — the denominator of the outlier score.
+ * Exposed so the browser-extension / search-any-channel paths can compute a
+ * *single* video's score against a cached channel rate without re-running the
+ * whole batch, using the SAME baseline definition as calculateOutlierScores
+ * (median over videos old enough to have a stable velocity reading).
+ */
+export function channelMedianRate(videos: ScorableVideo[]): number {
+  const scorable = videos.filter((v) => {
+    const age = ageDays(v.published_at);
+    return age === null || age >= MIN_SCORABLE_AGE_DAYS;
+  });
+  return getMedian((scorable.length >= 3 ? scorable : videos).map(viewsPerDay));
+}
+
+/**
+ * Score one video against a precomputed channel median rate. Returns null for
+ * videos too young to score, exactly like calculateOutlierScores.
+ */
+export function scoreAgainstRate(video: ScorableVideo, medianRate: number): number | null {
+  const age = ageDays(video.published_at);
+  if (age !== null && age < MIN_SCORABLE_AGE_DAYS) return null;
+  return medianRate > 0 ? parseFloat((viewsPerDay(video) / medianRate).toFixed(2)) : 1.0;
+}
+
+export type { ScorableVideo };
+
 function getMedian(nums: number[]): number {
   const sorted = [...nums].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);

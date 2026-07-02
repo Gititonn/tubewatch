@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "TubeWatch — Outlier Scores on YouTube",
+  "version": "0.1.0",
+  "description": "Overlays TubeWatch's age-adjusted outlier scores on YouTube thumbnails and adds one-click channel tracking.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://www.tubewatchhq.com/*"
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "TubeWatch"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["src/api.js", "src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

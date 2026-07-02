@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="header">
+      <span class="logo">🔥</span>
+      <div>
+        <h1>TubeWatch</h1>
+        <p class="tag">Outlier scores on YouTube</p>
+      </div>
+    </div>
+
+    <p id="status" class="status warn">Not connected — showing demo scores.</p>
+
+    <label for="key">Your TubeWatch API key</label>
+    <input id="key" type="password" placeholder="tw_…" autocomplete="off" spellcheck="false" />
+    <button id="save">Save</button>
+
+    <p class="hint">
+      Get your key from TubeWatch → Settings.
+      <a href="https://www.tubewatchhq.com/settings" target="_blank" rel="noopener">Open settings ↗</a>
+    </p>
+    <p class="note">
+      Live outlier scores turn on once the extension API endpoint ships. Until
+      then, badges show deterministic demo values so you can see placement.
+    </p>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

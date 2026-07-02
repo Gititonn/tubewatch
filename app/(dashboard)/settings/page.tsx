@@ -5,6 +5,7 @@ import { isPaidPlan } from "@/lib/plan";
 import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
 import DisconnectChannelButton from "./DisconnectChannelButton";
+import ExtensionKeySection from "./ExtensionKeySection";
 
 export const dynamic = "force-dynamic";
 
@@ -187,6 +188,9 @@ export default async function SettingsPage() {
           </div>
         )}
       </section>
+
+      {/* Browser Extension — per-user API key for the YouTube overlay */}
+      <ExtensionKeySection />
 
       {/* Plan */}
       <section
