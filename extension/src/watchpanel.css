@@ -1,0 +1,79 @@
+/* TubeWatch extension — watch-page panel styling. tw-wp- namespaced. */
+
+#tw-watch-panel {
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  color: #fff;
+  font-family: "Roboto", "Inter", system-ui, sans-serif;
+}
+
+.tw-wp-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+.tw-wp-logo { font-size: 16px; }
+.tw-wp-title { font-weight: 800; font-size: 14px; letter-spacing: 0.2px; }
+.tw-wp-demo {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffcc44;
+  border: 1px dashed rgba(255, 204, 68, 0.5);
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.tw-wp-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+  padding: 12px;
+  border: 1px solid;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.tw-wp-score-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #999;
+}
+
+.tw-wp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.tw-wp-stat {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #222;
+}
+.tw-wp-stat-val { font-size: 14px; font-weight: 700; }
+.tw-wp-stat-lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #888;
+  margin-top: 2px;
+}
+
+.tw-wp-note {
+  margin-top: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #888;
+}

@@ -15,8 +15,8 @@
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
-      "js": ["src/api.js", "src/content.js"],
-      "css": ["src/content.css"],
+      "js": ["src/api.js", "src/content.js", "src/watchpanel.js"],
+      "css": ["src/content.css", "src/watchpanel.css"],
       "run_at": "document_idle"
     }
   ]

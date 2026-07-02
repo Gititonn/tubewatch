@@ -58,10 +58,16 @@ extension/
     popup.html/.js/.css  API-key + status popup
 ```
 
+## Watch-page panel
+
+On a `youtube.com/watch` page, a **TubeWatch panel** is injected at the top of
+the right rail (like ViewStats): the video's outlier score plus views, likes,
+comments, views-per-hour, and exact publish date — from the same
+`/api/extension/outlier` endpoint. See `src/watchpanel.js`. Re-renders on
+navigation between videos; shows a "demo" state until an API key is set.
+
 ## Not yet included
 
 - Toolbar icons (Chrome shows a default; add `icons/` + `action.default_icon`
   before publishing).
-- Watch-page stats panel (views/VPH/exact date/"why it worked") — a possible
-  second surface, not in this slice.
 - Chrome Web Store packaging.
