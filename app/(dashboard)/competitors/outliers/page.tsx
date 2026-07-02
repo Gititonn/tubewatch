@@ -1,12 +1,14 @@
 "use client";
 import { MarkdownContent } from "@/components/MarkdownContent";
 import { VideoGridSkeleton } from "@/components/Skeleton";
+import { VideoDetailModal } from "@/components/VideoDetailModal";
 import { useState, useEffect } from "react";
 import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
 
 type CompetitorChannel = {
   id: string;
   channel_name: string;
+  youtube_channel_id: string;
   category: ChannelCategory | null;
 };
 
@@ -27,6 +29,10 @@ type OutlierVideo = {
     channel_name: string;
     thumbnail_url: string | null;
     youtube_channel_id: string;
+    channel_handle: string | null;
+    subscriber_count: number | null;
+    video_count: number | null;
+    category: ChannelCategory | null;
   };
 };
 
@@ -85,6 +91,47 @@ export default function OutliersPage() {
     loading: boolean;
   } | null>(null);
   const [whyCache, setWhyCache] = useState<Record<string, string>>({});
+  // Video-detail modal: clicking a card opens this in-app view (thumbnail,
+  // full stats, an explicit "Watch on YouTube" link, and a "Track this
+  // channel" action) instead of throwing the user straight onto YouTube.
+  const [selectedVideo, setSelectedVideo] = useState<OutlierVideo | null>(null);
+  const [trackingChannel, setTrackingChannel] = useState(false);
+  const [trackError, setTrackError] = useState<string | null>(null);
+
+  // The user's own tracked channels, keyed by YouTube id — lets us tell
+  // whether a video's channel is already being tracked (vs. a discovery-pool
+  // channel the user could add).
+  const ownedChannelIds = new Set(channels.map((c) => c.youtube_channel_id));
+
+  async function handleTrackChannel(v: OutlierVideo) {
+    const ch = v.competitor_channels;
+    if (!ch) return;
+    setTrackingChannel(true);
+    setTrackError(null);
+    const res = await fetch("/api/competitors/channels", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId: ch.youtube_channel_id,
+        name: ch.channel_name,
+        handle: ch.channel_handle,
+        thumbnail: ch.thumbnail_url,
+        subscriberCount: ch.subscriber_count,
+        videoCount: ch.video_count,
+        category: ch.category,
+      }),
+    });
+    const data = await res.json();
+    if (data.channel) {
+      // Refresh the owned-channel set so the modal flips to "✓ Tracking".
+      fetch("/api/competitors/channels")
+        .then((r) => r.json())
+        .then((d) => setChannels(d.channels ?? []));
+    } else if (data.error) {
+      setTrackError(data.error);
+    }
+    setTrackingChannel(false);
+  }
 
   useEffect(() => {
     fetch("/api/competitors/channels")
@@ -496,23 +543,20 @@ export default function OutliersPage() {
           {outliers.map((v) => {
             const score = v.outlier_score ?? 0;
             const colors = scoreColor(score);
-            const ytUrl = `https://www.youtube.com/watch?v=${v.youtube_video_id}`;
             const ch = v.competitor_channels;
 
             return (
-              // Outer div — button cannot be nested inside <a> (invalid HTML)
+              // Outer div — button cannot be nested inside the clickable area
               <div
                 key={v.id}
                 className="rounded-xl border overflow-hidden transition-all duration-200 hover:-translate-y-1"
                 style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
               >
-                {/* Clickable link area */}
-                <a
-                  href={ytUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block transition-transform hover:scale-[1.02]"
-                  style={{ textDecoration: "none" }}
+                {/* Clickable card area — opens the in-app detail modal instead
+                    of jumping straight to YouTube */}
+                <div
+                  onClick={() => { setTrackError(null); setSelectedVideo(v); }}
+                  className="block cursor-pointer transition-transform hover:scale-[1.02]"
                 >
                   {/* Thumbnail */}
                   <div className="relative" style={{ paddingBottom: "56.25%", background: "var(--bg-card)" }}>
@@ -588,9 +632,9 @@ export default function OutliersPage() {
                       <span>💬 {fmt(v.comment_count)}</span>
                     </div>
                   </div>
-                </a>
+                </div>
 
-                {/* Why It Worked button — outside <a> to keep HTML valid */}
+                {/* Why It Worked button — outside the clickable area to keep HTML valid */}
                 <div className="px-3 pb-3">
                   <button
                     onClick={() =>
@@ -643,6 +687,42 @@ export default function OutliersPage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Video detail modal — shared in-app "click a video" experience */}
+      {selectedVideo && (
+        <VideoDetailModal
+          video={{
+            title: selectedVideo.title,
+            thumbnail_url: selectedVideo.thumbnail_url,
+            youtube_video_id: selectedVideo.youtube_video_id,
+            view_count: selectedVideo.view_count,
+            like_count: selectedVideo.like_count,
+            comment_count: selectedVideo.comment_count,
+            published_at: selectedVideo.published_at,
+            outlier_score: selectedVideo.outlier_score,
+          }}
+          channel={{
+            id: selectedVideo.competitor_channels.id,
+            channel_name: selectedVideo.competitor_channels.channel_name,
+            thumbnail_url: selectedVideo.competitor_channels.thumbnail_url,
+            subscriber_count: selectedVideo.competitor_channels.subscriber_count,
+          }}
+          isTracked={ownedChannelIds.has(selectedVideo.competitor_channels.youtube_channel_id)}
+          tracking={trackingChannel}
+          onTrack={() => handleTrackChannel(selectedVideo)}
+          onClose={() => setSelectedVideo(null)}
+        />
+      )}
+
+      {/* Track-channel error (e.g. plan competitor limit) — sits above the modal */}
+      {trackError && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] rounded-lg px-4 py-2.5 text-sm max-w-md text-center"
+          style={{ background: "rgba(255,90,90,0.12)", border: "1px solid rgba(255,90,90,0.4)", color: "#ff8a8a" }}
+        >
+          {trackError}
         </div>
       )}
     </div>

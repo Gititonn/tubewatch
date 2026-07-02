@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
   let outliersQuery = supabase
     .from("competitor_videos")
-    .select(`*, competitor_channels(id, channel_name, thumbnail_url, youtube_channel_id, category, is_discovery)`)
+    .select(`*, competitor_channels(id, channel_name, thumbnail_url, youtube_channel_id, channel_handle, subscriber_count, video_count, category, is_discovery)`)
     .in("competitor_channel_id", channelIds)
     .gte("outlier_score", minScore)
     .order("outlier_score", { ascending: false })

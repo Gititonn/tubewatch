@@ -1,16 +1,32 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
+import { VideoDetailModal } from "@/components/VideoDetailModal";
 
-type CompetitorChannel = { id: string; category: ChannelCategory | null };
+type CompetitorChannel = { id: string; youtube_channel_id: string; category: ChannelCategory | null };
+
+type OutlierChannel = {
+  id: string;
+  channel_name: string;
+  thumbnail_url: string | null;
+  youtube_channel_id: string;
+  channel_handle: string | null;
+  subscriber_count: number | null;
+  video_count: number | null;
+  category: ChannelCategory | null;
+};
 
 type OutlierVideo = {
   id: string;
   youtube_video_id: string;
   title: string;
   thumbnail_url: string | null;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  published_at: string | null;
   outlier_score: number | null;
-  competitor_channels: { channel_name: string } | { channel_name: string }[] | null;
+  competitor_channels: OutlierChannel | OutlierChannel[] | null;
 };
 
 const SAMPLE_VIDEOS = [
@@ -42,6 +58,12 @@ export default function OutlierFeedWidget() {
   const [loading, setLoading] = useState(true);
   const [hasAnyChannel, setHasAnyChannel] = useState(true);
   const [checkedChannels, setCheckedChannels] = useState(false);
+  // Video-detail modal + track-channel state — mirrors the full outlier feed
+  // so clicking a card here opens the same in-app view rather than YouTube.
+  const [selectedVideo, setSelectedVideo] = useState<OutlierVideo | null>(null);
+  const [trackingChannel, setTrackingChannel] = useState(false);
+  const [trackError, setTrackError] = useState<string | null>(null);
+  const [ownedChannelIds, setOwnedChannelIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Categories come from BOTH the user's own tracked channels and the
@@ -58,9 +80,37 @@ export default function OutlierFeedWidget() {
       ) as ChannelCategory[];
       setAvailableCategories(cats);
       setHasAnyChannel(ownedChannels.length + discoveryChannels.length > 0);
+      setOwnedChannelIds(new Set(ownedChannels.map((c) => c.youtube_channel_id)));
       setCheckedChannels(true);
     });
   }, []);
+
+  async function handleTrackChannel(v: OutlierVideo) {
+    const ch = Array.isArray(v.competitor_channels) ? v.competitor_channels[0] : v.competitor_channels;
+    if (!ch) return;
+    setTrackingChannel(true);
+    setTrackError(null);
+    const res = await fetch("/api/competitors/channels", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        channelId: ch.youtube_channel_id,
+        name: ch.channel_name,
+        handle: ch.channel_handle,
+        thumbnail: ch.thumbnail_url,
+        subscriberCount: ch.subscriber_count,
+        videoCount: ch.video_count,
+        category: ch.category,
+      }),
+    });
+    const data = await res.json();
+    if (data.channel) {
+      setOwnedChannelIds((prev) => new Set(prev).add(ch.youtube_channel_id));
+    } else if (data.error) {
+      setTrackError(data.error);
+    }
+    setTrackingChannel(false);
+  }
 
   useEffect(() => {
     if (!hasAnyChannel) {
@@ -227,12 +277,10 @@ export default function OutlierFeedWidget() {
               const score = v.outlier_score ?? 0;
               const scoreColor = score >= 10 ? "#ff4444" : score >= 5 ? "#ffaa00" : "#4ade80";
               return (
-                <a
+                <div
                   key={v.id}
-                  href={`https://www.youtube.com/watch?v=${v.youtube_video_id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-xl border overflow-hidden block transition-all hover:border-red-500/40 hover:scale-[1.02]"
+                  onClick={() => { setTrackError(null); setSelectedVideo(v); }}
+                  className="rounded-xl border overflow-hidden block cursor-pointer transition-all hover:border-red-500/40 hover:scale-[1.02]"
                   style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                 >
                   {v.thumbnail_url && (
@@ -252,12 +300,54 @@ export default function OutlierFeedWidget() {
                       </span>
                     </div>
                   </div>
-                </a>
+                </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* Video detail modal — shared in-app "click a video" experience */}
+      {selectedVideo && (() => {
+        const ch = Array.isArray(selectedVideo.competitor_channels)
+          ? selectedVideo.competitor_channels[0]
+          : selectedVideo.competitor_channels;
+        if (!ch) return null;
+        return (
+          <VideoDetailModal
+            video={{
+              title: selectedVideo.title,
+              thumbnail_url: selectedVideo.thumbnail_url,
+              youtube_video_id: selectedVideo.youtube_video_id,
+              view_count: selectedVideo.view_count,
+              like_count: selectedVideo.like_count,
+              comment_count: selectedVideo.comment_count,
+              published_at: selectedVideo.published_at,
+              outlier_score: selectedVideo.outlier_score,
+            }}
+            channel={{
+              id: ch.id,
+              channel_name: ch.channel_name,
+              thumbnail_url: ch.thumbnail_url,
+              subscriber_count: ch.subscriber_count,
+            }}
+            isTracked={ownedChannelIds.has(ch.youtube_channel_id)}
+            tracking={trackingChannel}
+            onTrack={() => handleTrackChannel(selectedVideo)}
+            onClose={() => setSelectedVideo(null)}
+          />
+        );
+      })()}
+
+      {/* Track-channel error (e.g. plan competitor limit) — sits above the modal */}
+      {trackError && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[60] rounded-lg px-4 py-2.5 text-sm max-w-md text-center"
+          style={{ background: "rgba(255,90,90,0.12)", border: "1px solid rgba(255,90,90,0.4)", color: "#ff8a8a" }}
+        >
+          {trackError}
+        </div>
+      )}
     </div>
   );
 }
