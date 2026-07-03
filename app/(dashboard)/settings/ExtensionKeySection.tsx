@@ -39,6 +39,17 @@ export default function ExtensionKeySection() {
     return () => window.removeEventListener("message", onMsg);
   }, []);
 
+  // Once connected, take the user to YouTube — that's where the extension's
+  // overlay/panel actually shows, so the flow feels finished instead of just
+  // leaving them parked on Settings.
+  useEffect(() => {
+    if (connect !== "connected") return;
+    const t = window.setTimeout(() => {
+      window.location.href = "https://www.youtube.com";
+    }, 1500);
+    return () => window.clearTimeout(t);
+  }, [connect]);
+
   async function generate() {
     setGenerating(true);
     const r = await fetch("/api/settings/extension-key", { method: "POST" });
@@ -65,7 +76,7 @@ export default function ExtensionKeySection() {
 
   const connectLabel =
     connect === "connecting" ? "Connecting…"
-    : connect === "connected" ? "✓ Extension connected"
+    : connect === "connected" ? "✓ Connected! Opening YouTube…"
     : "🔗 Connect extension (1-click)";
 
   return (
