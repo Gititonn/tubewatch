@@ -10,6 +10,14 @@
   const BADGE_CLASS = "tw-outlier-badge";
   const PROCESSED = "data-tw-processed";
 
+  // YouTube renders thumbnails through two architectures: the older
+  // ytd-thumbnail (a#thumbnail) and the newer view-model lockups
+  // (a.ytLockupViewModelContentImage — used on watch-page recommendations, and
+  // increasingly the home feed and search). Match both, or badges silently
+  // stop appearing when YouTube ships the new components.
+  const THUMB_SELECTOR =
+    'a#thumbnail[href*="/watch?v="], a.ytLockupViewModelContentImage[href*="/watch?v="]';
+
   function scoreColor(score) {
     if (score >= 10) return "#ff4444";
     if (score >= 5) return "#ffaa00";
@@ -91,9 +99,7 @@
   }
 
   function scan(root) {
-    (root || document)
-      .querySelectorAll(`a#thumbnail[href*="/watch?v="]:not([${PROCESSED}])`)
-      .forEach(decorateThumb);
+    (root || document).querySelectorAll(THUMB_SELECTOR).forEach(decorateThumb);
     maybeInjectChannelTrack();
   }
 
@@ -102,7 +108,7 @@
     for (const m of mutations) {
       for (const node of m.addedNodes) {
         if (node.nodeType !== 1) continue;
-        if (node.matches?.('a#thumbnail[href*="/watch?v="]')) decorateThumb(node);
+        if (node.matches?.(THUMB_SELECTOR)) decorateThumb(node);
         else if (node.querySelectorAll) scan(node);
       }
     }
