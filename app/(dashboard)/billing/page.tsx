@@ -21,6 +21,30 @@ function CtaSkeleton() {
   );
 }
 
+function CurrentPlanCta({ hasStripeCustomer }: { hasStripeCustomer: boolean }) {
+  // Stripe customers get a working portal link; comped/launch users get a
+  // non-interactive "Current plan" state (no dead link).
+  if (hasStripeCustomer) {
+    return (
+      <a
+        href="/api/stripe/portal"
+        className="block w-full py-2 rounded-lg text-sm text-center font-medium"
+        style={{ background: "#00ff8715", color: "#00ff87", border: "1px solid #00ff8740" }}
+      >
+        Manage billing
+      </a>
+    );
+  }
+  return (
+    <div
+      className="w-full py-2 rounded-lg text-sm text-center font-medium"
+      style={{ background: "#00ff8715", color: "#00ff87", border: "1px solid #00ff8740", cursor: "default" }}
+    >
+      ✓ Current plan
+    </div>
+  );
+}
+
 function FeatureList({ features }: { features: string[] }) {
   return (
     <ul className="mt-4 space-y-2">
@@ -79,6 +103,10 @@ export default function BillingPage() {
 
   const currentPlan = status?.plan ?? "free";
   const isPaid = currentPlan === "pro" || currentPlan === "growth";
+  // Comped / launch-code users have a paid plan but no Stripe customer — there's
+  // no portal to manage, so show an honest "Current plan" state instead of a
+  // "Manage billing" link that just bounces back here.
+  const hasStripeCustomer = !!status?.stripe_customer_id;
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -181,13 +209,7 @@ export default function BillingPage() {
               <FeatureList features={PLANS.pro.features} />
               <div className="mt-auto pt-6">
                 {loading ? <CtaSkeleton /> : currentPlan === "pro" ? (
-                  <a
-                    href="/api/stripe/portal"
-                    className="block w-full py-2 rounded-lg text-sm text-center font-medium"
-                    style={{ background: "#00ff8715", color: "#00ff87", border: "1px solid #00ff8740" }}
-                  >
-                    Manage billing
-                  </a>
+                  <CurrentPlanCta hasStripeCustomer={hasStripeCustomer} />
                 ) : currentPlan === "growth" ? (
                   <div
                     className="w-full py-2 rounded-lg text-sm text-center"
@@ -235,13 +257,7 @@ export default function BillingPage() {
               <FeatureList features={PLANS.growth.features} />
               <div className="mt-auto pt-6">
                 {loading ? <CtaSkeleton /> : currentPlan === "growth" ? (
-                  <a
-                    href="/api/stripe/portal"
-                    className="block w-full py-2 rounded-lg text-sm text-center font-medium"
-                    style={{ background: "#00ff8715", color: "#00ff87", border: "1px solid #00ff8740" }}
-                  >
-                    Manage billing
-                  </a>
+                  <CurrentPlanCta hasStripeCustomer={hasStripeCustomer} />
                 ) : (
                   <form action="/api/stripe/checkout" method="POST">
                     <input type="hidden" name="plan" value="growth" />
@@ -259,7 +275,7 @@ export default function BillingPage() {
             </div>
           </div>
 
-          {isPaid && (
+          {isPaid && hasStripeCustomer && (
             <div className="mt-6 text-sm" style={{ color: "var(--text-secondary)" }}>
               Need to cancel or change payment method?{" "}
               <a href="/api/stripe/portal" style={{ color: "#00ff87" }}>
