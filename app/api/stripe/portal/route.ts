@@ -7,11 +7,14 @@ function getStripe() {
 }
 
 export async function GET(request: Request) {
+  // NextResponse.redirect requires an ABSOLUTE URL — relative paths throw
+  // "URL is malformed" (500) in production. Build absolutes off the request.
+  const { origin } = new URL(request.url);
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.redirect("/login");
+    return NextResponse.redirect(`${origin}/login`);
   }
 
   const { data: profile } = await supabase
@@ -20,12 +23,13 @@ export async function GET(request: Request) {
     .eq("id", user.id)
     .single();
 
+  // Comped / launch-code users have a plan but no Stripe customer — there's
+  // nothing to manage, so send them back to billing instead of crashing.
   if (!profile?.stripe_customer_id) {
-    return NextResponse.redirect("/settings");
+    return NextResponse.redirect(`${origin}/billing`);
   }
 
   const stripe = getStripe();
-  const { origin } = new URL(request.url);
 
   const session = await stripe.billingPortal.sessions.create({
     customer: profile.stripe_customer_id,

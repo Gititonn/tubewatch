@@ -14,7 +14,8 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.redirect("/login");
+    // Absolute URL required — a relative path throws "URL is malformed" (500).
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const contentType = request.headers.get("content-type") ?? "";
