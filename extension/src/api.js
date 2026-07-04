@@ -33,6 +33,26 @@
   let queue = new Map(); // videoId -> [resolve, ...]
   let timer = null;
 
+  // Fired when the stored API key changes (connect/disconnect/regenerate). We
+  // clear the in-memory score cache so demo scores upgrade to real ones — and
+  // vice versa — without needing a page reload, then notify subscribers
+  // (content.js badges, watchpanel.js) so they can re-render live.
+  const keyChangeCallbacks = [];
+  function onKeyChange(fn) {
+    keyChangeCallbacks.push(fn);
+  }
+  try {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== "local" || !changes.twApiKey) return;
+      cache.clear();
+      keyChangeCallbacks.forEach((fn) => {
+        try { fn(); } catch { /* subscriber threw — keep going */ }
+      });
+    });
+  } catch {
+    /* storage.onChanged unavailable — live upgrade just won't fire */
+  }
+
   async function flush() {
     timer = null;
     const pending = queue;
@@ -98,5 +118,5 @@
     }
   }
 
-  globalThis.TubeWatchAPI = { getOutlierScore, getApiKey, trackChannel };
+  globalThis.TubeWatchAPI = { getOutlierScore, getApiKey, trackChannel, onKeyChange };
 })();

@@ -116,5 +116,15 @@
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
   window.addEventListener("yt-navigate-finish", () => setTimeout(() => scan(document), 300));
+
+  // When the API key is connected/changed mid-session, wipe existing badges and
+  // their processed markers, then re-scan so demo badges upgrade to real scores
+  // (or the reverse on disconnect) without a page reload.
+  window.TubeWatchAPI.onKeyChange?.(() => {
+    document.querySelectorAll("." + BADGE_CLASS).forEach((b) => b.remove());
+    document.querySelectorAll("[" + PROCESSED + "]").forEach((el) => el.removeAttribute(PROCESSED));
+    scan(document);
+  });
+
   scan(document);
 })();

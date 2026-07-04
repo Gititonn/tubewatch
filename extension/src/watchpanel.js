@@ -54,8 +54,12 @@
     if (!panel) {
       panel = document.createElement("div");
       panel.id = PANEL_ID;
-      container.prepend(panel);
     }
+    // Prepend into the given (visible) container — and move the panel there if it
+    // currently lives in a different, stale 0×0 #secondary left over from a SPA
+    // navigation. That misplacement was why the sidebar stayed invisible until a
+    // hard reload.
+    if (panel.parentElement !== container) container.prepend(panel);
     panel.innerHTML = `
       <div class="tw-wp-head">
         <span class="tw-wp-logo">🔥</span>
@@ -95,33 +99,100 @@
   }
 
   let lastVideoId = null;
+  let lastResult = null; // cached score for lastVideoId, so re-injection doesn't refetch
+  let ensuring = false; // guards against overlapping container-wait timers
 
-  async function update() {
+  // The right rail (#secondary / #secondary-inner) that we inject into. During a
+  // SPA navigation YouTube briefly keeps a *stale* #secondary in the DOM that is
+  // collapsed to 0×0, ahead of the live one in document order — so a plain
+  // querySelector("#secondary") can hand back the invisible ghost. Pick the
+  // first candidate that is actually laid out (non-zero width), preferring
+  // #secondary-inner.
+  function findContainer() {
+    const candidates = [
+      ...document.querySelectorAll("#secondary-inner"),
+      ...document.querySelectorAll("#secondary"),
+    ];
+    return candidates.find((el) => el.getBoundingClientRect().width > 0) || null;
+  }
+
+  // The panel is only "healthy" if it exists AND has real dimensions. A panel
+  // sitting inside a 0×0 stale container counts as broken and must be re-homed.
+  function panelHealthy() {
+    const p = document.getElementById(PANEL_ID);
+    return !!p && p.getBoundingClientRect().width > 0;
+  }
+
+  // Keep (re)injecting until the panel is present in a *visible* container. Polls
+  // because the rail renders async and can be rebuilt mid-transition; render()
+  // moves the panel into the live container if it landed in a ghost.
+  function ensurePanel(videoId) {
+    if (ensuring) return;
+    if (panelHealthy() && videoId === lastVideoId && lastResult) return;
+    ensuring = true;
+    let tries = 0;
+    const timer = setInterval(async () => {
+      if (currentVideoId() !== videoId) { // navigated away while waiting
+        clearInterval(timer);
+        ensuring = false;
+        return;
+      }
+      const container = findContainer();
+      if (container) {
+        if (!lastResult) lastResult = await window.TubeWatchAPI.getOutlierScore(videoId);
+        if (currentVideoId() !== videoId) { clearInterval(timer); ensuring = false; return; }
+        render(container, videoId, lastResult);
+        if (panelHealthy()) {
+          clearInterval(timer);
+          ensuring = false;
+          return;
+        }
+      }
+      if (++tries > 60) { // ~15s ceiling
+        clearInterval(timer);
+        ensuring = false;
+      }
+    }, 250);
+  }
+
+  function update() {
     const videoId = currentVideoId();
     if (!videoId) {
       const existing = document.getElementById(PANEL_ID);
       if (existing) existing.remove();
       lastVideoId = null;
+      lastResult = null;
       return;
     }
-    if (videoId === lastVideoId && document.getElementById(PANEL_ID)) return;
-    lastVideoId = videoId;
-
-    // Wait for the right rail to exist (it renders async).
-    let tries = 0;
-    const timer = setInterval(async () => {
-      const container = document.querySelector("#secondary-inner, #secondary");
-      if (container) {
-        clearInterval(timer);
-        const result = await window.TubeWatchAPI.getOutlierScore(videoId);
-        // guard against a navigation that happened while we awaited
-        if (currentVideoId() === videoId) render(container, videoId, result);
-      } else if (++tries > 40) {
-        clearInterval(timer);
-      }
-    }, 250);
+    if (videoId !== lastVideoId) {
+      lastVideoId = videoId;
+      lastResult = null; // new video — force a fresh fetch
+    }
+    ensurePanel(videoId);
   }
 
+  // Safety net for YouTube rebuilding/wiping the rail after we've injected. The
+  // callback is coalesced to once per frame so the getBoundingClientRect health
+  // check doesn't force a reflow on every one of YouTube's many mutations.
+  let scheduled = false;
+  const observer = new MutationObserver(() => {
+    if (scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      if (currentVideoId() && !panelHealthy()) ensurePanel(currentVideoId());
+    });
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
   window.addEventListener("yt-navigate-finish", update);
+
+  // Live key connect/disconnect: drop the cached score and re-render.
+  window.TubeWatchAPI.onKeyChange?.(() => {
+    lastResult = null;
+    lastVideoId = null;
+    update();
+  });
+
   update();
 })();
