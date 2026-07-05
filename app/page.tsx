@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import FeatureCarousel from "./feature-carousel";
 import ComparisonSection from "./comparison-section";
+import HeroDemo from "./hero-demo";
+import ScoreMathSection from "./score-math-section";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
 
@@ -113,9 +115,10 @@ export default async function Home() {
           </h1>
 
           <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
-            TubeWatch surfaces the videos quietly overperforming across the channels you compete
-            with — then your AI coach turns them into your next upload. Built for{" "}
-            <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
+            Other tools rank raw view counts, so their &quot;outliers&quot; are old hits. TubeWatch
+            scores <strong style={{ color: "#ccc" }}>views-per-day against each channel&apos;s own median</strong> to
+            catch videos while they&apos;re breaking — then the AI coach turns them into your next
+            upload. Built for <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap">
@@ -138,6 +141,8 @@ export default async function Home() {
           <p className="mt-4 text-sm" style={{ color: "#444" }}>
             No credit card required · Cancel anytime
           </p>
+
+          <HeroDemo />
         </section>
 
         {/* FEATURE PILLS */}
@@ -224,6 +229,9 @@ export default async function Home() {
           </div>
         </div>
 
+        {/* THE MATH — why this score isn't views ÷ median */}
+        <ScoreMathSection />
+
         {/* FEATURE CAROUSEL */}
         <FeatureCarousel />
 
@@ -253,9 +261,6 @@ export default async function Home() {
 
             {/* Pro — highlighted */}
             <div className="rounded-2xl border p-8 flex flex-col relative" style={{ borderColor: "#00ff87", background: "#0a1a0f", boxShadow: "0 0 40px rgba(0,255,135,0.12)" }}>
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-black" style={{ background: "#00ff87", color: "#000" }}>
-                MOST POPULAR
-              </div>
               <p className="text-sm font-bold mb-2" style={{ color: "#00ff87" }}>PRO</p>
               <div className="flex items-end gap-1 mb-6">
                 <span className="text-4xl font-black text-white">${PLANS.pro.priceMonthly}</span>
