@@ -104,7 +104,11 @@ export default async function LeaderboardIndex() {
                   <div className="text-3xl mb-3">{c.emoji}</div>
                   <h2 className="text-lg font-bold text-white mb-1">{c.label}</h2>
                   <p className="text-sm mb-4" style={{ color: "#666" }}>
-                    {stats.channelCount} channel{stats.channelCount === 1 ? "" : "s"} tracked
+                    {/* One template string, not adjacent JSX text nodes — Next
+                        separates those with HTML comments in the SSR output,
+                        which text scrapers/SEO extractors read as stray spaces
+                        ("2 channel s tracked"). */}
+                    {`${stats.channelCount} channel${stats.channelCount === 1 ? "" : "s"} tracked`}
                   </p>
                   {topScore ? (
                     <span
