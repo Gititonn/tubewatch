@@ -1,6 +1,6 @@
 # Spec: Transcript-Aware "Why It Worked" v2 (the AI moat)
 
-**Status:** proposed · **Owner:** — · **Est:** ~2–3 sessions
+**Status:** SHIPPED 2026-07-05 (lib/transcript.ts + why-it-worked v2 + transcript route refactor). Remaining: closed-loop measurement (section "Why this is a moat" item c).
 **Origin:** every external review converged on the same point — the AI coach is the only
 defensible moat candidate, and today it's a thin wrapper. This upgrades "Why It Worked"
 from *title horoscope* to *structural teardown no Data API pull can replicate*.

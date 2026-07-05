@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { YoutubeTranscript } from 'youtube-transcript'
 import { createClient } from '@/lib/supabase/server'
+import { fetchTimedTranscript } from '@/lib/transcript'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -17,29 +17,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  try {
-    const transcript = await YoutubeTranscript.fetchTranscript(videoId)
-
-    // Return both raw segments and a single concatenated string
-    const fullText = transcript
-      .map(seg => seg.text)
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-
-    return NextResponse.json({
-      videoId,
-      segments: transcript.map(seg => ({
-        text: seg.text,
-        offset: seg.offset,   // milliseconds
-        duration: seg.duration,
-      })),
-      fullText,
-      wordCount: fullText.split(' ').length,
-    })
-  } catch (err) {
-    // Common causes: transcripts disabled, private video, wrong ID
-    const message = (err instanceof Error ? err.message : null) || 'Failed to fetch transcript'
-    return NextResponse.json({ error: message }, { status: 500 })
+  // Shared fetch path (lib/transcript.ts): timeout-bounded, null on any
+  // failure — captions disabled, private video, scrape breakage.
+  const transcript = await fetchTimedTranscript(videoId)
+  if (!transcript) {
+    return NextResponse.json({ error: 'Transcript unavailable for this video' }, { status: 404 })
   }
+
+  return NextResponse.json({
+    videoId,
+    segments: transcript.segments,
+    fullText: transcript.fullText,
+    wordCount: transcript.wordCount,
+  })
 }
