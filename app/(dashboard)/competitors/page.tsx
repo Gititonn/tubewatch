@@ -45,6 +45,36 @@ function fmt(n: number | null): string {
   return n.toString();
 }
 
+function visibleChannels(
+  channels: CompetitorChannel[],
+  query: string,
+  sortBy: "recent" | "subs" | "median" | "name"
+): CompetitorChannel[] {
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? channels.filter(
+        (c) =>
+          c.channel_name.toLowerCase().includes(q) ||
+          (c.channel_handle ?? "").toLowerCase().includes(q)
+      )
+    : channels;
+  return [...filtered].sort((a, b) => {
+    switch (sortBy) {
+      case "subs":
+        return (b.subscriber_count ?? 0) - (a.subscriber_count ?? 0);
+      case "median":
+        return (b.median_views ?? 0) - (a.median_views ?? 0);
+      case "name":
+        return a.channel_name.localeCompare(b.channel_name);
+      default:
+        return (
+          (b.last_synced_at ? new Date(b.last_synced_at).getTime() : 0) -
+          (a.last_synced_at ? new Date(a.last_synced_at).getTime() : 0)
+        );
+    }
+  });
+}
+
 function timeAgo(iso: string | null): string {
   if (!iso) return "Never";
   const diff = Date.now() - new Date(iso).getTime();
@@ -55,10 +85,21 @@ function timeAgo(iso: string | null): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
+type SortKey = "recent" | "subs" | "median" | "name";
+
+const SORTS: { id: SortKey; label: string }[] = [
+  { id: "recent", label: "Recently synced" },
+  { id: "subs", label: "Most subscribers" },
+  { id: "median", label: "Highest median views" },
+  { id: "name", label: "Name A–Z" },
+];
+
 export default function CompetitorsPage() {
   const [channels, setChannels] = useState<CompetitorChannel[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [listQuery, setListQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortKey>("recent");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -236,7 +277,32 @@ export default function CompetitorsPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {channels.map((ch) => (
+          {/* Search + sort only once the list is big enough to need them — at
+              3 tracked channels these controls are clutter; at the Pro/Growth
+              caps (10–25) a plain vertical list is a chore. */}
+          {channels.length >= 5 && (
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <input
+                value={listQuery}
+                onChange={(e) => setListQuery(e.target.value)}
+                placeholder="🔍 Filter tracked channels…"
+                className="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-primary)" }}
+              />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortKey)}
+                aria-label="Sort tracked channels"
+                className="px-3 py-2 rounded-lg text-sm outline-none"
+                style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+              >
+                {SORTS.map((s) => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {visibleChannels(channels, listQuery, sortBy).map((ch) => (
             <div
               key={ch.id}
               className="flex items-center gap-4 rounded-xl border px-5 py-4"

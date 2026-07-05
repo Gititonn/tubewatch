@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { VideoGridSkeleton } from "@/components/Skeleton";
+import AddCompetitorModal from "@/components/AddCompetitorModal";
 
 type CompetitorChannel = {
   id: string;
@@ -72,6 +73,10 @@ export default function RisingPage() {
   const [daysAgo, setDaysAgo] = useState(30);
   const [tracked, setTracked] = useState<Set<string>>(new Set());
   const [tracking, setTracking] = useState<Set<string>>(new Set());
+  const [showAddModal, setShowAddModal] = useState(false);
+  // Bumped when the quick-add modal tracks+syncs a channel, so the radar
+  // refetches with the new competitor's videos without leaving the page.
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -88,7 +93,7 @@ export default function RisingPage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [minScore, maxSubscribers, daysAgo]);
+  }, [minScore, maxSubscribers, daysAgo, refreshKey]);
 
   function getChannel(v: RisingVideo): CompetitorChannel | null {
     if (!v.competitor_channels) return null;
@@ -197,24 +202,25 @@ export default function RisingPage() {
               well above their channel&apos;s normal pace — while the topic is still worth acting on.{" "}
               Add competitors to start tracking momentum.
             </p>
-            <a
-              href="/competitors"
+            {/* Opens the quick-add modal in place — bouncing the user to
+                /competitors mid-task loses the Rising context they came for. */}
+            <button
+              onClick={() => setShowAddModal(true)}
               className="mt-6 inline-block px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors"
               style={{
                 border: "1px solid #00ff87",
                 color: "#00ff87",
                 background: "transparent",
-                textDecoration: "none",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "rgba(0,255,135,0.1)";
+                (e.currentTarget as HTMLButtonElement).style.background = "rgba(0,255,135,0.1)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                (e.currentTarget as HTMLButtonElement).style.background = "transparent";
               }}
             >
               Add Your First Competitor →
-            </a>
+            </button>
           </div>
 
           {/* Ghost preview cards */}
@@ -390,6 +396,12 @@ export default function RisingPage() {
           })}
         </div>
       )}
+
+      <AddCompetitorModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAdded={() => setRefreshKey((k) => k + 1)}
+      />
     </div>
   );
 }

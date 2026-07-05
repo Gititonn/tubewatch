@@ -17,6 +17,15 @@ function fmt(n: number): string {
   return n.toString();
 }
 
+// Example series for the collecting-data empty state (blurred, aria-hidden).
+const days = (vals: number[]): TrendPoint[] =>
+  vals.map((v, i) => ({ t: new Date(Date.now() - (vals.length - 1 - i) * 86400000).toISOString(), v }));
+const EXAMPLE_TRENDS = [
+  { title: "Your next breakout video", points: days([1200, 1900, 3400, 6800, 12400]), latest: "12.4K views", delta: "+5.6K" },
+  { title: "A steady performer", points: days([8200, 8600, 9100, 9500, 9900]), latest: "9.9K views", delta: "+400" },
+  { title: "An old video resurging", points: days([40200, 40300, 40900, 42800, 46100]), latest: "46.1K views", delta: "+3.3K" },
+];
+
 /**
  * Channel-level view-trend charts (P2.4). Reads the per-video snapshot series
  * for the user's own channel. Because snapshots accrue one point per daily
@@ -70,12 +79,46 @@ export default function ViewTrendsWidget() {
             ))}
           </div>
         ) : chartable === 0 ? (
-          <div
-            className="rounded-xl border p-5 text-center text-sm"
-            style={{ borderColor: "var(--border)", background: "var(--bg-hover, rgba(255,255,255,0.02))", color: "var(--text-muted)" }}
-          >
-            📊 Collecting trend data. Each daily sync records where your videos&apos; views
-            stand — charts appear once a video has 2+ days of history.
+          // Sell the destination, not the wait: a blurred example of what the
+          // widget becomes, with the "collecting" note on top. A bare text
+          // block gives the user no reason to come back in two days.
+          <div className="relative rounded-xl border overflow-hidden" style={{ borderColor: "var(--border)" }}>
+            <div
+              aria-hidden
+              className="pointer-events-none select-none grid gap-3 p-3"
+              style={{
+                gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+                filter: "blur(4px)",
+                opacity: 0.5,
+              }}
+            >
+              {EXAMPLE_TRENDS.map((ex) => (
+                <div
+                  key={ex.title}
+                  className="rounded-xl border p-3"
+                  style={{ borderColor: "var(--border)", background: "var(--bg-hover, rgba(255,255,255,0.02))" }}
+                >
+                  <p className="text-xs font-semibold mb-2 leading-snug" style={{ color: "var(--text-primary)", minHeight: 32 }}>
+                    {ex.title}
+                  </p>
+                  <ViewTrendChart points={ex.points} />
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>{ex.latest}</span>
+                    <span className="text-xs font-bold" style={{ color: "#00ff87" }}>{ex.delta}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div
+              className="absolute inset-0 flex items-center justify-center text-center px-6"
+              style={{ background: "rgba(10,10,10,0.55)" }}
+            >
+              <p className="text-sm" style={{ color: "var(--text-secondary)", maxWidth: 420 }}>
+                📊 <span className="font-semibold text-white">Collecting trend data.</span> Each daily
+                sync records where your videos&apos; views stand — charts like these appear once a
+                video has 2+ days of history.
+              </p>
+            </div>
           </div>
         ) : (
           <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
