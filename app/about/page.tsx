@@ -38,8 +38,10 @@ export default function AboutPage() {
           <div>
             <h2 className="text-white font-bold mb-2">Who it&apos;s for</h2>
             <p>
-              Small and mid-sized creators who want the kind of data-driven feedback loop that bigger channels
-              take for granted — without the price tag or complexity built for agencies and networks.
+              Creators fighting for their first 100K — the ones the big analytics suites treat as an
+              afterthought. If you run a growing channel in a specific niche, this is your tool. If you
+              already have a million subscribers and a strategy team, it isn&apos;t; the enterprise dashboards
+              will serve you better, and we&apos;re fine with that.
             </p>
           </div>
           <div>

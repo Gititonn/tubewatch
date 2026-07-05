@@ -118,12 +118,19 @@ export default async function Home() {
             </span>
           </h1>
 
-          <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
+          <p className="text-lg mb-4 max-w-xl" style={{ color: "#888" }}>
             Other tools rank raw view counts, so their &quot;outliers&quot; are old hits. TubeWatch
             scores <strong style={{ color: "#ccc" }}>views-per-day against each channel&apos;s own median</strong> to
             catch videos while they&apos;re breaking — and AI breaks down exactly why each one
-            worked, so you can adapt it for your channel. Built for{" "}
-            <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
+            worked, so you can adapt it for your channel.
+          </p>
+
+          {/* The wedge, polarized: name the enemy, name who this is NOT for.
+              "Growing creators, 1K–100K subs" was a demographic; this is a side. */}
+          <p className="text-base mb-8 max-w-xl font-semibold" style={{ color: "#ccc" }}>
+            vidIQ and TubeBuddy are bloated dashboards built for million-sub empires.{" "}
+            <span style={{ color: "#00ff87" }}>TubeWatch is the sniper scope for your first 100K.</span>{" "}
+            <span className="font-normal" style={{ color: "#555" }}>Already famous? This isn&apos;t for you.</span>
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap">
