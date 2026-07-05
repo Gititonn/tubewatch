@@ -1,16 +1,21 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { searchChannels, YouTubeApiError } from "@/lib/youtube";
+import { searchChannels, searchNicheChannels, YouTubeApiError } from "@/lib/youtube";
 import { categoryLabel } from "@/lib/categories";
 
 /**
  * "Similar channels you could track" — algorithmic suggestions (P2.2).
  *
  * Primary source is the shared discovery pool, ranked by niche match and
- * subscriber proximity to the channels the user already tracks. Because the
- * pool is still small per niche, we fall back to a live YouTube search (same
- * helper the Add-Channel search uses) when the pool can't fill the shelf —
- * mirroring how the Outlier Feed's search already dead-ends into YouTube.
+ * subscriber proximity to the channels the user already tracks; a live
+ * YouTube lookup tops the shelf up when the pool runs thin.
+ *
+ * Every candidate — pool or YouTube — must pass the same size band used by
+ * the connect-time auto-suggest: within ~10x of the user's typical tracked
+ * channel on a log scale, at least 5 uploads. Before this filter the shelf
+ * served 45M-sub behemoths and 0-sub shells next to a 300K-sub list; a
+ * suggestion that ignores the user's size reads as noise, and noise here
+ * poisons trust in the scoring everywhere else.
  */
 
 type Suggestion = {
@@ -28,6 +33,24 @@ type Suggestion = {
 
 const SHELF_SIZE = 6;
 const POOL_MIN_BEFORE_FALLBACK = 3;
+const MIN_SUBS = 1_000;
+const MIN_VIDEOS = 5;
+const DEFAULT_REF_SUBS = 10_000;
+// A peer is within one order of magnitude of the user's typical tracked size.
+const BAND_SPAN = 10;
+
+function median(nums: number[]): number | null {
+  if (nums.length === 0) return null;
+  const s = [...nums].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 !== 0 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+function fmtSubs(n: number): string {
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1_000) return Math.round(n / 1_000) + "K";
+  return String(n);
+}
 
 export async function GET() {
   const supabase = createClient();
@@ -38,24 +61,28 @@ export async function GET() {
   // (b) the subscriber tier they care about, and (c) what to exclude.
   const { data: tracked, error: trackedErr } = await supabase
     .from("competitor_channels")
-    .select("youtube_channel_id, category, subscriber_count")
+    .select("id, youtube_channel_id, category, subscriber_count")
     .eq("user_id", user.id);
   if (trackedErr) return NextResponse.json({ error: trackedErr.message }, { status: 500 });
 
   const trackedIds = new Set((tracked ?? []).map((c) => c.youtube_channel_id));
 
-  // Average subscriber tier per tracked category, for proximity ranking.
-  const catSubs = new Map<string, { sum: number; n: number }>();
+  // The size band candidates must land in, anchored on the median tracked
+  // channel so one giant in the list doesn't drag suggestions upmarket.
+  const refSubs =
+    median((tracked ?? []).map((c) => c.subscriber_count ?? 0).filter((n) => n > 0)) ??
+    DEFAULT_REF_SUBS;
+  const bandMin = Math.max(MIN_SUBS, refSubs / BAND_SPAN);
+  const bandMax = refSubs * BAND_SPAN;
+  const inBand = (subs: number, videos: number) =>
+    subs >= bandMin && subs <= bandMax && videos >= MIN_VIDEOS;
+  const logDist = (subs: number) => Math.abs(Math.log10(subs) - Math.log10(refSubs));
+
+  const catSubs = new Map<string, number>();
   for (const c of tracked ?? []) {
-    if (!c.category) continue;
-    const e = catSubs.get(c.category) ?? { sum: 0, n: 0 };
-    e.sum += c.subscriber_count ?? 0;
-    e.n += 1;
-    catSubs.set(c.category, e);
+    if (c.category) catSubs.set(c.category, (catSubs.get(c.category) ?? 0) + 1);
   }
   const trackedCategories = Array.from(catSubs.keys());
-  const catAvg = (cat: string | null) =>
-    cat && catSubs.has(cat) ? catSubs.get(cat)!.sum / catSubs.get(cat)!.n : null;
 
   // Candidate universe: the discovery pool, scoped to the user's niches when
   // they track anything (otherwise suggest across all niches).
@@ -71,52 +98,82 @@ export async function GET() {
   const ranked: { s: Suggestion; prox: number }[] = [];
   for (const p of pool ?? []) {
     if (!p.youtube_channel_id || trackedIds.has(p.youtube_channel_id) || seen.has(p.youtube_channel_id)) continue;
+    const subs = p.subscriber_count ?? 0;
+    if (!inBand(subs, p.video_count ?? 0)) continue;
     seen.add(p.youtube_channel_id);
-    const avg = catAvg(p.category);
     ranked.push({
-      prox: avg != null ? Math.abs((p.subscriber_count ?? 0) - avg) : Number.MAX_SAFE_INTEGER,
+      prox: logDist(subs),
       s: {
         channelId: p.youtube_channel_id,
         name: p.channel_name,
         handle: p.channel_handle,
         thumbnail: p.thumbnail_url,
-        subscriberCount: p.subscriber_count ?? 0,
+        subscriberCount: subs,
         videoCount: p.video_count ?? 0,
         medianViews: p.median_views,
         category: p.category,
-        reason: trackedCategories.length > 0 && p.category
-          ? `Similar niche · ${categoryLabel(p.category)}`
-          : "Popular in the discovery pool",
+        // Say WHY it's here — a suggestion without a reason reads as an ad.
+        reason: p.category
+          ? `Match: ${categoryLabel(p.category)} · ${fmtSubs(subs)} subs, your tier`
+          : `Match: ${fmtSubs(subs)} subs, your tier`,
         source: "pool",
       },
     });
   }
-  // Closest subscriber tier within niche first, then larger channels.
-  ranked.sort((a, b) => a.prox - b.prox || b.s.subscriberCount - a.s.subscriberCount);
+  // Nearest in size on a log scale — a 40K list should see 15K–300K peers,
+  // not whoever in the pool happens to be biggest.
+  ranked.sort((a, b) => a.prox - b.prox);
   const suggestions: Suggestion[] = ranked.slice(0, SHELF_SIZE).map((r) => r.s);
 
-  // Thin pool → top up from a live YouTube search in the user's main niche.
-  if (suggestions.length < POOL_MIN_BEFORE_FALLBACK && trackedCategories.length > 0) {
-    const topCat = [...trackedCategories].sort((a, b) => catSubs.get(b)!.n - catSubs.get(a)!.n)[0];
+  // Thin pool → top up live from YouTube, seeded by the user's tracked
+  // channels' top outlier title (their niche, stated in its own words). The
+  // old fallback searched "<category> youtube channel", which for the default
+  // "other" category literally queried "Other youtube channel" and filled the
+  // shelf with junk.
+  if (suggestions.length < POOL_MIN_BEFORE_FALLBACK && (tracked ?? []).length > 0) {
     try {
-      const yt = await searchChannels(`${categoryLabel(topCat)} youtube channel`, SHELF_SIZE);
-      for (const ch of yt) {
-        const id = ch.id ?? undefined;
-        if (!id || trackedIds.has(id) || seen.has(id)) continue;
-        seen.add(id);
-        suggestions.push({
-          channelId: id,
+      const { data: topVideo } = await supabase
+        .from("competitor_videos")
+        .select("title")
+        .in("competitor_channel_id", (tracked ?? []).map((c) => c.id))
+        .order("outlier_score", { ascending: false, nullsFirst: false })
+        .limit(1)
+        .single();
+
+      const topCat = trackedCategories.sort((a, b) => (catSubs.get(b) ?? 0) - (catSubs.get(a) ?? 0))[0];
+      const candidates = topVideo?.title
+        ? await searchNicheChannels(topVideo.title)
+        : topCat && topCat !== "other"
+          ? await searchChannels(`${categoryLabel(topCat)} youtube channel`, SHELF_SIZE * 2)
+          : [];
+
+      const ytRanked = candidates
+        .map((ch) => ({
+          id: ch.id ?? "",
           name: ch.snippet?.title ?? "",
           handle: ch.snippet?.customUrl ?? null,
           thumbnail: ch.snippet?.thumbnails?.medium?.url ?? null,
-          subscriberCount: parseInt(ch.statistics?.subscriberCount ?? "0"),
-          videoCount: parseInt(ch.statistics?.videoCount ?? "0"),
+          subs: parseInt(ch.statistics?.subscriberCount ?? "0"),
+          videos: parseInt(ch.statistics?.videoCount ?? "0"),
+        }))
+        .filter((c) => c.id && !trackedIds.has(c.id) && !seen.has(c.id) && inBand(c.subs, c.videos))
+        .sort((a, b) => logDist(a.subs) - logDist(b.subs));
+
+      for (const c of ytRanked) {
+        if (suggestions.length >= SHELF_SIZE) break;
+        seen.add(c.id);
+        suggestions.push({
+          channelId: c.id,
+          name: c.name,
+          handle: c.handle,
+          thumbnail: c.thumbnail,
+          subscriberCount: c.subs,
+          videoCount: c.videos,
           medianViews: null,
-          category: topCat,
-          reason: `Found on YouTube · ${categoryLabel(topCat)}`,
+          category: topCat ?? null,
+          reason: `Match: ranks for your niche's breakout topics · ${fmtSubs(c.subs)} subs`,
           source: "youtube",
         });
-        if (suggestions.length >= SHELF_SIZE) break;
       }
     } catch (err) {
       // YouTube top-up is best-effort; pool suggestions still return. Only a
