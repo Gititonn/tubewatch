@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
-import { syncChannel } from "@/lib/sync";
+import {
+  createCompetitorSyncCache,
+  syncChannel,
+  syncCompetitorChannel,
+} from "@/lib/sync";
 
 // How many channels to sync at once. Each syncChannel fires ~3 sequential
 // YouTube API calls, so this caps outbound concurrency at ~3×LIMIT instead of
@@ -40,10 +44,32 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // scope=priority syncs only Growth users' channels — the schedule that backs
+  // the "priority sync (6h vs 24h)" plan feature. The daily run (no param, the
+  // existing vercel.json cron) syncs everything.
+  const { searchParams } = new URL(request.url);
+  const priorityOnly = searchParams.get("scope") === "priority";
+
   const supabase = createServiceClient();
-  const { data: channels, error } = await supabase
-    .from("channels")
-    .select("id, youtube_channel_id");
+
+  let growthUserIds: string[] | null = null;
+  if (priorityOnly) {
+    const { data: growthProfiles, error: profErr } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("plan", "growth");
+    if (profErr) {
+      return NextResponse.json({ error: profErr.message }, { status: 500 });
+    }
+    growthUserIds = (growthProfiles ?? []).map((p) => p.id);
+    if (growthUserIds.length === 0) {
+      return NextResponse.json({ synced: 0, competitorsSynced: 0, total: 0 });
+    }
+  }
+
+  let channelQuery = supabase.from("channels").select("id, youtube_channel_id, user_id");
+  if (growthUserIds) channelQuery = channelQuery.in("user_id", growthUserIds);
+  const { data: channels, error } = await channelQuery;
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -58,8 +84,39 @@ export async function GET(request: Request) {
     (ch) => syncChannel(ch.id, ch.youtube_channel_id, { enforceCooldown: false })
   );
 
+  // Competitor channels are the pool the outlier radar actually watches, yet
+  // they used to sync only when a user clicked the button — so their view
+  // time series (and therefore velocity_ratio) went stale the moment users
+  // stopped babysitting them. The cron now walks them too. The shared cache
+  // collapses duplicate rows pointing at the same YouTube channel into one
+  // fetch and one snapshot append. Discovery-pool channels ride along on the
+  // full daily run only.
+  let competitorQuery = supabase
+    .from("competitor_channels")
+    .select("id, youtube_channel_id, user_id");
+  if (growthUserIds) competitorQuery = competitorQuery.in("user_id", growthUserIds);
+  const { data: competitorChannels, error: compErr } = await competitorQuery;
+
+  if (compErr) {
+    return NextResponse.json({ error: compErr.message }, { status: 500 });
+  }
+
+  const cache = createCompetitorSyncCache();
+  const compResults = await mapSettledLimited(
+    competitorChannels ?? [],
+    SYNC_CONCURRENCY,
+    (ch) => syncCompetitorChannel(ch.id, ch.youtube_channel_id, cache)
+  );
+
   const succeeded = results.filter(
     (r) => r.status === "fulfilled" && "synced" in r.value
   ).length;
-  return NextResponse.json({ synced: succeeded, total: channels?.length ?? 0 });
+  const competitorsSynced = compResults.filter(
+    (r) => r.status === "fulfilled" && "synced" in r.value
+  ).length;
+  return NextResponse.json({
+    synced: succeeded,
+    competitorsSynced,
+    total: (channels?.length ?? 0) + (competitorChannels?.length ?? 0),
+  });
 }

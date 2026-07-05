@@ -1,6 +1,12 @@
 import { createServiceClient } from "@/lib/supabase/server";
 import { getChannelVideos, parseDurationToSeconds, YouTubeApiError } from "@/lib/youtube";
-import { calculateOutlierScores } from "@/lib/outlier";
+import { calculateOutlierScores, channelBaseline } from "@/lib/outlier";
+import {
+  fetchGlobalBaselines,
+  fetchOwnBaselines,
+  recentRates,
+  velocityOf,
+} from "@/lib/velocity";
 import type { Video } from "@/lib/types";
 
 export type SyncResult =
@@ -73,8 +79,24 @@ export async function syncChannel(
 
   const withScores = calculateOutlierScores(rawVideos as Video[]);
 
+  // Snapshot-powered recent velocity: views gained/day since the ~48h-old
+  // baseline snapshot, over the same median denominator as outlier_score.
+  // Empty baselines (first days of a channel, migration not applied) just
+  // leave the velocity columns null.
+  const baselines = await fetchOwnBaselines(
+    supabase,
+    channelDbId,
+    withScores.map((v) => v.youtube_video_id)
+  );
+  const rates = recentRates(withScores, baselines);
+  const medians = channelBaseline(withScores);
+
   const { error } = await supabase.from("videos").upsert(
-    withScores.map((v) => ({ ...v, updated_at: new Date().toISOString() })),
+    withScores.map((v) => ({
+      ...v,
+      ...velocityOf(v.youtube_video_id, rates, medians.rateFor(v)),
+      updated_at: new Date().toISOString(),
+    })),
     { onConflict: "channel_id,youtube_video_id" }
   );
 
@@ -98,4 +120,119 @@ export async function syncChannel(
     .eq("id", channelDbId);
 
   return { synced: withScores.length };
+}
+
+/**
+ * Per-run cache for competitor syncs. The same YouTube channel is often
+ * tracked by many users (one competitor_channels row each); within a cron run
+ * this makes it one YouTube fetch and one snapshot append instead of N.
+ */
+export interface CompetitorSyncCache {
+  videosByChannel: Map<string, Awaited<ReturnType<typeof getChannelVideos>>>;
+  snapshottedVideoIds: Set<string>;
+}
+
+export function createCompetitorSyncCache(): CompetitorSyncCache {
+  return { videosByChannel: new Map(), snapshottedVideoIds: new Set() };
+}
+
+export type CompetitorSyncResult =
+  | { synced: number; median: number }
+  | { error: string; status: number };
+
+/**
+ * Sync one competitor_channels row: fetch videos, score (lifetime outlier +
+ * snapshot velocity), upsert, append view snapshots, update channel stats.
+ * Service-role writes — callers MUST verify the row is visible to the acting
+ * user (or be the cron). Shared by the manual sync route and the daily cron;
+ * before the cron called this, competitor snapshots only accumulated when a
+ * user happened to click sync, which starved the velocity time series for the
+ * exact pool the product is about.
+ */
+export async function syncCompetitorChannel(
+  competitorChannelDbId: string,
+  youtubeChannelId: string,
+  cache: CompetitorSyncCache = createCompetitorSyncCache()
+): Promise<CompetitorSyncResult> {
+  const svc = createServiceClient();
+
+  let ytVideos = cache.videosByChannel.get(youtubeChannelId);
+  if (!ytVideos) {
+    try {
+      ytVideos = await getChannelVideos(youtubeChannelId, 50);
+    } catch (err) {
+      if (err instanceof YouTubeApiError) {
+        return { error: err.message, status: err.reason === "quota_exceeded" ? 503 : err.status };
+      }
+      return { error: "Couldn't reach YouTube. Please try again.", status: 503 };
+    }
+    cache.videosByChannel.set(youtubeChannelId, ytVideos);
+  }
+  if (!ytVideos || ytVideos.length === 0) return { synced: 0, median: 0 };
+
+  const rawVideos = ytVideos.map((v) => ({
+    competitor_channel_id: competitorChannelDbId,
+    youtube_video_id: v.id!,
+    title: v.snippet?.title ?? "Untitled",
+    thumbnail_url: v.snippet?.thumbnails?.medium?.url ?? null,
+    published_at: v.snippet?.publishedAt ?? null,
+    view_count: parseInt(v.statistics?.viewCount ?? "0"),
+    like_count: parseInt(v.statistics?.likeCount ?? "0"),
+    comment_count: parseInt(v.statistics?.commentCount ?? "0"),
+    duration_seconds: v.contentDetails?.duration
+      ? parseDurationToSeconds(v.contentDetails.duration)
+      : null,
+    outlier_score: null as number | null,
+    fetched_at: new Date().toISOString(),
+  }));
+
+  const withScores = calculateOutlierScores(rawVideos);
+
+  const globalBaselines = await fetchGlobalBaselines(
+    svc,
+    withScores.map((v) => v.youtube_video_id)
+  );
+  const rates = recentRates(withScores, globalBaselines);
+  const medians = channelBaseline(withScores);
+
+  const { error: upsertError } = await svc.from("competitor_videos").upsert(
+    withScores.map((v) => ({
+      ...v,
+      ...velocityOf(v.youtube_video_id, rates, medians.rateFor(v)),
+    })),
+    { onConflict: "competitor_channel_id,youtube_video_id" }
+  );
+  if (upsertError) return { error: upsertError.message, status: 500 };
+
+  // Append today's snapshot to the global time series (best-effort, deduped
+  // per run — several rows can point at the same YouTube channel).
+  const fresh = withScores.filter((v) => !cache.snapshottedVideoIds.has(v.youtube_video_id));
+  if (fresh.length > 0) {
+    const { error: snapErr } = await svc.from("video_view_history").insert(
+      fresh.map((v) => ({ youtube_video_id: v.youtube_video_id, view_count: v.view_count }))
+    );
+    if (snapErr) {
+      console.warn("video_view_history insert skipped:", snapErr.message);
+    } else {
+      fresh.forEach((v) => cache.snapshottedVideoIds.add(v.youtube_video_id));
+    }
+  }
+
+  // median_views stays a simple raw-view median — it's a display stat on the
+  // Competitors page ("Median: X views"), not the scoring input.
+  const views = rawVideos.map((v) => v.view_count).sort((a, b) => a - b);
+  const mid = Math.floor(views.length / 2);
+  const median =
+    views.length % 2 !== 0 ? views[mid] : (views[mid - 1] + views[mid]) / 2;
+
+  await svc
+    .from("competitor_channels")
+    .update({
+      median_views: Math.round(median),
+      video_count: ytVideos.length,
+      last_synced_at: new Date().toISOString(),
+    })
+    .eq("id", competitorChannelDbId);
+
+  return { synced: withScores.length, median };
 }

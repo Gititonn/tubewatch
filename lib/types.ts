@@ -30,5 +30,10 @@ export interface Video {
   duration_seconds: number | null;
   thumbnail_url: string | null;
   outlier_score: number | null;
+  /** views gained/day since the ~48h-old baseline snapshot (null until the
+   *  snapshot series has enough history). */
+  recent_views_per_day?: number | null;
+  /** recent_views_per_day ÷ channel median views/day — "Nx right now". */
+  velocity_ratio?: number | null;
   updated_at: string;
 }

@@ -19,10 +19,15 @@ import type { Video } from "./types";
  * two different formulas that produced numbers with the same "Nx" label but
  * different meanings — fixed so one badge means one thing everywhere.
  *
- * NOTE: the fully calibrated version compares a video's early trajectory to the
- * channel's own historical first-48h curve — that needs a per-video snapshot
- * table capturing view_count over time, which we don't store yet. This velocity
- * ratio is the honest, shippable approximation until those snapshots exist.
+ * Shorts and longform are scored against SEPARATE medians. Shorts routinely
+ * run 10–100x a channel's longform view counts; one combined median makes
+ * every Short an "outlier" and every longform video an "underperformer" on
+ * any channel that posts both. A segment needs 3 scorable videos to stand on
+ * its own median; below that it borrows the combined one.
+ *
+ * This file scores lifetime overperformance. The companion question — "is it
+ * pulling views right now?" — is snapshot-derived and lives in lib/velocity.ts
+ * as velocity_ratio, sharing this file's median as its denominator.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -40,10 +45,21 @@ const MIN_AGE_DAYS = 1;
 // ("too early to score" in the UI) until the initial spike has settled.
 const MIN_SCORABLE_AGE_DAYS = 3;
 
+// YouTube counts anything up to 3 minutes as a Short (since Oct 2024).
+const SHORTS_MAX_SECONDS = 180;
+
 interface ScorableVideo {
   view_count: number;
   published_at: string | null;
+  duration_seconds?: number | null;
   outlier_score?: number | null;
+}
+
+type Segment = "short" | "long";
+
+function segmentOf(video: ScorableVideo): Segment {
+  const d = video.duration_seconds;
+  return d != null && d > 0 && d <= SHORTS_MAX_SECONDS ? "short" : "long";
 }
 
 function ageDays(publishedAt: string | null): number | null {
@@ -57,22 +73,54 @@ function viewsPerDay(video: ScorableVideo): number {
   return video.view_count / Math.max(age, MIN_AGE_DAYS);
 }
 
-export function calculateOutlierScores<T extends ScorableVideo>(videos: T[]): T[] {
-  if (videos.length < 3) return videos;
+/**
+ * Per-segment median views/day for a channel. `rateFor` resolves the right
+ * denominator for a given video (its segment's median, or the combined median
+ * when the segment is too thin to have one of its own).
+ */
+export interface ChannelBaseline {
+  short: number;
+  long: number;
+  combined: number;
+  rateFor(video: ScorableVideo): number;
+}
 
-  // Median is computed only from videos old enough to have a stable velocity
-  // reading, so a batch of brand-new uploads can't drag the baseline around.
+export function channelBaseline(videos: ScorableVideo[]): ChannelBaseline {
+  // Medians use only videos old enough to have a stable velocity reading, so
+  // a batch of brand-new uploads can't drag the baseline around.
   const scorable = videos.filter((v) => {
     const age = ageDays(v.published_at);
     return age === null || age >= MIN_SCORABLE_AGE_DAYS;
   });
-  const medianRate = getMedian((scorable.length >= 3 ? scorable : videos).map(viewsPerDay));
+  const pool = scorable.length >= 3 ? scorable : videos;
+
+  const combined = getMedian(pool.map(viewsPerDay));
+  const segMedian = (seg: Segment) => {
+    const inSeg = pool.filter((v) => segmentOf(v) === seg);
+    return inSeg.length >= 3 ? getMedian(inSeg.map(viewsPerDay)) : combined;
+  };
+  const short = segMedian("short");
+  const long = segMedian("long");
+
+  return {
+    short,
+    long,
+    combined,
+    rateFor: (video) => (segmentOf(video) === "short" ? short : long),
+  };
+}
+
+export function calculateOutlierScores<T extends ScorableVideo>(videos: T[]): T[] {
+  if (videos.length < 3) return videos;
+
+  const baseline = channelBaseline(videos);
 
   return videos.map((video) => {
     const age = ageDays(video.published_at);
     if (age !== null && age < MIN_SCORABLE_AGE_DAYS) {
       return { ...video, outlier_score: null };
     }
+    const medianRate = baseline.rateFor(video);
     return {
       ...video,
       outlier_score:
@@ -91,11 +139,9 @@ export function calculateOutlierScores<T extends ScorableVideo>(videos: T[]): T[
  * (median over videos old enough to have a stable velocity reading).
  */
 export function channelMedianRate(videos: ScorableVideo[]): number {
-  const scorable = videos.filter((v) => {
-    const age = ageDays(v.published_at);
-    return age === null || age >= MIN_SCORABLE_AGE_DAYS;
-  });
-  return getMedian((scorable.length >= 3 ? scorable : videos).map(viewsPerDay));
+  // The cache stores one number per channel, so this stays the combined
+  // median; segment-aware scoring paths should use channelBaseline instead.
+  return channelBaseline(videos).combined;
 }
 
 /**

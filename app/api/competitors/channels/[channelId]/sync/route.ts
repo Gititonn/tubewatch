@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@/lib/supabase/server";
-import { getChannelVideos, parseDurationToSeconds, YouTubeApiError } from "@/lib/youtube";
-import { calculateOutlierScores } from "@/lib/outlier";
+import { createClient } from "@/lib/supabase/server";
+import { syncCompetitorChannel } from "@/lib/sync";
 
 export async function POST(
   _request: Request,
@@ -18,7 +17,7 @@ export async function POST(
   // can trigger a resync since the RLS policy already makes it readable to all).
   const { data: competitorChannel, error: chError } = await supabase
     .from("competitor_channels")
-    .select("*")
+    .select("id, youtube_channel_id")
     .eq("id", channelId)
     .or(`user_id.eq.${user.id},is_discovery.eq.true`)
     .single();
@@ -27,79 +26,15 @@ export async function POST(
     return NextResponse.json({ error: "Channel not found" }, { status: 404 });
   }
 
-  let ytVideos;
-  try {
-    ytVideos = await getChannelVideos(competitorChannel.youtube_channel_id, 50);
-  } catch (err) {
-    if (err instanceof YouTubeApiError) {
-      return NextResponse.json({ error: err.message }, { status: err.reason === "quota_exceeded" ? 503 : err.status });
-    }
-    return NextResponse.json({ error: "Couldn't reach YouTube. Please try again." }, { status: 503 });
+  // Fetch/score/upsert/snapshot all live in lib/sync.ts, shared with the
+  // daily cron — one code path so scores and snapshots can't drift apart.
+  const result = await syncCompetitorChannel(
+    competitorChannel.id,
+    competitorChannel.youtube_channel_id
+  );
+
+  if ("error" in result) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
-
-  if (!ytVideos || ytVideos.length === 0) {
-    return NextResponse.json({ synced: 0 });
-  }
-
-  const rawVideos = ytVideos.map((v) => ({
-    competitor_channel_id: channelId,
-    youtube_video_id: v.id!,
-    title: v.snippet?.title ?? "Untitled",
-    thumbnail_url: v.snippet?.thumbnails?.medium?.url ?? null,
-    published_at: v.snippet?.publishedAt ?? null,
-    view_count: parseInt(v.statistics?.viewCount ?? "0"),
-    like_count: parseInt(v.statistics?.likeCount ?? "0"),
-    comment_count: parseInt(v.statistics?.commentCount ?? "0"),
-    duration_seconds: v.contentDetails?.duration
-      ? parseDurationToSeconds(v.contentDetails.duration)
-      : null,
-    outlier_score: null as number | null,
-    fetched_at: new Date().toISOString(),
-  }));
-
-  // Same scoring function used for the caller's own channel and the discovery
-  // pool (lib/outlier.ts) — age-normalized velocity, not raw views ÷ median.
-  // Previously this route computed a separate, cruder ratio, so the same "Nx"
-  // badge meant two different things depending on which pool a video came
-  // from. One formula everywhere now.
-  const withScores = calculateOutlierScores(rawVideos);
-
-  // median_views stays a simple raw-view median — it's a display stat on the
-  // Competitors page ("Median: X views"), not the scoring input.
-  const views = rawVideos.map((v) => v.view_count).sort((a, b) => a - b);
-  const mid = Math.floor(views.length / 2);
-  const median =
-    views.length % 2 !== 0 ? views[mid] : (views[mid - 1] + views[mid]) / 2;
-
-  const { error: upsertError } = await supabase
-    .from("competitor_videos")
-    .upsert(withScores, { onConflict: "competitor_channel_id,youtube_video_id" });
-
-  if (upsertError) {
-    return NextResponse.json({ error: upsertError.message }, { status: 500 });
-  }
-
-  // Append a point-in-time view snapshot per video (best-effort). Previously
-  // the upsert above overwrote yesterday's numbers, discarding the free view-
-  // velocity history for the largest pool of videos we have. video_view_history
-  // is RLS-locked, so use the service client and never fail the sync over it.
-  try {
-    const svc = createServiceClient();
-    await svc.from("video_view_history").insert(
-      rawVideos.map((v) => ({ youtube_video_id: v.youtube_video_id, view_count: v.view_count }))
-    );
-  } catch (e) {
-    console.warn("video_view_history insert skipped:", e);
-  }
-
-  await supabase
-    .from("competitor_channels")
-    .update({
-      median_views: Math.round(median),
-      video_count: ytVideos.length,
-      last_synced_at: new Date().toISOString(),
-    })
-    .eq("id", channelId);
-
-  return NextResponse.json({ synced: withScores.length, median });
+  return NextResponse.json(result);
 }

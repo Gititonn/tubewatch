@@ -29,6 +29,8 @@ export async function GET(request: Request) {
       thumbnail_url,
       view_count,
       outlier_score,
+      recent_views_per_day,
+      velocity_ratio,
       published_at,
       competitor_channels!inner(
         id,
@@ -39,10 +41,14 @@ export async function GET(request: Request) {
         youtube_channel_id
       )
     `)
-    .gte("outlier_score", minScore)
+    // Rising = early momentum. A video qualifies by pulling views right now
+    // (snapshot-derived velocity_ratio) OR by lifetime overperformance
+    // (outlier_score) while the velocity time series is still warming up.
+    .or(`velocity_ratio.gte.${minScore},outlier_score.gte.${minScore}`)
     .lte("competitor_channels.subscriber_count", maxSubscribers)
     .gte("published_at", new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString())
-    .order("outlier_score", { ascending: false })
+    .order("velocity_ratio", { ascending: false, nullsFirst: false })
+    .order("outlier_score", { ascending: false, nullsFirst: false })
     .limit(limit);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

@@ -62,7 +62,8 @@ lib/
     client.ts         Browser client (createBrowserClient)
     server.ts         Server client (createServerClient)
     middleware.ts     Auth session refresh middleware
-  outlier.ts          Outlier score engine (views / channel median)
+  outlier.ts          Outlier score engine (age-normalized: views/day vs channel median views/day, Shorts/longform split)
+  velocity.ts         Snapshot-derived recent velocity ("Nx right now" from view time series)
   youtube.ts          YouTube API helpers (getChannelByHandle, getChannelVideos)
   types.ts            Profile, Channel, Video interfaces
 supabase/
@@ -76,7 +77,7 @@ vercel.json           Cron: 0 6 * * *
 - Supabase client is initialized **inside** handlers/effects — never at module scope (SSR safety)
 - All dashboard pages: `export const dynamic = "force-dynamic"`
 - Design tokens: `#0f0f0f` bg, `#1a1a1a` cards, `#2a2a2a` borders, `#00ff87` accent green, Inter font
-- Outlier score = video views ÷ channel median views
+- Outlier score = lifetime views/day ÷ channel median views/day (age-normalized; Shorts and longform use separate medians; videos < 3 days old are unscored). Separate metric `velocity_ratio` = views gained/day since a ~48h-old snapshot ÷ same median ("breaking now" — powers Rising)
 - Streaming AI: use Vercel AI SDK `StreamingTextResponse` pattern with `anthropic.messages.stream()`
 
 ## Environment Variables
