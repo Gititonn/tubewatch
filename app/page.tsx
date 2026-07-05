@@ -7,17 +7,21 @@ import ScoreMathSection from "./score-math-section";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
 
+// Illustrative outlier-feed cards. Deliberately hyper-specific micro-niche
+// titles with modest view counts — the target user runs a weird, specific
+// channel, and generic "100K subscribers!" hustle-bro mockups told them this
+// tool wasn't built for people like them.
 const cards = [
-  { emoji: "📅", title: "I posted every day for 30 days", views: "847K views", duration: "12:08", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🖼️", title: "The thumbnail that changed everything", views: "1.2M views", duration: "8:47", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "💬", title: "Honest review: is it actually worth it?", views: "23K views", duration: "15:32", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
-  { emoji: "📈", title: "How I grew 10K subs in 60 days", views: "312K views", duration: "10:21", badge: "⭐ Viral", badgeColor: "#8b5cf6", bg: "#120a1a" },
-  { emoji: "🎤", title: "Q&A: your questions answered!", views: "18K views", duration: "22:54", badge: "😴 Below avg", badgeColor: "#666", bg: "#111" },
-  { emoji: "🎬", title: "Behind the scenes of my studio setup", views: "445K views", duration: "6:13", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🎯", title: "The video formula that actually works", views: "671K views", duration: "9:05", badge: "🚀 Top video", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "🏆", title: "100K subscribers! How we got here", views: "89K views", duration: "14:39", badge: "⭐ Milestone", badgeColor: "#ffaa00", bg: "#1a150a" },
-  { emoji: "🍕", title: "I only ate one food for a week", views: "2.1M views", duration: "18:02", badge: "🔥 Outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
-  { emoji: "🎮", title: "Playing games I've never tried before", views: "156K views", duration: "27:46", badge: "📈 Growing", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "🪚", title: "Restoring a rusted 1970s hand plane I found at an estate sale", views: "94K views", duration: "14:12", badge: "🔥 8.3x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🍞", title: "Why your sourdough scoring keeps dragging (3 fixes)", views: "41K views", duration: "8:47", badge: "🚀 5.1x", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "⌨️", title: "I built a $60 keyboard that sounds like a $400 one", views: "127K views", duration: "11:32", badge: "🔥 6.7x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🌱", title: "Stop repotting your monstera like this", views: "38K views", duration: "6:21", badge: "📈 Rising now", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "♟️", title: "The London System is ruining club chess (fight me)", views: "52K views", duration: "18:54", badge: "🚀 4.4x", badgeColor: "#8b5cf6", bg: "#120a1a" },
+  { emoji: "🎻", title: "Adult beginner violin: month 18 honest progress", views: "12K views", duration: "9:13", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
+  { emoji: "🚐", title: "My camper's 12V wiring failed inspection — here's what I got wrong", views: "67K views", duration: "16:05", badge: "🔥 7.2x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🎨", title: "Watercolor skies: the wet-on-wet timing nobody explains", views: "29K views", duration: "12:39", badge: "🚀 3.8x", badgeColor: "#ffaa00", bg: "#1a150a" },
+  { emoji: "🥏", title: "Disc golf putting drills that fixed my round in 2 weeks", views: "19K views", duration: "10:02", badge: "📈 Rising now", badgeColor: "#00ff87", bg: "#0a1a0f" },
+  { emoji: "📻", title: "This $8 thrift store radio had a secret inside", views: "83K views", duration: "13:46", badge: "🔥 9.1x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
 ];
 
 const features = [
@@ -117,8 +121,9 @@ export default async function Home() {
           <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
             Other tools rank raw view counts, so their &quot;outliers&quot; are old hits. TubeWatch
             scores <strong style={{ color: "#ccc" }}>views-per-day against each channel&apos;s own median</strong> to
-            catch videos while they&apos;re breaking — then the AI coach turns them into your next
-            upload. Built for <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
+            catch videos while they&apos;re breaking — and AI breaks down exactly why each one
+            worked, so you can adapt it for your channel. Built for{" "}
+            <strong style={{ color: "#ccc" }}>growing creators, roughly 1K–100K subs.</strong>
           </p>
 
           <div className="flex gap-4 justify-center flex-wrap">

@@ -30,8 +30,9 @@ export default function AboutPage() {
               views far faster than the channel&apos;s norm — so you can see what&apos;s working before everyone else
               copies it. It scores videos on an age-adjusted velocity basis (views-per-day vs. the channel
               median), not raw totals, so fresh breakouts show up early instead of months late. From there it
-              layers on rising and trending feeds, title pattern analysis, and an AI coach that explains why a
-              video worked and turns it into your next upload.
+              layers on rising and trending feeds, title pattern analysis, and an AI coach that
+              reverse-engineers why a video worked — the hook, the packaging, the timing — so you can
+              adapt the pattern for your own channel.
             </p>
           </div>
           <div>

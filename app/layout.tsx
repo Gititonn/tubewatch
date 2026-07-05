@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "TubeWatch — find the breakout videos in your niche",
-  description: "See the videos quietly overperforming across the channels you compete with, then turn them into your next upload. Built for growing creators (roughly 1K–100K subs).",
+  description: "See the videos quietly overperforming across the channels you compete with, and learn exactly why they worked. Built for growing creators (roughly 1K–100K subs).",
 };
 
 // Inline script prevents flash of wrong theme on load
