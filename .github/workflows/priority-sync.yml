@@ -1,0 +1,26 @@
+# Growth-tier "priority sync (6h vs 24h)" — delivered without Vercel Pro.
+#
+# Vercel Hobby allows only 2 daily crons and both slots are taken (full sync
+# 06:00, purge 04:00). These three firings fill in the 6-hour cadence by
+# hitting the same cron route with scope=priority, which syncs ONLY Growth
+# users' channels — and returns immediately if there are none, so this is a
+# free no-op until someone is actually paying $49/mo.
+#
+# Requires one repo secret: CRON_SECRET (same value as the Vercel env var).
+#   gh secret set CRON_SECRET
+name: priority-sync
+on:
+  schedule:
+    - cron: "0 0,12,18 * * *" # 06:00 UTC is covered by the Vercel cron
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Trigger priority sync
+        run: |
+          curl -fsS --max-time 300 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://tubewatchhq.com/api/cron/sync?scope=priority"

@@ -216,6 +216,44 @@ export async function searchChannels(query: string, maxResults = 5) {
   return channelsRes.data.items ?? [];
 }
 
+/**
+ * Channels active in a niche, found via a VIDEO search on a seed query (the
+ * user's top video title is the best public signal for "my niche"). A video
+ * search surfaces channels the algorithm actually ranks for the topic —
+ * channel-name search only finds channels *named* like the query. One
+ * search.list call (100 quota units) + one channels.list (1 unit); used once
+ * per connect, not on any hot path.
+ */
+export async function searchNicheChannels(query: string, excludeChannelId?: string) {
+  const searchRes = await withYouTubeRetry(() =>
+    youtube.search.list({
+      part: ["snippet"],
+      type: ["video"],
+      q: query,
+      maxResults: 25,
+    })
+  );
+
+  const channelIds = Array.from(
+    new Set(
+      (searchRes.data.items ?? [])
+        .map((item) => item.snippet?.channelId)
+        .filter((id): id is string => Boolean(id) && id !== excludeChannelId)
+    )
+  ).slice(0, 20);
+
+  if (channelIds.length === 0) return [];
+
+  const channelsRes = await withYouTubeRetry(() =>
+    youtube.channels.list({
+      part: ["snippet", "statistics"],
+      id: channelIds,
+    })
+  );
+
+  return channelsRes.data.items ?? [];
+}
+
 export function parseDurationToSeconds(iso: string): number {
   const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!match) return 0;

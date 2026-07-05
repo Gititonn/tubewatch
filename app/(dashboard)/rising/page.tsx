@@ -191,10 +191,11 @@ export default function RisingPage() {
             style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
           >
             <div className="text-6xl mb-4">🚀</div>
-            <h2 className="text-xl font-black text-foreground mb-3">Catch Breakouts Before They Go Viral</h2>
+            <h2 className="text-xl font-black text-foreground mb-3">Catch Breakouts Before Your Next Video</h2>
             <p style={{ color: "var(--text-secondary)", fontSize: 14, maxWidth: 440, lineHeight: 1.6 }}>
-              Rising shows videos from competitor channels gaining momentum in the first 48–72 hours — before the algorithm kicks in.{" "}
-              Add competitors to start tracking early signals.
+              Rising tracks daily view snapshots across your competitors and surfaces videos pulling
+              well above their channel&apos;s normal pace — while the topic is still worth acting on.{" "}
+              Add competitors to start tracking momentum.
             </p>
             <a
               href="/competitors"

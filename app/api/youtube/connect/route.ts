@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getChannelByHandle, YouTubeApiError } from "@/lib/youtube";
 import { syncChannel } from "@/lib/sync";
+import { autoSuggestCompetitors } from "@/lib/competitor-suggest";
+import { getUserPlan } from "@/lib/plan";
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -68,5 +70,25 @@ export async function POST(request: Request) {
     // Non-fatal: channel is saved, user can Resync manually once the cooldown clears.
   }
 
-  return NextResponse.json({ success: true, channel: upserted });
+  // First-run: if the user tracks no competitors yet, find 3 similarly-sized
+  // channels in their niche and sync them before the redirect lands — the
+  // dashboard's first paint should show scored competitor outliers, not an
+  // empty "add your first competitor" homework prompt. Best-effort: a quota
+  // error or thin search results just skips the suggestion.
+  let suggestedCompetitors = 0;
+  try {
+    const plan = await getUserPlan(supabase, user.id);
+    const result = await autoSuggestCompetitors({
+      userId: user.id,
+      channelDbId: upserted.id,
+      youtubeChannelId: channel.id!,
+      subscriberCount: upserted.subscriber_count,
+      plan,
+    });
+    suggestedCompetitors = result.suggested;
+  } catch {
+    // Non-fatal — connect always succeeds even if suggestions don't.
+  }
+
+  return NextResponse.json({ success: true, channel: upserted, suggestedCompetitors });
 }
