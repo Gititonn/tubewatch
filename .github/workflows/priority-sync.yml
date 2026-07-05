@@ -20,7 +20,10 @@ jobs:
     timeout-minutes: 6
     steps:
       - name: Trigger priority sync
+        # www is the canonical host — the apex 308-redirects to it, and curl
+        # won't forward the Authorization header across a redirect, so hitting
+        # the apex would "succeed" while never reaching the route.
         run: |
           curl -fsS --max-time 300 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://tubewatchhq.com/api/cron/sync?scope=priority"
+            "https://www.tubewatchhq.com/api/cron/sync?scope=priority"
