@@ -4,6 +4,7 @@ import { VideoGridSkeleton } from "@/components/Skeleton";
 import { VideoDetailModal } from "@/components/VideoDetailModal";
 import { useState, useEffect } from "react";
 import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
+import AiCreditBadge from "@/components/AiCreditBadge";
 
 type CompetitorChannel = {
   id: string;
@@ -242,11 +243,14 @@ export default function OutliersPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
-        <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
-          Competitor videos that massively outperformed their channel&apos;s average.
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
+          <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
+            Competitor videos that massively outperformed their channel&apos;s average.
+          </p>
+        </div>
+        <AiCreditBadge className="mt-1" />
       </div>
 
       {/* Search — matches video title, across both tracked and discovery channels */}
@@ -444,8 +448,8 @@ export default function OutliersPage() {
                       </div>
                     </div>
                     <div className="px-3 pb-3">
-                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}>
-                        🧠 Why It Worked
+                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }} title="Uses 1 of your monthly AI answers">
+                        🧠 Why It Worked <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
                       </div>
                     </div>
                   </div>
@@ -649,8 +653,9 @@ export default function OutliersPage() {
                     }
                     className="mt-2 w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
                     style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+                    title="Uses 1 of your monthly AI answers"
                   >
-                    🧠 Why It Worked
+                    🧠 Why It Worked <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
                   </button>
                 </div>
               </div>

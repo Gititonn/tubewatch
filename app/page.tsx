@@ -232,11 +232,14 @@ export default async function Home() {
         {/* THE MATH — why this score isn't views ÷ median */}
         <ScoreMathSection />
 
+        {/* COMPARISON VS OTHER TOOLS — the instant-sync killshot sits with
+            the proof sections, before the feature tour: "works on YOUR
+            channel right now" converts impatient creators; a carousel of
+            features doesn't. */}
+        <ComparisonSection />
+
         {/* FEATURE CAROUSEL */}
         <FeatureCarousel />
-
-        {/* COMPARISON VS OTHER TOOLS */}
-        <ComparisonSection />
 
         {/* PRICING */}
         <section className="px-4 pb-24 max-w-5xl mx-auto w-full">

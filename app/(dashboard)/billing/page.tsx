@@ -85,12 +85,16 @@ export default function BillingPage() {
   const [loading, setLoading] = useState(true);
   const [upgraded, setUpgraded] = useState(false);
   const [annual, setAnnual] = useState(false);
+  const [unlockFeature, setUnlockFeature] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("upgraded") === "true") {
       setUpgraded(true);
     }
+    // Set when the user arrived from a locked feature's "View Plans" CTA —
+    // keep what they came to unlock on screen while they weigh the price.
+    setUnlockFeature(params.get("unlock"));
 
     fetch("/api/billing/status")
       .then((r) => r.json())
@@ -121,6 +125,15 @@ export default function BillingPage() {
           style={{ background: "#00ff8720", border: "1px solid #00ff87", color: "#00ff87" }}
         >
           Your plan has been upgraded successfully!
+        </div>
+      )}
+
+      {!upgraded && unlockFeature && !isPaid && (
+        <div
+          className="mb-6 px-4 py-3 rounded-lg text-sm font-medium"
+          style={{ background: "#00ff8712", border: "1px solid #00ff8755", color: "#00ff87" }}
+        >
+          🔓 Unlock {unlockFeature} and every other Pro tool with one upgrade.
         </div>
       )}
 

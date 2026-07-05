@@ -125,7 +125,7 @@ export default function ComparePage() {
   if (upgradeRequired || !isPaid(plan)) {
     return (
       <div className="p-4 md:p-8 max-w-7xl">
-        <ProLockScreen />
+        <ProLockScreen feature="Channel Compare" />
       </div>
     );
   }

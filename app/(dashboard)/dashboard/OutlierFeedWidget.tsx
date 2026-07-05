@@ -179,13 +179,17 @@ export default function OutlierFeedWidget() {
 
       {availableCategories.length > 1 && (
         <div className="flex gap-1.5 mt-3 mb-1 flex-wrap relative z-10">
+          {/* Active pill: white-on-red + bold + glow. Black-on-red read as
+              just another dark chip at a glance — the selected filter should
+              be findable without scanning every pill. */}
           <button
             onClick={() => setCategory("")}
-            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+            className={`px-3 py-1.5 rounded-full text-xs transition-colors ${category === "" ? "font-black" : "font-semibold"}`}
             style={{
               background: category === "" ? "#ff4444" : "var(--bg-card)",
-              color: category === "" ? "#000" : "var(--text-secondary)",
-              border: `1px solid ${category === "" ? "#ff4444" : "var(--border)"}`,
+              color: category === "" ? "#fff" : "var(--text-secondary)",
+              border: `1px solid ${category === "" ? "#ff6666" : "var(--border)"}`,
+              boxShadow: category === "" ? "0 0 12px rgba(255,68,68,0.45)" : undefined,
             }}
           >
             All niches
@@ -194,11 +198,12 @@ export default function OutlierFeedWidget() {
             <button
               key={c.id}
               onClick={() => setCategory(c.id)}
-              className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+              className={`px-3 py-1.5 rounded-full text-xs transition-colors ${category === c.id ? "font-black" : "font-semibold"}`}
               style={{
                 background: category === c.id ? "#ff4444" : "var(--bg-card)",
-                color: category === c.id ? "#000" : "var(--text-secondary)",
-                border: `1px solid ${category === c.id ? "#ff4444" : "var(--border)"}`,
+                color: category === c.id ? "#fff" : "var(--text-secondary)",
+                border: `1px solid ${category === c.id ? "#ff6666" : "var(--border)"}`,
+                boxShadow: category === c.id ? "0 0 12px rgba(255,68,68,0.45)" : undefined,
               }}
             >
               {c.emoji} {c.label}

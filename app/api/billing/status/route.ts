@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { planLimits } from "@/lib/entitlements";
 
 export async function GET() {
   const supabase = createClient();
@@ -11,7 +12,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("plan, stripe_customer_id, stripe_subscription_id")
+    .select("plan, stripe_customer_id, stripe_subscription_id, ai_calls_used, ai_calls_reset_at")
     .eq("id", user.id)
     .single();
 
@@ -19,9 +20,23 @@ export async function GET() {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
+  const plan = (profile.plan === "pro" || profile.plan === "growth" ? profile.plan : "free") as
+    | "free"
+    | "pro"
+    | "growth";
+
+  // AI meter for UI display. The counter resets lazily inside consume_ai_call,
+  // so a stale row can show last month's usage — mirror that reset here for
+  // display only (past reset_at means the next call starts a fresh month).
+  const limit = planLimits(plan).aiCallsPerMonth;
+  const resetAt = profile.ai_calls_reset_at as string | null;
+  const stale = resetAt != null && new Date(resetAt).getTime() <= Date.now();
+  const used = stale ? 0 : ((profile.ai_calls_used as number | null) ?? 0);
+
   return NextResponse.json({
-    plan: profile.plan as "free" | "pro" | "growth",
+    plan,
     stripe_customer_id: profile.stripe_customer_id as string | null,
     stripe_subscription_id: profile.stripe_subscription_id as string | null,
+    aiCalls: { used, limit, remaining: Math.max(0, limit - used), resetAt },
   });
 }

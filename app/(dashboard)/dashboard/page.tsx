@@ -6,6 +6,7 @@ import ResyncButton from "./ResyncButton";
 import DisconnectChannelButton from "../settings/DisconnectChannelButton";
 import OutlierFeedWidget from "./OutlierFeedWidget";
 import ViewTrendsWidget from "./ViewTrendsWidget";
+import AiCreditBadge from "@/components/AiCreditBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -162,7 +163,7 @@ export default async function DashboardPage() {
             <StatCard label="Subscribers" value={fmt(channel.subscriber_count ?? 0)} icon="👥" accent="#4ade80" sub="total" />
             <StatCard label="Avg Views / Video" value={fmt(avgViews)} icon="👁" accent="#3b82f6" sub={`across ${videos.length} videos`} />
             <StatCard label="Est. Revenue (30d)" value={recentViews > 0 ? estRevenue(recentViews) : "---"} icon="💰" accent="#4ade80" sub="based on avg CPM" />
-            <StatCard label="Top Outlier" value={topOutlier?.outlier_score ? topOutlier.outlier_score.toFixed(1) + "x" : "---"} icon="🔥" accent="#ff4444" sub="channel median" />
+            <StatCard label="Top Outlier" value={topOutlier?.outlier_score ? topOutlier.outlier_score.toFixed(1) + "x" : "---"} icon="🔥" accent="#ff4444" sub="channel median" highlight />
           </div>
 
           {topOutlier && topOutlier.outlier_score >= 2 && (
@@ -182,9 +183,12 @@ export default async function DashboardPage() {
                     {fmt(topOutlier.view_count ?? 0)} views &middot; {topOutlier.outlier_score.toFixed(1)}x your channel average
                   </div>
                 </div>
-                <div className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-bold"
-                  style={{ background: "rgba(255,68,68,0.15)", color: "#ff4444", border: "1px solid rgba(255,68,68,0.3)" }}>
-                  Analyze
+                <div className="flex-shrink-0 flex flex-col items-center gap-1">
+                  <div className="px-4 py-2 rounded-xl text-sm font-bold"
+                    style={{ background: "rgba(255,68,68,0.15)", color: "#ff4444", border: "1px solid rgba(255,68,68,0.3)" }}>
+                    Analyze
+                  </div>
+                  <AiCreditBadge />
                 </div>
               </div>
             </Link>
@@ -381,13 +385,23 @@ function SectionHeader({ label, href }: { label: string; href?: string }) {
   );
 }
 
-function StatCard({ label, value, icon, accent, sub }: { label: string; value: string; icon: string; accent: string; sub?: string }) {
+function StatCard({ label, value, icon, accent, sub, highlight }: { label: string; value: string; icon: string; accent: string; sub?: string; highlight?: boolean }) {
+  // `highlight` marks the one metric the product exists for (Top Outlier).
+  // Subscribers/views/revenue are vanity stats YouTube Studio already shows;
+  // if all four cards carry equal weight, the differentiated number reads as
+  // just another stat. Stronger border + fill pulls the eye to it first.
   return (
     <div className="rounded-xl border p-4 flex flex-col gap-1 min-w-0"
-      style={{ borderColor: "var(--border)", background: `linear-gradient(135deg, ${accent}08 0%, var(--bg-card) 100%)` }}>
+      style={{
+        borderColor: highlight ? `${accent}66` : "var(--border)",
+        background: highlight
+          ? `linear-gradient(135deg, ${accent}1f 0%, ${accent}08 55%, var(--bg-card) 100%)`
+          : `linear-gradient(135deg, ${accent}08 0%, var(--bg-card) 100%)`,
+        boxShadow: highlight ? `0 0 24px ${accent}14` : undefined,
+      }}>
       <div className="flex items-center gap-2">
         <span className="text-sm flex-shrink-0">{icon}</span>
-        <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: "var(--text-muted)" }}>{label}</span>
+        <span className="text-xs uppercase tracking-wide font-semibold truncate" style={{ color: highlight ? accent : "var(--text-muted)" }}>{label}</span>
       </div>
       <div className="text-2xl font-black mt-1 leading-tight break-all" style={{ color: accent }}>{value}</div>
       {sub && <div className="text-xs truncate" style={{ color: "var(--text-muted)" }}>{sub}</div>}

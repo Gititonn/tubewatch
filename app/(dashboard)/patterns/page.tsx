@@ -88,7 +88,7 @@ export default function PatternsPage() {
   if (upgradeRequired || !isPaid(plan)) {
     return (
       <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
-        <ProLockScreen />
+        <ProLockScreen feature="Patterns" />
       </div>
     );
   }
