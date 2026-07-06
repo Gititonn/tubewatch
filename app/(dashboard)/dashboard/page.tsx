@@ -71,6 +71,43 @@ export default async function DashboardPage() {
     .reduce((s, v) => s + (v.view_count ?? 0), 0);
   const topOutlier = [...videos].sort((a, b) => (b.outlier_score ?? 0) - (a.outlier_score ?? 0))[0] ?? null;
 
+  // Getting-started state — computed from real data, not a dismissible tour.
+  // A new user's first question is "what do I do here"; this answers it as
+  // ordinary page content that vanishes once every step is genuinely done,
+  // instead of a coachmark the user clicks through once and never returns to.
+  let competitorCount = 0;
+  let aiCallsUsed = 0;
+  if (channel) {
+    const { count } = await supabase
+      .from("competitor_channels")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user!.id);
+    competitorCount = count ?? 0;
+
+    const { data: profileRow } = await supabase
+      .from("profiles")
+      .select("ai_calls_used")
+      .eq("id", user!.id)
+      .single();
+    aiCallsUsed = profileRow?.ai_calls_used ?? 0;
+  }
+  const gettingStartedSteps = [
+    {
+      done: competitorCount > 0,
+      label: "Track competitors in your niche",
+      sub: "We already auto-tracked a few similar channels — take a look.",
+      href: "/competitors",
+      cta: "View",
+    },
+    {
+      done: aiCallsUsed > 0,
+      label: "See why a video worked",
+      sub: "Pick any outlier below and hit “Why It Worked” — it's free.",
+      href: "/competitors/outliers",
+      cta: "Try it",
+    },
+  ];
+
   // Trending from cache (no auth needed, just Supabase)
   const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
   const { data: trendingCache } = await serviceClient
@@ -193,6 +230,8 @@ export default async function DashboardPage() {
               </div>
             </Link>
           )}
+
+          <GettingStarted steps={gettingStartedSteps} />
         </>
       )}
 
@@ -299,32 +338,12 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Explore feature tiles */}
-      <div className="mb-8">
-        <SectionHeader label="Explore" />
-        <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))" }}>
-          {[
-            { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed", desc: "Videos crushing their average", accent: "#ef4444", border: "rgba(239,68,68,0.25)", bg: "rgba(239,68,68,0.07)" },
-            { href: "/competitors", icon: "⚡", label: "Competitors", desc: "Track rival channels", accent: "#f59e0b", border: "rgba(245,158,11,0.25)", bg: "rgba(245,158,11,0.07)" },
-            { href: "/outlier", icon: "⭐", label: "Your Outliers", desc: "YOUR videos that beat the curve", accent: "#4ade80", border: "rgba(0,255,135,0.25)", bg: "rgba(0,255,135,0.07)" },
-            { href: "/ai", icon: "🧠", label: "AI Coach", desc: "Ask the TubeWatch AI Engine your strategy questions", accent: "#a855f7", border: "rgba(168,85,247,0.3)", bg: "rgba(168,85,247,0.08)" },
-            { href: "/rising", icon: "🚀", label: "Rising Videos", desc: "Spot hits before they peak", accent: "#a855f7", border: "rgba(168,85,247,0.25)", bg: "rgba(168,85,247,0.07)" },
-            { href: "/patterns", icon: "🎯", label: "Patterns", desc: "What formats consistently win", accent: "#10b981", border: "rgba(16,185,129,0.25)", bg: "rgba(16,185,129,0.07)" },
-            { href: "/trending", icon: "📈", label: "Trending Now", desc: "What's blowing up right now", accent: "#3b82f6", border: "rgba(59,130,246,0.25)", bg: "rgba(59,130,246,0.07)" },
-            { href: "/compare", icon: "⚖️", label: "Compare", desc: "Head-to-head channel tool", accent: "#06b6d4", border: "rgba(6,182,212,0.25)", bg: "rgba(6,182,212,0.07)" },
-            { href: "/videos", icon: "▶️", label: "All Videos", desc: "Full library + outlier scores", accent: "#888", border: "rgba(255,255,255,0.1)", bg: "rgba(255,255,255,0.03)" },
-          ].map((t) => (
-            <Link key={t.href} href={t.href}>
-              <div className="rounded-xl border p-4 h-full transition-transform hover:scale-[1.02]"
-                style={{ borderColor: t.border, background: t.bg }}>
-                <div className="text-xl mb-2">{t.icon}</div>
-                <div className="font-bold text-sm mb-1" style={{ color: t.accent }}>{t.label}</div>
-                <div className="text-xs leading-relaxed" style={{ color: "var(--text-muted)" }}>{t.desc}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
+      {/* The old "Explore" grid repeated all 9 sidebar destinations as
+          equally-weighted tiles mid-page — a sitemap dumped into the
+          dashboard, several duplicating cards already above (Outlier Feed,
+          AI Coach). Wayfinding to Patterns/Compare/Rising/Videos already
+          lives in the sidebar; the dashboard's job is to say what's
+          happening now, not re-list where everything is. Removed. */}
 
       {/* Your recent videos — only if channel connected */}
       {channel && videos.length > 0 && (
@@ -370,6 +389,65 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function GettingStarted({
+  steps,
+}: {
+  steps: { done: boolean; label: string; sub: string; href: string; cta: string }[];
+}) {
+  // Computed, not dismissed — reappears honestly if state ever regresses
+  // (e.g. every tracked competitor gets removed), and needs no localStorage
+  // or "don't show again" state to get right.
+  if (steps.every((s) => s.done)) return null;
+  return (
+    <div
+      className="rounded-2xl border p-5 mb-8"
+      style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+    >
+      <div className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>
+        Getting started
+      </div>
+      <div className="flex flex-col gap-4">
+        {steps.map((s, i) => (
+          <div key={s.label} className="flex items-center gap-3">
+            <div
+              className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
+              style={{
+                background: s.done ? "#00ff87" : "var(--border)",
+                color: s.done ? "#000" : "var(--text-muted)",
+              }}
+            >
+              {s.done ? "✓" : i + 1}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div
+                className="text-sm font-semibold"
+                style={{
+                  color: s.done ? "var(--text-muted)" : "var(--text-primary)",
+                  textDecoration: s.done ? "line-through" : "none",
+                }}
+              >
+                {s.label}
+              </div>
+              {!s.done && (
+                <div className="text-xs" style={{ color: "var(--text-muted)" }}>{s.sub}</div>
+              )}
+            </div>
+            {!s.done && (
+              <Link
+                href={s.href}
+                className="flex-shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-transform hover:scale-105"
+                style={{ background: "#00ff87", color: "#000" }}
+              >
+                {s.cta} →
+              </Link>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
