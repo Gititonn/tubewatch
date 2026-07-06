@@ -329,6 +329,7 @@ export default async function Home() {
         >
           <span>© 2026 TubeWatch</span>
           <Link href="/leaderboard" className="hover:text-white transition-colors">Leaderboards</Link>
+          <Link href="/faq" className="hover:text-white transition-colors">FAQ</Link>
           <Link href="/about" className="hover:text-white transition-colors">About</Link>
           <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
           <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>

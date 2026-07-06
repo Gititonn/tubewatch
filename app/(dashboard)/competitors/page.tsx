@@ -246,9 +246,10 @@ export default function CompetitorsPage() {
     <div className="p-8 max-w-5xl" style={{ color: "var(--text-primary)" }}>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Competitor Channels</h1>
+          <h1 className="text-2xl font-bold mb-1">Tracked Channels</h1>
           <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
-            Track competitor channels and surface their breakout videos.
+            We scan these channels every day for quiet breakouts — their overperformers show up
+            in your Breakouts feed automatically.
           </p>
         </div>
         <button

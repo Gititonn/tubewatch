@@ -29,7 +29,12 @@ export default function HeroDemo() {
           placeholder="Paste any channel — @handle"
           aria-label="YouTube channel handle"
           className="flex-1 px-4 py-3 rounded-xl text-sm outline-none"
-          style={{ background: "#1a1a1a", border: "1px solid #2a2a2a", color: "#fff" }}
+          style={{
+            background: "#1a1a1a",
+            border: "1px solid rgba(0,255,135,0.35)",
+            boxShadow: "0 0 20px rgba(0,255,135,0.08)",
+            color: "#fff",
+          }}
         />
         <button
           type="submit"

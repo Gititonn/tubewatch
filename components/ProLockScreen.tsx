@@ -87,21 +87,32 @@ export default function ProLockScreen({
   const href = feature ? `/billing?unlock=${encodeURIComponent(feature)}` : '/billing';
   const mock = preview === 'patterns' ? <PatternsPreview /> : preview === 'compare' ? <ComparePreview /> : null;
 
+  // ✨, not 🔒 — a padlock reads as punishment; sparkles read as something
+  // worth wanting. The card is a bounded, high-contrast box ON TOP of the
+  // blur, so the blur clearly reads as "premium teaser behind glass" instead
+  // of "this page failed to render".
   const lockCard = (
-    <>
-      <div className="text-4xl mb-4">🔒</div>
-      <h3 className="text-xl font-bold text-white mb-2">{feature ? `${feature} is a Pro feature` : 'Premium Feature'}</h3>
-      <p className="text-gray-400 max-w-md mx-auto mb-6">Upgrade to the Pro or Growth plan to unlock this tool and level up your channel analytics.</p>
+    <div
+      className="flex flex-col items-center text-center rounded-2xl p-8 max-w-md mx-4"
+      style={{
+        background: 'rgba(17,24,39,0.95)',
+        border: '1px solid rgba(168,85,247,0.4)',
+        boxShadow: '0 0 40px rgba(168,85,247,0.15)',
+      }}
+    >
+      <div className="text-4xl mb-4">✨</div>
+      <h3 className="text-xl font-bold text-white mb-2">{feature ? `Unlock ${feature}` : 'Unlock this tool'}</h3>
+      <p className="text-gray-400 mb-6">Upgrade to the Pro or Growth plan to unlock this tool and level up your channel analytics.</p>
       <Link href={href} className="px-6 py-3 bg-[#00ff87] text-[#0f0f0f] font-semibold rounded-lg hover:bg-[#00ff87]/90 transition-colors">
         View Plans
       </Link>
       {mock && <p className="mt-4 text-xs text-gray-500">Preview shown with example data</p>}
-    </>
+    </div>
   );
 
   if (!mock) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-[#111] border border-[#2a2a2a] rounded-xl text-center my-8">
+      <div className="flex flex-col items-center justify-center p-8 bg-[#111] border border-[#2a2a2a] rounded-xl my-8">
         {lockCard}
       </div>
     );
@@ -115,8 +126,8 @@ export default function ProLockScreen({
         {mock}
       </div>
       <div
-        className="absolute inset-0 flex flex-col items-center justify-center text-center p-8"
-        style={{ background: 'rgba(10,10,10,0.62)' }}
+        className="absolute inset-0 flex flex-col items-center justify-center p-8"
+        style={{ background: 'rgba(10,10,10,0.45)' }}
       >
         {lockCard}
       </div>

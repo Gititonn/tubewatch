@@ -22,7 +22,9 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     items: [
       { href: "/dashboard", icon: "⊞", label: "Dashboard" },
-      { href: "/competitors/outliers", icon: "🔥", label: "Outlier Feed" },
+      // "Breakouts", not "Outlier Feed" — outlier is a math term; breakout is
+      // the word creators actually use for the thing this feed shows them.
+      { href: "/competitors/outliers", icon: "🔥", label: "Breakouts" },
       { href: "/ai", icon: "🧠", label: "AI Coach", ai: true },
     ],
   },

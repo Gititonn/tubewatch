@@ -245,9 +245,10 @@ export default function OutliersPage() {
     <div className="p-4 md:p-8 max-w-6xl" style={{ color: "var(--text-primary)" }}>
       <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Outlier Feed</h1>
+          <h1 className="text-2xl font-bold mb-1">Breakout Videos</h1>
           <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
-            Competitor videos that massively outperformed their channel&apos;s average.
+            Competitor videos pulling views far faster than their channel&apos;s normal —
+            find the topic before everyone copies it.
           </p>
         </div>
         <AiCreditBadge className="mt-1" />
@@ -426,6 +427,7 @@ export default function OutliersPage() {
                       <div
                         className="absolute top-2 right-2 px-2 py-0.5 rounded-md text-xs font-bold"
                         style={{ background: colors.bg, border: `1px solid ${colors.border}`, color: colors.text }}
+                        title="Outlier Score: this video's views-per-day ÷ the channel's median views-per-day. 6x = pulling views 6 times faster than this channel's normal."
                       >
                         🔥 {v.score.toFixed(1)}x
                       </div>
@@ -448,8 +450,8 @@ export default function OutliersPage() {
                       </div>
                     </div>
                     <div className="px-3 pb-3">
-                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }} title="Uses 1 of your monthly AI answers">
-                        🧠 Why It Worked <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
+                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }} title="Uses 1 of your monthly AI answers">
+                        🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
                       </div>
                     </div>
                   </div>
@@ -585,6 +587,7 @@ export default function OutliersPage() {
                         color: colors.text,
                         backdropFilter: "blur(4px)",
                       }}
+                      title="Outlier Score: this video's views-per-day ÷ the channel's median views-per-day. 6x = pulling views 6 times faster than this channel's normal."
                     >
                       🔥 {score.toFixed(1)}x
                     </div>
@@ -652,10 +655,10 @@ export default function OutliersPage() {
                       )
                     }
                     className="mt-2 w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
-                    style={{ background: "var(--bg-card)", border: "1px solid var(--border)", color: "var(--text-secondary)" }}
+                    style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }}
                     title="Uses 1 of your monthly AI answers"
                   >
-                    🧠 Why It Worked <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
+                    🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
                   </button>
                 </div>
               </div>

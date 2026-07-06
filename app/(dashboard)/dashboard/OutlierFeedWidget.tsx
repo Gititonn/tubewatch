@@ -152,7 +152,7 @@ export default function OutlierFeedWidget() {
         <div className="flex items-center gap-2.5">
           <span className="text-2xl">🔥</span>
           <div>
-            <h2 className="text-lg font-black text-foreground leading-tight">Outlier Videos This Week</h2>
+            <h2 className="text-lg font-black text-foreground leading-tight">Breakouts This Week</h2>
             <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
               The breakout videos in your niche — find these before you make your next one.
             </p>

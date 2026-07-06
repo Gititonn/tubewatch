@@ -405,7 +405,13 @@ function GettingStarted({
   return (
     <div
       className="rounded-2xl border p-5 mb-8"
-      style={{ borderColor: "var(--border)", background: "var(--bg-card)" }}
+      style={{
+        borderColor: "var(--border)",
+        background: "var(--bg-card)",
+        // Level-1 depth cue: the brand-accent top edge marks "act on this
+        // first" so the card outranks the equally-boxed content below it.
+        borderTop: "2px solid #00ff87",
+      }}
     >
       <div className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: "var(--text-muted)" }}>
         Getting started
