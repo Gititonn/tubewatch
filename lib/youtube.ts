@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+import { reserveSearchQuota } from "@/lib/youtube-quota";
 
 const youtube = google.youtube({
   version: "v3",
@@ -191,6 +192,14 @@ export async function getVideosByIds(ids: string[]) {
  * else, and the route no longer needs to construct its own client.
  */
 export async function searchChannels(query: string, maxResults = 5) {
+  if (!(await reserveSearchQuota())) {
+    throw new YouTubeApiError(
+      "quota_exceeded",
+      503,
+      "Search is temporarily limited due to high demand — try tracking a channel by its exact @handle instead, or check back in a few hours."
+    );
+  }
+
   const searchRes = await withYouTubeRetry(() =>
     youtube.search.list({
       part: ["snippet"],
@@ -225,6 +234,14 @@ export async function searchChannels(query: string, maxResults = 5) {
  * per connect, not on any hot path.
  */
 export async function searchNicheChannels(query: string, excludeChannelId?: string) {
+  if (!(await reserveSearchQuota())) {
+    throw new YouTubeApiError(
+      "quota_exceeded",
+      503,
+      "Competitor suggestions are temporarily paused due to high demand — you can still add channels manually."
+    );
+  }
+
   const searchRes = await withYouTubeRetry(() =>
     youtube.search.list({
       part: ["snippet"],

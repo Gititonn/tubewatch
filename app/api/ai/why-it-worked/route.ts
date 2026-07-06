@@ -30,11 +30,14 @@ type BaselineVideo = {
   outlier_score: number | null;
 };
 
+type VideoSource = "own" | "competitor" | "discovered";
+
 type VideoContext = {
   baseline: BaselineVideo[];
   duration_seconds: number | null;
   velocity_ratio: number | null;
   recent_views_per_day: number | null;
+  source: VideoSource | null;
 };
 
 /**
@@ -50,6 +53,7 @@ async function fetchVideoContext(videoId: string): Promise<VideoContext> {
     duration_seconds: null,
     velocity_ratio: null,
     recent_views_per_day: null,
+    source: null,
   };
 
   try {
@@ -76,6 +80,7 @@ async function fetchVideoContext(videoId: string): Promise<VideoContext> {
         duration_seconds: comp.duration_seconds,
         velocity_ratio: comp.velocity_ratio,
         recent_views_per_day: comp.recent_views_per_day,
+        source: "competitor",
       };
     }
 
@@ -96,6 +101,7 @@ async function fetchVideoContext(videoId: string): Promise<VideoContext> {
         duration_seconds: disc.duration_seconds,
         velocity_ratio: disc.velocity_ratio,
         recent_views_per_day: disc.recent_views_per_day,
+        source: "discovered",
       };
     }
 
@@ -116,6 +122,7 @@ async function fetchVideoContext(videoId: string): Promise<VideoContext> {
         duration_seconds: own.duration_seconds,
         velocity_ratio: own.velocity_ratio,
         recent_views_per_day: own.recent_views_per_day,
+        source: "own",
       };
     }
   } catch {
@@ -156,6 +163,25 @@ export async function POST(request: Request) {
   const ageDays = publishedAt
     ? Math.max(1, Math.round((Date.now() - new Date(publishedAt).getTime()) / 86_400_000))
     : null;
+
+  // Closed-loop groundwork: log that this teardown happened, so a later job
+  // can check whether the user's next own-channel upload beat their median.
+  // Fire-and-forget — a logging failure must never break the AI response the
+  // user is waiting on.
+  createServiceClient()
+    .from("ai_teardowns")
+    .insert({
+      user_id: user.id,
+      youtube_video_id: videoId,
+      source: ctx.source ?? "discovered",
+      title,
+      outlier_score: outlierScore ?? null,
+      velocity_ratio: ctx.velocity_ratio,
+      had_transcript: transcript !== null,
+    })
+    .then(({ error }) => {
+      if (error) console.warn("ai_teardowns insert skipped:", error.message);
+    });
 
   // ── Assemble the grounded context blocks ─────────────────────────────────
   const velocityLine =
