@@ -200,21 +200,21 @@ export default async function DashboardPage() {
             <StatCard label="Subscribers" value={fmt(channel.subscriber_count ?? 0)} icon="👥" accent="#4ade80" sub="total" />
             <StatCard label="Avg Views / Video" value={fmt(avgViews)} icon="👁" accent="#3b82f6" sub={`across ${videos.length} videos`} />
             <StatCard label="Est. Revenue (30d)" value={recentViews > 0 ? estRevenue(recentViews) : "---"} icon="💰" accent="#4ade80" sub="based on avg CPM" />
-            <StatCard label="Top Outlier" value={topOutlier?.outlier_score ? topOutlier.outlier_score.toFixed(1) + "x" : "---"} icon="🔥" accent="#ff4444" sub="channel median" highlight />
+            <StatCard label="Top Outlier" value={topOutlier?.outlier_score ? topOutlier.outlier_score.toFixed(1) + "x" : "---"} icon="🔥" accent="#f97316" sub="channel median" highlight />
           </div>
 
           {topOutlier && topOutlier.outlier_score >= 2 && (
             <Link href="/outlier">
               <div
-                className="rounded-2xl border p-5 mb-8 flex items-center gap-4 transition-all hover:border-red-500/40"
+                className="rounded-2xl border p-5 mb-8 flex items-center gap-4 transition-all hover:border-orange-500/40"
                 style={{
-                  borderColor: "rgba(255,68,68,0.25)",
-                  background: "linear-gradient(135deg, rgba(255,68,68,0.07) 0%, rgba(255,68,68,0.02) 100%)",
+                  borderColor: "rgba(249,115,22,0.25)",
+                  background: "linear-gradient(135deg, rgba(249,115,22,0.07) 0%, rgba(249,115,22,0.02) 100%)",
                 }}
               >
                 <div className="text-4xl">🔥</div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-black mb-1" style={{ color: "#ff4444" }}>YOUR BIGGEST OUTLIER</div>
+                  <div className="text-xs font-black mb-1" style={{ color: "#f97316" }}>YOUR BIGGEST OUTLIER</div>
                   <div className="font-semibold text-white truncate text-sm mb-1">{topOutlier.title}</div>
                   <div className="text-xs" style={{ color: "var(--text-secondary)" }}>
                     {fmt(topOutlier.view_count ?? 0)} views &middot; {topOutlier.outlier_score.toFixed(1)}x your channel average
@@ -222,7 +222,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex-shrink-0 flex flex-col items-center gap-1">
                   <div className="px-4 py-2 rounded-xl text-sm font-bold"
-                    style={{ background: "rgba(255,68,68,0.15)", color: "#ff4444", border: "1px solid rgba(255,68,68,0.3)" }}>
+                    style={{ background: "rgba(249,115,22,0.15)", color: "#f97316", border: "1px solid rgba(249,115,22,0.3)" }}>
                     Analyze
                   </div>
                   <AiCreditBadge />
@@ -376,8 +376,8 @@ export default async function DashboardPage() {
                     {v.outlier_score != null && v.outlier_score >= 1.2 && (
                       <span className="text-xs font-bold px-1.5 py-0.5 rounded-md"
                         style={{
-                          color: v.outlier_score >= 3 ? "#ff4444" : v.outlier_score >= 2 ? "#ffaa00" : "#4ade80",
-                          background: v.outlier_score >= 3 ? "rgba(255,68,68,0.15)" : v.outlier_score >= 2 ? "rgba(255,170,0,0.15)" : "rgba(0,255,135,0.15)",
+                          color: v.outlier_score >= 3 ? "#f97316" : v.outlier_score >= 2 ? "#ffaa00" : "#4ade80",
+                          background: v.outlier_score >= 3 ? "rgba(249,115,22,0.15)" : v.outlier_score >= 2 ? "rgba(255,170,0,0.15)" : "rgba(0,255,135,0.15)",
                         }}>
                         {v.outlier_score.toFixed(1)}x
                       </span>

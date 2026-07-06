@@ -12,16 +12,16 @@ import { createClient } from "@/lib/supabase/server";
 // channel, and generic "100K subscribers!" hustle-bro mockups told them this
 // tool wasn't built for people like them.
 const cards = [
-  { emoji: "🪚", title: "Restoring a rusted 1970s hand plane I found at an estate sale", views: "94K views", duration: "14:12", badge: "🔥 8.3x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🪚", title: "Restoring a rusted 1970s hand plane I found at an estate sale", views: "94K views", duration: "14:12", badge: "🔥 8.3x outlier", badgeColor: "#f97316", bg: "#1a120a" },
   { emoji: "🍞", title: "Why your sourdough scoring keeps dragging (3 fixes)", views: "41K views", duration: "8:47", badge: "🚀 5.1x", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "⌨️", title: "I built a $60 keyboard that sounds like a $400 one", views: "127K views", duration: "11:32", badge: "🔥 6.7x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "⌨️", title: "I built a $60 keyboard that sounds like a $400 one", views: "127K views", duration: "11:32", badge: "🔥 6.7x outlier", badgeColor: "#f97316", bg: "#1a120a" },
   { emoji: "🌱", title: "Stop repotting your monstera like this", views: "38K views", duration: "6:21", badge: "📈 Rising now", badgeColor: "#00ff87", bg: "#0a1a0f" },
   { emoji: "♟️", title: "The London System is ruining club chess (fight me)", views: "52K views", duration: "18:54", badge: "🚀 4.4x", badgeColor: "#8b5cf6", bg: "#120a1a" },
   { emoji: "🎻", title: "Adult beginner violin: month 18 honest progress", views: "12K views", duration: "9:13", badge: "📊 Tracking", badgeColor: "#3b82f6", bg: "#0a0f1a" },
-  { emoji: "🚐", title: "My camper's 12V wiring failed inspection — here's what I got wrong", views: "67K views", duration: "16:05", badge: "🔥 7.2x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "🚐", title: "My camper's 12V wiring failed inspection — here's what I got wrong", views: "67K views", duration: "16:05", badge: "🔥 7.2x outlier", badgeColor: "#f97316", bg: "#1a120a" },
   { emoji: "🎨", title: "Watercolor skies: the wet-on-wet timing nobody explains", views: "29K views", duration: "12:39", badge: "🚀 3.8x", badgeColor: "#ffaa00", bg: "#1a150a" },
   { emoji: "🥏", title: "Disc golf putting drills that fixed my round in 2 weeks", views: "19K views", duration: "10:02", badge: "📈 Rising now", badgeColor: "#00ff87", bg: "#0a1a0f" },
-  { emoji: "📻", title: "This $8 thrift store radio had a secret inside", views: "83K views", duration: "13:46", badge: "🔥 9.1x outlier", badgeColor: "#ff4444", bg: "#1a0a0a" },
+  { emoji: "📻", title: "This $8 thrift store radio had a secret inside", views: "83K views", duration: "13:46", badge: "🔥 9.1x outlier", badgeColor: "#f97316", bg: "#1a120a" },
 ];
 
 const features = [

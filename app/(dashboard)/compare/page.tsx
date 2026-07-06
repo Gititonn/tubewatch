@@ -21,7 +21,7 @@ interface ChannelData {
 
 function outlierColor(score: number | null) {
   if (!score) return "#666";
-  if (score >= 3) return "#ff4444";
+  if (score >= 3) return "#f97316";
   if (score >= 2) return "#ffaa00";
   if (score >= 1) return "#00ff87";
   return "#666";

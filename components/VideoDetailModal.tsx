@@ -87,7 +87,7 @@ export function VideoDetailModal({
           {score > 0 && (
             <div
               className="absolute top-2 left-2 px-2.5 py-1 rounded-md text-xs font-black"
-              style={{ background: "rgba(0,0,0,0.7)", color: "#ff4444" }}
+              style={{ background: "rgba(0,0,0,0.7)", color: "#f97316" }}
             >
               🔥 {score.toFixed(1)}x outlier
             </div>

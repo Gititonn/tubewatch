@@ -30,7 +30,7 @@
 
   function scoreColor(score) {
     if (score == null) return "var(--tw-muted, #888)";
-    if (score >= 10) return "#ff4444";
+    if (score >= 10) return "#f97316";
     if (score >= 5) return "#ffaa00";
     return "#00ff87";
   }

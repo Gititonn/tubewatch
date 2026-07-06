@@ -134,16 +134,16 @@ export default function OutlierFeedWidget() {
     <div
       className="rounded-2xl border p-5 mb-8 relative overflow-hidden"
       style={{
-        borderColor: "rgba(255,68,68,0.3)",
-        background: "linear-gradient(135deg, rgba(255,68,68,0.08) 0%, rgba(255,68,68,0.01) 60%, var(--bg-card) 100%)",
-        boxShadow: "0 0 40px rgba(255,68,68,0.06)",
+        borderColor: "rgba(249,115,22,0.3)",
+        background: "linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(249,115,22,0.01) 60%, var(--bg-card) 100%)",
+        boxShadow: "0 0 40px rgba(249,115,22,0.06)",
       }}
     >
       <div
         style={{
           position: "absolute", top: -60, right: -60, width: 220, height: 220,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(255,68,68,0.1) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(249,115,22,0.1) 0%, transparent 70%)",
           pointerEvents: "none",
         }}
       />
@@ -161,7 +161,7 @@ export default function OutlierFeedWidget() {
         <a
           href="/competitors/outliers"
           className="flex-shrink-0 px-3.5 py-2 rounded-lg text-xs font-black transition-transform hover:scale-105"
-          style={{ background: "rgba(255,68,68,0.15)", color: "#ff4444", border: "1px solid rgba(255,68,68,0.3)" }}
+          style={{ background: "rgba(249,115,22,0.15)", color: "#f97316", border: "1px solid rgba(249,115,22,0.3)" }}
         >
           See full feed →
         </a>
@@ -186,10 +186,10 @@ export default function OutlierFeedWidget() {
             onClick={() => setCategory("")}
             className={`px-3 py-1.5 rounded-full text-xs transition-colors ${category === "" ? "font-black" : "font-semibold"}`}
             style={{
-              background: category === "" ? "#ff4444" : "var(--bg-card)",
+              background: category === "" ? "#f97316" : "var(--bg-card)",
               color: category === "" ? "#fff" : "var(--text-secondary)",
-              border: `1px solid ${category === "" ? "#ff6666" : "var(--border)"}`,
-              boxShadow: category === "" ? "0 0 12px rgba(255,68,68,0.45)" : undefined,
+              border: `1px solid ${category === "" ? "#fb923c" : "var(--border)"}`,
+              boxShadow: category === "" ? "0 0 12px rgba(249,115,22,0.45)" : undefined,
             }}
           >
             All niches
@@ -200,10 +200,10 @@ export default function OutlierFeedWidget() {
               onClick={() => setCategory(c.id)}
               className={`px-3 py-1.5 rounded-full text-xs transition-colors ${category === c.id ? "font-black" : "font-semibold"}`}
               style={{
-                background: category === c.id ? "#ff4444" : "var(--bg-card)",
+                background: category === c.id ? "#f97316" : "var(--bg-card)",
                 color: category === c.id ? "#fff" : "var(--text-secondary)",
-                border: `1px solid ${category === c.id ? "#ff6666" : "var(--border)"}`,
-                boxShadow: category === c.id ? "0 0 12px rgba(255,68,68,0.45)" : undefined,
+                border: `1px solid ${category === c.id ? "#fb923c" : "var(--border)"}`,
+                boxShadow: category === c.id ? "0 0 12px rgba(249,115,22,0.45)" : undefined,
               }}
             >
               {c.emoji} {c.label}
@@ -251,7 +251,7 @@ export default function OutlierFeedWidget() {
                     </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs" style={{ color: "var(--text-muted)" }}>{v.channel}</span>
-                      <span className="text-xs font-black px-1.5 py-0.5 rounded" style={{ color: "#ff4444", background: "rgba(255,68,68,0.15)" }}>
+                      <span className="text-xs font-black px-1.5 py-0.5 rounded" style={{ color: "#f97316", background: "rgba(249,115,22,0.15)" }}>
                         {v.score.toFixed(1)}x
                       </span>
                     </div>
@@ -262,7 +262,7 @@ export default function OutlierFeedWidget() {
             <a
               href="/competitors"
               className="inline-block px-5 py-2.5 rounded-xl font-black text-black text-sm transition-transform hover:scale-105"
-              style={{ background: "#ff4444" }}
+              style={{ background: "#f97316" }}
             >
               Track your first competitor →
             </a>
@@ -270,7 +270,7 @@ export default function OutlierFeedWidget() {
         ) : videos.length === 0 ? (
           <div className="rounded-xl border p-6 text-center text-sm" style={{ borderColor: "var(--border)", background: "var(--bg-card)", color: "var(--text-muted)" }}>
             {search.trim() ? (
-              <>Nothing tracked matches that search yet. <a href="/competitors/outliers" className="underline" style={{ color: "#ff4444" }}>Open the full feed</a> to search YouTube directly and add a channel.</>
+              <>Nothing tracked matches that search yet. <a href="/competitors/outliers" className="underline" style={{ color: "#f97316" }}>Open the full feed</a> to search YouTube directly and add a channel.</>
             ) : (
               "No outliers in this category yet — try a lower score threshold on the full feed, or check back after the next sync."
             )}
@@ -280,12 +280,12 @@ export default function OutlierFeedWidget() {
             {videos.map((v) => {
               const ch = Array.isArray(v.competitor_channels) ? v.competitor_channels[0] : v.competitor_channels;
               const score = v.outlier_score ?? 0;
-              const scoreColor = score >= 10 ? "#ff4444" : score >= 5 ? "#ffaa00" : "#4ade80";
+              const scoreColor = score >= 10 ? "#f97316" : score >= 5 ? "#ffaa00" : "#4ade80";
               return (
                 <div
                   key={v.id}
                   onClick={() => { setTrackError(null); setSelectedVideo(v); }}
-                  className="rounded-xl border overflow-hidden block cursor-pointer transition-all hover:border-red-500/40 hover:scale-[1.02]"
+                  className="rounded-xl border overflow-hidden block cursor-pointer transition-all hover:border-orange-500/40 hover:scale-[1.02]"
                   style={{ borderColor: "var(--border)", background: "var(--bg-card)", boxShadow: "0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)" }}
                 >
                   {v.thumbnail_url && (

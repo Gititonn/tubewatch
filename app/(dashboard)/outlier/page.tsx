@@ -260,7 +260,7 @@ function ScoreBadge({
   if (score === null) {
     style = { background: "rgba(136,136,136,0.12)", color: "var(--text-secondary)", border: "1px solid var(--border)" };
   } else if (score >= 5) {
-    style = { background: "rgba(255,68,68,0.18)", color: "#ff6b6b", border: "1px solid rgba(255,68,68,0.45)", boxShadow: "0 0 12px rgba(255,68,68,0.25)" };
+    style = { background: "rgba(249,115,22,0.18)", color: "#fb923c", border: "1px solid rgba(249,115,22,0.45)", boxShadow: "0 0 12px rgba(249,115,22,0.25)" };
     prefix = "🔥 ";
   } else if (score >= 3) {
     style = { background: "rgba(255,170,0,0.18)", color: "#ffb020", border: "1px solid rgba(255,170,0,0.4)" };

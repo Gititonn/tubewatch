@@ -35,7 +35,7 @@ function fmtDate(iso: string | null): string {
 }
 
 function scoreColor(score: number) {
-  if (score >= 10) return { bg: "rgba(255,68,68,0.12)", border: "#f87171", text: "#fca5a5" };
+  if (score >= 10) return { bg: "rgba(249,115,22,0.12)", border: "#fb923c", text: "#fdba74" };
   if (score >= 5) return { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" };
   return { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };
 }

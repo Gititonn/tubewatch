@@ -109,7 +109,7 @@ export default async function LeaderboardCategory({ params }: { params: { catego
                     ) : null}
                     <span
                       className="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-black"
-                      style={{ background: "rgba(0,0,0,0.75)", color: "#ff4444" }}
+                      style={{ background: "rgba(0,0,0,0.75)", color: "#f97316" }}
                     >
                       🔥 {(v.outlier_score ?? 0).toFixed(1)}x
                     </span>

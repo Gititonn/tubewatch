@@ -19,7 +19,7 @@
     'a#thumbnail[href*="/watch?v="], a.ytLockupViewModelContentImage[href*="/watch?v="]';
 
   function scoreColor(score) {
-    if (score >= 10) return "#ff4444";
+    if (score >= 10) return "#f97316";
     if (score >= 5) return "#ffaa00";
     return "#00ff87";
   }

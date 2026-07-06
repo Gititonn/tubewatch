@@ -129,7 +129,7 @@ function DashboardMockup() {
           { label: "Subscribers", val: "24.3K", icon: "👥" },
           { label: "Avg Views", val: "18.4K", icon: "▶️" },
           { label: "Tracked", val: "142", icon: "📹" },
-          { label: "Top Outlier", val: "6.2x", icon: "🔥", accent: "#ff4444" },
+          { label: "Top Outlier", val: "6.2x", icon: "🔥", accent: "#f97316" },
         ].map((c) => (
           <div
             key={c.label}
@@ -149,7 +149,7 @@ function DashboardMockup() {
           {[30, 45, 20, 80, 55, 35, 100, 42, 68, 25, 90, 38].map((h, i) => (
             <div key={i} className="flex-1 rounded-t" style={{
               height: `${h}%`,
-              background: h >= 80 ? "#ff4444" : h >= 60 ? "#ffaa00" : h >= 40 ? "#00ff87" : "#2a2a2a",
+              background: h >= 80 ? "#f97316" : h >= 60 ? "#ffaa00" : h >= 40 ? "#00ff87" : "#2a2a2a",
             }} />
           ))}
         </div>
@@ -160,8 +160,8 @@ function DashboardMockup() {
 
 function OutlierMockup() {
   const videos = [
-    { title: "I ate one food for 30 days", views: "2.1M", score: 6.2, color: "#ff4444" },
-    { title: "The thumbnail formula that works", views: "847K", score: 3.1, color: "#ff4444" },
+    { title: "I ate one food for 30 days", views: "2.1M", score: 6.2, color: "#f97316" },
+    { title: "The thumbnail formula that works", views: "847K", score: 3.1, color: "#f97316" },
     { title: "Behind my studio setup", views: "445K", score: 2.4, color: "#ffaa00" },
     { title: "Q&A: your questions answered", views: "38K", score: 0.6, color: "#2a2a2a" },
   ];
@@ -227,7 +227,7 @@ function CompareMockup() {
 
 function VideosMockup() {
   const vids = [
-    { emoji: "🎬", title: "Studio tour 2024", views: "671K", score: "3.1x", sc: "#ff4444" },
+    { emoji: "🎬", title: "Studio tour 2024", views: "671K", score: "3.1x", sc: "#f97316" },
     { emoji: "📅", title: "30 days of posting", views: "312K", score: "2.2x", sc: "#ffaa00" },
     { emoji: "🎤", title: "Honest gear review", views: "156K", score: "1.4x", sc: "#00ff87" },
     { emoji: "🏆", title: "100K milestone", views: "89K", score: "0.9x", sc: "#444" },

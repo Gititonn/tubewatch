@@ -49,7 +49,7 @@ function fmtDate(iso: string | null): string {
 }
 
 function scoreColor(score: number): { bg: string; border: string; text: string } {
-  if (score >= 10) return { bg: "rgba(255,68,68,0.12)", border: "#f87171", text: "#fca5a5" };
+  if (score >= 10) return { bg: "rgba(249,115,22,0.12)", border: "#fb923c", text: "#fdba74" };
   if (score >= 5) return { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" };
   return { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };
 }
@@ -416,7 +416,7 @@ export default function OutliersPage() {
                 { title: "The 5AM Routine That Actually Changed My Life", channel: "MindsetDaily", views: 312000, likes: 14100, comments: 1032, score: 12.1, published: "2026-06-18T00:00:00Z" },
               ].map((v, i) => {
                 const colors = v.score >= 10
-                  ? { bg: "rgba(255,68,68,0.12)", border: "#f87171", text: "#fca5a5" }
+                  ? { bg: "rgba(249,115,22,0.12)", border: "#fb923c", text: "#fdba74" }
                   : v.score >= 5
                   ? { bg: "rgba(255,170,0,0.12)", border: "#ffaa00", text: "#ffcc44" }
                   : { bg: "rgba(0,255,135,0.10)", border: "#00ff87", text: "#4ade80" };

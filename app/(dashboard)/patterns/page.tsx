@@ -17,7 +17,7 @@ type PatternResult = {
 };
 
 function scoreColor(score: number): string {
-  if (score >= 10) return "#ff6666";
+  if (score >= 10) return "#fb923c";
   if (score >= 5) return "#ffcc44";
   return "#00ff87";
 }

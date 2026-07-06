@@ -18,9 +18,9 @@ function fmtDate(iso: string | null): string {
 
 function scoreBadge(score: number | null): { text: string; bg: string; border: string; color: string } | null {
   if (score == null) return null;
-  const color = score >= 10 ? "#fca5a5" : score >= 5 ? "#ffcc44" : "#4ade80";
-  const border = score >= 10 ? "#f87171" : score >= 5 ? "#ffaa00" : "#00ff87";
-  const bg = score >= 10 ? "rgba(255,68,68,0.12)" : score >= 5 ? "rgba(255,170,0,0.12)" : "rgba(0,255,135,0.10)";
+  const color = score >= 10 ? "#fdba74" : score >= 5 ? "#ffcc44" : "#4ade80";
+  const border = score >= 10 ? "#fb923c" : score >= 5 ? "#ffaa00" : "#00ff87";
+  const bg = score >= 10 ? "rgba(249,115,22,0.12)" : score >= 5 ? "rgba(255,170,0,0.12)" : "rgba(0,255,135,0.10)";
   return { text: `🔥 ${score.toFixed(1)}x`, bg, border, color };
 }
 
