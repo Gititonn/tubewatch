@@ -1,7 +1,19 @@
 # Chrome Web Store — submission pack
 
-Everything you need to paste/upload. The package to upload is
-`dist/tubewatch-extension-v0.1.0.zip`.
+Everything you need to paste/upload.
+
+**Upload these files (absolute paths):**
+- Package: `C:\Users\admin\tubewatch\extension\dist\tubewatch-extension-v0.1.2.zip`
+- Screenshot 1 (hero): `C:\Users\admin\tubewatch\extension\store-assets\01-channel-track-button.png`
+- Screenshot 2: `C:\Users\admin\tubewatch\extension\store-assets\02-badges-grid.png`
+- Screenshot 3: `C:\Users\admin\tubewatch\extension\store-assets\03-watch-panel.png`
+
+All three screenshots are exactly 1280×800, captured from the live extension
+(regenerate any time with `node scripts/store-screenshots.mjs`).
+
+> Note: the Web Store dashboard cannot be driven by browser automation (Chrome
+> blocks extensions from scripting the gallery), so the console clicks below
+> are manual by platform design.
 
 > Only you can do the account-bound steps: create the developer account, pay the
 > $5 one-time fee, accept Google's terms, and click **Publish**. Everything
