@@ -6,6 +6,7 @@ import { PLANS } from "@/lib/plans";
 import GoogleConnectButton from "./GoogleConnectButton";
 import DisconnectChannelButton from "./DisconnectChannelButton";
 import ExtensionKeySection from "./ExtensionKeySection";
+import EmailPrefsSection from "./EmailPrefsSection";
 
 export const dynamic = "force-dynamic";
 
@@ -188,6 +189,9 @@ export default async function SettingsPage() {
           </div>
         )}
       </section>
+
+      {/* Weekly breakout email preference */}
+      <EmailPrefsSection initialEnabled={profile?.weekly_email_enabled ?? true} />
 
       {/* Browser Extension — per-user API key for the YouTube overlay */}
       <ExtensionKeySection />

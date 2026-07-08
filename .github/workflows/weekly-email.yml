@@ -1,0 +1,26 @@
+# Weekly Breakout Email — the retention loop.
+#
+# Vercel Hobby allows only 2 daily crons and both slots are taken (sync 06:00,
+# purge 04:00), so this fires from GitHub Actions instead — same pattern as
+# priority-sync.yml. The route is idempotent (won't re-send within 6 days) and
+# per-user best-effort, so a re-run or partial failure is safe.
+#
+# Requires the CRON_SECRET repo secret (already set for priority-sync).
+name: weekly-email
+on:
+  schedule:
+    - cron: "0 14 * * 1" # Mondays 14:00 UTC (morning US)
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Trigger weekly email
+        # www host — apex 308-redirects and curl drops the auth header across
+        # redirects, so the apex would "succeed" without reaching the route.
+        run: |
+          curl -fsS --max-time 540 \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.tubewatchhq.com/api/cron/weekly-email"
