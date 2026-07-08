@@ -76,7 +76,7 @@ export default async function DashboardPage() {
   // ordinary page content that vanishes once every step is genuinely done,
   // instead of a coachmark the user clicks through once and never returns to.
   let competitorCount = 0;
-  let aiCallsUsed = 0;
+  let teardownsRun = 0;
   if (channel) {
     const { count } = await supabase
       .from("competitor_channels")
@@ -84,12 +84,13 @@ export default async function DashboardPage() {
       .eq("user_id", user!.id);
     competitorCount = count ?? 0;
 
-    const { data: profileRow } = await supabase
-      .from("profiles")
-      .select("ai_calls_used")
-      .eq("id", user!.id)
-      .single();
-    aiCallsUsed = profileRow?.ai_calls_used ?? 0;
+    // Teardown log, not the credit meter — the first teardown is free and
+    // doesn't touch ai_calls_used, but it absolutely completes this step.
+    const { count: tdCount } = await supabase
+      .from("ai_teardowns")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user!.id);
+    teardownsRun = tdCount ?? 0;
   }
   const gettingStartedSteps = [
     {
@@ -100,11 +101,11 @@ export default async function DashboardPage() {
       cta: "View",
     },
     {
-      done: aiCallsUsed > 0,
-      label: "See why a video worked",
-      sub: "Pick any outlier below and hit “Why It Worked” — it's free.",
+      done: teardownsRun > 0,
+      label: "Run your first AI teardown",
+      sub: "See exactly why a competitor's video is blowing up. The first one's on the house — it won't use your monthly credits.",
       href: "/competitors/outliers",
-      cta: "Try it",
+      cta: "Find a breakout",
     },
   ];
 
@@ -245,10 +246,6 @@ export default async function DashboardPage() {
           every tracked channel's outliers to every signed-in user. */}
       <OutlierFeedWidget />
 
-      {/* Channel-level view-trend charts (P2.4) — own-channel view-count series
-          from video_snapshots. Self-hides for users with no channel connected. */}
-      <ViewTrendsWidget />
-
       {/* AI Strategy Card — always shown; free users are sent to billing, not a 402 */}
       <Link href={aiUnlocked ? "/ai" : "/billing"}>
         <div
@@ -303,6 +300,11 @@ export default async function DashboardPage() {
           </Link>
         ))}
       </div>
+
+      {/* Channel-level view-trend charts — own-channel view-count series from
+          video_snapshots. Demoted below the decision surfaces (breakouts, AI):
+          it's historical context, not a "what should I film" answer. */}
+      <ViewTrendsWidget />
 
       {/* TRENDING NOW — generic YouTube-wide signal, kept but demoted below the niche outlier feed */}
       {trendingCache && trendingCache.length > 0 && (

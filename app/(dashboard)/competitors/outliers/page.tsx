@@ -4,7 +4,7 @@ import { VideoGridSkeleton } from "@/components/Skeleton";
 import { VideoDetailModal } from "@/components/VideoDetailModal";
 import { useState, useEffect } from "react";
 import { CATEGORIES, type ChannelCategory } from "@/lib/categories";
-import AiCreditBadge from "@/components/AiCreditBadge";
+import AiCreditBadge, { fetchAiStatus, invalidateAiStatus } from "@/components/AiCreditBadge";
 
 type CompetitorChannel = {
   id: string;
@@ -92,6 +92,12 @@ export default function OutliersPage() {
     loading: boolean;
   } | null>(null);
   const [whyCache, setWhyCache] = useState<Record<string, string>>({});
+  // Zero-risk first use: the first teardown is server-side free; the buttons
+  // advertise it so "only 5 credits" anxiety can't block the aha moment.
+  const [firstFree, setFirstFree] = useState(false);
+  useEffect(() => {
+    fetchAiStatus().then((s) => setFirstFree(!!s?.firstTeardownFree));
+  }, []);
   // Video-detail modal: clicking a card opens this in-app view (thumbnail,
   // full stats, an explicit "Watch on YouTube" link, and a "Track this
   // channel" action) instead of throwing the user straight onto YouTube.
@@ -225,6 +231,14 @@ export default function OutliersPage() {
       body: JSON.stringify({ videoId, title, viewCount, outlierScore, channelName, publishedAt }),
     });
 
+    // Metering/auth errors come back as JSON — surface the message instead of
+    // streaming raw JSON into the panel.
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      setWhyItWorked({ videoId, content: err?.error ?? "Something went wrong — try again.", loading: false });
+      return;
+    }
+
     if (!res.body) return;
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -239,6 +253,9 @@ export default function OutliersPage() {
     }
 
     setWhyCache((prev) => ({ ...prev, [videoId]: full }));
+    // A credit (or the freebie) was just consumed — refresh badge/button state.
+    invalidateAiStatus();
+    setFirstFree(false);
   }
 
   return (
@@ -450,8 +467,8 @@ export default function OutliersPage() {
                       </div>
                     </div>
                     <div className="px-3 pb-3">
-                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }} title="Uses 1 of your monthly AI answers">
-                        🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
+                      <div className="mt-2 w-full px-2 py-1.5 rounded-lg text-xs font-medium" style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }} title={firstFree ? "Your first teardown is free — pick a video and see exactly why it's outperforming." : "Uses 1 of your monthly AI answers"}>
+                        {firstFree ? <>🎁 Ask AI: why did this break out? <span style={{ color: "#00ff87", fontSize: 10 }}>· first one&apos;s free</span></> : <>🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span></>}
                       </div>
                     </div>
                   </div>
@@ -656,9 +673,9 @@ export default function OutliersPage() {
                     }
                     className="mt-2 w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
                     style={{ background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.35)", color: "#c084fc" }}
-                    title="Uses 1 of your monthly AI answers"
+                    title={firstFree ? "Your first teardown is free — pick a video and see exactly why it's outperforming." : "Uses 1 of your monthly AI answers"}
                   >
-                    🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span>
+                    {firstFree ? <>🎁 Ask AI: why did this break out? <span style={{ color: "#00ff87", fontSize: 10 }}>· first one&apos;s free</span></> : <>🧠 Ask AI: why did this break out? <span style={{ color: "var(--text-muted)", fontSize: 10 }}>· 1 credit</span></>}
                   </button>
                 </div>
               </div>
@@ -688,7 +705,7 @@ export default function OutliersPage() {
           </div>
           <div className="p-4 flex-1">
             {whyItWorked.loading ? (
-              <p style={{ color: "var(--text-muted)", fontSize: 13 }}>Analyzing…</p>
+              <AnalysisLoadingSteps />
             ) : (
               <div style={{ color: "var(--text-secondary)", fontSize: 13 }}>
                 <MarkdownContent content={whyItWorked.content} />
@@ -735,4 +752,28 @@ export default function OutliersPage() {
       )}
     </div>
     );
+}
+
+/**
+ * The teardown takes a few seconds to start streaming — narrate the real work
+ * happening instead of a mute spinner, so the wait builds credibility rather
+ * than doubt.
+ */
+function AnalysisLoadingSteps() {
+  const steps = [
+    "Fetching transcript and pacing data…",
+    "Comparing the hook against this channel's baseline…",
+    "Reading how fast views arrived vs. the channel's normal pace…",
+    "Identifying the breakout variables…",
+  ];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI((v) => (v + 1) % steps.length), 1800);
+    return () => clearInterval(t);
+  }, [steps.length]);
+  return (
+    <p style={{ color: "var(--text-muted)", fontSize: 13 }} aria-live="polite">
+      {steps[i]}
+    </p>
+  );
 }

@@ -145,9 +145,23 @@ export async function POST(request: Request) {
   }
 
   const plan = await getUserPlan(supabase, user.id);
-  const gate = await consumeAiCall(supabase, user.id, plan);
-  if (!gate.ok) {
-    return NextResponse.json({ error: gate.error }, { status: gate.status });
+
+  // The FIRST teardown is on the house — it never touches the monthly meter.
+  // With only 5 free credits, users hoard them and never click the one button
+  // that demonstrates the product ("potion hoarding"); a zero-risk first use
+  // is what buys the aha moment. Detected from the teardown log rather than a
+  // flag, so it's exactly-once per account by construction.
+  const { count: teardownCount } = await supabase
+    .from("ai_teardowns")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+  const firstTeardownFree = (teardownCount ?? 0) === 0;
+
+  if (!firstTeardownFree) {
+    const gate = await consumeAiCall(supabase, user.id, plan);
+    if (!gate.ok) {
+      return NextResponse.json({ error: gate.error }, { status: gate.status });
+    }
   }
 
   const { videoId, title, viewCount, outlierScore, channelName, publishedAt } =

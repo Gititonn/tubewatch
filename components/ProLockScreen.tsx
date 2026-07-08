@@ -87,6 +87,15 @@ export default function ProLockScreen({
   const href = feature ? `/billing?unlock=${encodeURIComponent(feature)}` : '/billing';
   const mock = preview === 'patterns' ? <PatternsPreview /> : preview === 'compare' ? <ComparePreview /> : null;
 
+  // Specific value beats generic "unlock this tool" — the teaser names what
+  // Pro users actually see behind the blur.
+  const teaser =
+    preview === 'patterns'
+      ? 'Pro creators see which title formats consistently win in their niche — win rates per format, updated as new breakouts land.'
+      : preview === 'compare'
+        ? 'Put your channel head-to-head with any competitor: views-per-day, upload cadence, outlier rate, and Shorts mix, side by side.'
+        : 'Upgrade to the Pro or Growth plan to unlock this tool and level up your channel analytics.';
+
   // ✨, not 🔒 — a padlock reads as punishment; sparkles read as something
   // worth wanting. The card is a bounded, high-contrast box ON TOP of the
   // blur, so the blur clearly reads as "premium teaser behind glass" instead
@@ -102,7 +111,7 @@ export default function ProLockScreen({
     >
       <div className="text-4xl mb-4">✨</div>
       <h3 className="text-xl font-bold text-white mb-2">{feature ? `Unlock ${feature}` : 'Unlock this tool'}</h3>
-      <p className="text-gray-400 mb-6">Upgrade to the Pro or Growth plan to unlock this tool and level up your channel analytics.</p>
+      <p className="text-gray-400 mb-6">{teaser}</p>
       <Link href={href} className="px-6 py-3 bg-[#00ff87] text-[#0f0f0f] font-semibold rounded-lg hover:bg-[#00ff87]/90 transition-colors">
         View Plans
       </Link>

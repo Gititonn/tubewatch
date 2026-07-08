@@ -2,41 +2,68 @@
 
 import { useEffect, useState } from "react";
 
-type AiCalls = { used: number; limit: number; remaining: number };
+type AiStatus = {
+  aiCalls: { used: number; limit: number; remaining: number } | null;
+  firstTeardownFree: boolean;
+};
 
 // One fetch per page load even if several badges render (dashboard card +
 // feed buttons); every instance shares this in-flight promise.
-let statusPromise: Promise<AiCalls | null> | null = null;
-function fetchAiCalls(): Promise<AiCalls | null> {
+let statusPromise: Promise<AiStatus | null> | null = null;
+export function fetchAiStatus(): Promise<AiStatus | null> {
   if (!statusPromise) {
     statusPromise = fetch("/api/billing/status")
       .then((r) => r.json())
-      .then((d) => (d.aiCalls as AiCalls) ?? null)
+      .then((d) => ({
+        aiCalls: (d.aiCalls as AiStatus["aiCalls"]) ?? null,
+        firstTeardownFree: !!d.firstTeardownFree,
+      }))
       .catch(() => null);
   }
   return statusPromise;
 }
 
+/** Call after a teardown is consumed so freebie/remaining states refresh. */
+export function invalidateAiStatus() {
+  statusPromise = null;
+}
+
 /**
- * "⚡ 3/5 left" — the AI meter, shown at the point of spend. Both external
- * reviews flagged the same failure independently: a free user burns their 5
- * monthly AI answers exploring the UI and hits the wall with zero warning,
- * which reads as a punishment instead of a limit. Cost must be visible
- * BEFORE the click.
+ * The AI meter, shown at the point of spend. Both external reviews flagged
+ * the same failure independently: a free user burns their 5 monthly AI
+ * answers exploring the UI and hits the wall with zero warning. Cost must be
+ * visible BEFORE the click — and the FIRST teardown is free (server-enforced),
+ * so before it's redeemed this renders the zero-risk gift state instead of a
+ * scary countdown.
  */
 export default function AiCreditBadge({ className = "" }: { className?: string }) {
-  const [ai, setAi] = useState<AiCalls | null>(null);
+  const [status, setStatus] = useState<AiStatus | null>(null);
 
   useEffect(() => {
     let active = true;
-    fetchAiCalls().then((v) => {
-      if (active) setAi(v);
+    fetchAiStatus().then((v) => {
+      if (active) setStatus(v);
     });
     return () => {
       active = false;
     };
   }, []);
 
+  if (!status) return null;
+
+  if (status.firstTeardownFree) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1 text-[11px] font-semibold whitespace-nowrap ${className}`}
+        style={{ color: "#00ff87" }}
+        title="Your first AI teardown is on the house — it won't use your monthly credits."
+      >
+        🎁 First teardown free
+      </span>
+    );
+  }
+
+  const ai = status.aiCalls;
   if (!ai || ai.limit <= 0) return null;
 
   const low = ai.remaining <= 2;

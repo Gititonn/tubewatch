@@ -33,10 +33,18 @@ export async function GET() {
   const stale = resetAt != null && new Date(resetAt).getTime() <= Date.now();
   const used = stale ? 0 : ((profile.ai_calls_used as number | null) ?? 0);
 
+  // First AI teardown is free (doesn't touch the meter) — the UI uses this to
+  // render the zero-risk "first one's on us" state until it's redeemed.
+  const { count: teardowns } = await supabase
+    .from("ai_teardowns")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+
   return NextResponse.json({
     plan,
     stripe_customer_id: profile.stripe_customer_id as string | null,
     stripe_subscription_id: profile.stripe_subscription_id as string | null,
     aiCalls: { used, limit, remaining: Math.max(0, limit - used), resetAt },
+    firstTeardownFree: (teardowns ?? 0) === 0,
   });
 }

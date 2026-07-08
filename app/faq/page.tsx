@@ -75,6 +75,32 @@ const faqs: { q: string; a: React.ReactNode }[] = [
     ),
   },
   {
+    q: "Does the AI actually watch the video?",
+    a: (
+      <>
+        No — and we&apos;d rather tell you exactly what it does see. The AI reads the video&apos;s{" "}
+        <strong>transcript with timestamps</strong> (when captions exist), its public stats, how
+        fast its views arrived versus the channel&apos;s normal pace, and the channel&apos;s other
+        videos as a baseline. That&apos;s enough to quote the hook lines with timestamps and name
+        what the video did differently. What it can&apos;t see: retention graphs, click-through
+        rates, or anything private to the creator — so treat every teardown as a well-grounded
+        hypothesis, not gospel. When a video has no captions, the analysis says so plainly and
+        sticks to packaging and baseline comparisons instead of inventing quotes.
+      </>
+    ),
+  },
+  {
+    q: "Will the channels I track know I'm tracking them?",
+    a: (
+      <>
+        No. Tracking a competitor only reads their <strong>public</strong> data through
+        YouTube&apos;s official API — the same numbers anyone can see on their channel page.
+        There&apos;s no notification, no follow, no interaction with their channel, and nothing
+        for them to detect. Your tracked list is private to your account.
+      </>
+    ),
+  },
+  {
     q: "What happens if I track a channel that hasn't posted in months?",
     a: (
       <>
