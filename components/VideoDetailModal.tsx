@@ -1,5 +1,7 @@
 "use client";
 
+import TranscriptPanel from "./TranscriptPanel";
+
 /**
  * Shared "click a video" experience for every outlier surface (full feed,
  * dashboard hero widget, and eventually rising/trending/patterns). Previously
@@ -155,6 +157,12 @@ export function VideoDetailModal({
                 {tracking ? "Adding…" : "+ Track this channel"}
               </button>
             )}
+          </div>
+
+          {/* Transcript / script — the raw material for writing your own
+              version of this breakout. Lazy: only fetched when asked. */}
+          <div className="mt-3">
+            <TranscriptPanel videoId={video.youtube_video_id} title={video.title} />
           </div>
         </div>
       </div>
