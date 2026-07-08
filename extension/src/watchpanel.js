@@ -83,16 +83,28 @@
 
     const trackBtn = panel.querySelector(".tw-wp-track");
     if (trackBtn) {
+      // Once the plan limit is hit, the button becomes an upgrade CTA — a
+      // click opens billing instead of retrying a track that can't succeed.
+      let limitReached = false;
       trackBtn.addEventListener("click", async () => {
+        if (limitReached) {
+          window.open("https://www.tubewatchhq.com/billing", "_blank");
+          return;
+        }
         trackBtn.disabled = true;
         trackBtn.textContent = "Tracking…";
         const res = await window.TubeWatchAPI.trackChannel({ channelId: d.youtube_channel_id });
         if (res.ok) {
           trackBtn.textContent = "✓ Tracking";
           trackBtn.classList.add("tw-wp-tracking");
+        } else if (res.status === 402) {
+          limitReached = true;
+          trackBtn.disabled = false;
+          trackBtn.textContent = "Limit reached — upgrade";
+          trackBtn.classList.add("tw-wp-upgrade");
         } else {
           trackBtn.disabled = false;
-          trackBtn.textContent = res.status === 402 ? "Limit reached — upgrade" : "Track failed — retry";
+          trackBtn.textContent = "Track failed — retry";
         }
       });
     }

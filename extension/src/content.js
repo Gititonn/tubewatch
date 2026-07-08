@@ -80,7 +80,14 @@
     const btn = document.createElement("button");
     btn.className = "tw-track-btn";
     btn.textContent = "＋ Track on TubeWatch";
+    let limitReached = false;
     btn.addEventListener("click", async () => {
+      // After hitting the plan limit, the button is an upgrade CTA that opens
+      // billing rather than re-attempting an impossible track.
+      if (limitReached) {
+        window.open("https://www.tubewatchhq.com/billing", "_blank");
+        return;
+      }
       const handle = location.pathname.replace(/^\//, "").split("/")[0];
       btn.disabled = true;
       btn.textContent = "Tracking…";
@@ -90,9 +97,13 @@
       } else if (res.error === "no-key") {
         btn.textContent = "Add API key first";
         window.open("https://www.tubewatchhq.com/settings", "_blank");
+      } else if (res.status === 402) {
+        limitReached = true;
+        btn.disabled = false;
+        btn.textContent = "Limit reached — upgrade";
       } else {
         btn.disabled = false;
-        btn.textContent = res.status === 402 ? "Limit reached — upgrade" : "Track failed — retry";
+        btn.textContent = "Track failed — retry";
       }
     });
     actions.prepend(btn);
