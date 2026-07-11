@@ -39,6 +39,42 @@ export async function GET(request: Request) {
   // clients.
   const resend = new Resend(process.env.RESEND_API_KEY);
   const svc = createServiceClient();
+
+  // ── Safe test mode: ?test=<email> sends ONE email to that address only,
+  // built from the demo account's real breakout data, and touches no real
+  // users / no last_sent_at stamps. For verifying the render + delivery
+  // before the Monday auto-send. Still CRON_SECRET-guarded above.
+  const testEmail = new URL(request.url).searchParams.get("test");
+  if (testEmail) {
+    const { data: sample } = await svc
+      .from("profiles")
+      .select("id")
+      .eq("email", "demo@tubewatchhq.com")
+      .single();
+    if (!sample?.id) {
+      return NextResponse.json({ error: "test: demo sample account not found" }, { status: 404 });
+    }
+    const digest = await buildDigest(svc, sample.id, true); // paid view = full email
+    if (digest.breakouts.length === 0) {
+      return NextResponse.json({ error: "test: sample account has no fresh breakouts to show" }, { status: 404 });
+    }
+    const unsubscribeUrl = `${BASE}/api/email/unsubscribe?token=test`;
+    const { subject, html } = renderEmail({ digest, isPaid: true, unsubscribeUrl });
+    const { error: sendErr } = await resend.emails.send({
+      from: FROM,
+      to: testEmail,
+      subject: `[TEST] ${subject}`,
+      html,
+    });
+    return NextResponse.json({
+      test: true,
+      sentTo: testEmail,
+      breakouts: digest.breakouts.length,
+      hadAiPick: !!digest.aiPick,
+      error: sendErr?.message ?? null,
+    });
+  }
+
   const cutoff = new Date(Date.now() - RESEND_COOLDOWN_MS).toISOString();
 
   // Eligible: opted in, and not emailed in the last 6 days (idempotency guard

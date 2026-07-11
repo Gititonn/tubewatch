@@ -10,7 +10,12 @@ name: weekly-email
 on:
   schedule:
     - cron: "0 14 * * 1" # Mondays 14:00 UTC (morning US)
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Optional: send ONE test email to this address (demo data), skipping the real-user send"
+        required: false
+        default: ""
 
 jobs:
   send:
@@ -20,7 +25,12 @@ jobs:
       - name: Trigger weekly email
         # www host — apex 308-redirects and curl drops the auth header across
         # redirects, so the apex would "succeed" without reaching the route.
+        # A non-empty `test` input appends ?test=<email> for a safe test send.
+        env:
+          TEST_EMAIL: ${{ github.event.inputs.test }}
         run: |
+          URL="https://www.tubewatchhq.com/api/cron/weekly-email"
+          if [ -n "$TEST_EMAIL" ]; then URL="$URL?test=$TEST_EMAIL"; fi
           curl -fsS --max-time 540 \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://www.tubewatchhq.com/api/cron/weekly-email"
+            "$URL"
