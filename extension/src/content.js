@@ -10,6 +10,20 @@
   const BADGE_CLASS = "tw-outlier-badge";
   const PROCESSED = "data-tw-processed";
 
+  // Open a URL in a new tab from a content script. window.open() is frequently
+  // swallowed by popup blockers here (isolated world, cross-origin), which is
+  // why the "Limit reached — upgrade" click appeared to do nothing. A
+  // programmatic anchor click under the same user gesture is reliable.
+  function openTab(url) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   // YouTube renders thumbnails through two architectures: the older
   // ytd-thumbnail (a#thumbnail) and the newer view-model lockups
   // (a.ytLockupViewModelContentImage — used on watch-page recommendations, and
@@ -85,7 +99,7 @@
       // After hitting the plan limit, the button is an upgrade CTA that opens
       // billing rather than re-attempting an impossible track.
       if (limitReached) {
-        window.open("https://www.tubewatchhq.com/billing", "_blank");
+        openTab("https://www.tubewatchhq.com/billing");
         return;
       }
       const handle = location.pathname.replace(/^\//, "").split("/")[0];
@@ -96,7 +110,7 @@
         btn.textContent = "✓ Tracking";
       } else if (res.error === "no-key") {
         btn.textContent = "Add API key first";
-        window.open("https://www.tubewatchhq.com/settings", "_blank");
+        openTab("https://www.tubewatchhq.com/settings");
       } else if (res.status === 402) {
         limitReached = true;
         btn.disabled = false;

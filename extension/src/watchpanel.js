@@ -10,6 +10,18 @@
 (function () {
   const PANEL_ID = "tw-watch-panel";
 
+  // Reliable new-tab open from a content script — window.open() is often
+  // popup-blocked here, which made the "Limit reached — upgrade" click a no-op.
+  function openTab(url) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
   function fmt(n) {
     if (n == null) return "—";
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
@@ -88,7 +100,7 @@
       let limitReached = false;
       trackBtn.addEventListener("click", async () => {
         if (limitReached) {
-          window.open("https://www.tubewatchhq.com/billing", "_blank");
+          openTab("https://www.tubewatchhq.com/billing");
           return;
         }
         trackBtn.disabled = true;

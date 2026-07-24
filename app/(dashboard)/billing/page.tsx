@@ -157,7 +157,7 @@ export default function BillingPage() {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-3 mt-3">
+      <div className="grid grid-cols-1 gap-6 md:gap-4 md:grid-cols-2 mt-3 max-w-2xl">
             {/* Free Plan */}
             <div
               className="rounded-xl p-6 flex flex-col"
@@ -246,46 +246,6 @@ export default function BillingPage() {
               </div>
             </div>
 
-            {/* Growth Plan */}
-            <div
-              className="rounded-xl p-6 flex flex-col"
-              style={{
-                background: "var(--bg-card)",
-                border: `1px solid ${currentPlan === "growth" ? "#00ff87" : "#2a2a2a"}`,
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>Growth</h2>
-                {currentPlan === "growth" && (
-                  <span
-                    className="text-xs font-medium px-2 py-0.5 rounded-full"
-                    style={{ background: "#00ff8720", color: "#00ff87" }}
-                  >
-                    Current
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-2xl font-bold" style={{ color: "var(--text-primary)" }}>${annual ? annualPrice(PLANS.growth) : PLANS.growth.priceMonthly}<span className="text-sm font-normal" style={{ color: "var(--text-secondary)" }}>{annual ? "/yr" : "/mo"}</span></p>
-              <p className="mt-1 text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>{PLANS.growth.tagline}</p>
-              <FeatureList features={PLANS.growth.features} />
-              <div className="mt-auto pt-6">
-                {loading ? <CtaSkeleton /> : currentPlan === "growth" ? (
-                  <CurrentPlanCta hasStripeCustomer={hasStripeCustomer} />
-                ) : (
-                  <form action="/api/stripe/checkout" method="POST">
-                    <input type="hidden" name="plan" value="growth" />
-                    <input type="hidden" name="cycle" value={annual ? "annual" : "monthly"} />
-                    <button
-                      type="submit"
-                      className="w-full py-2 rounded-lg text-sm font-medium transition-opacity hover:opacity-90"
-                      style={{ background: "#00ff87", color: "#000" }}
-                    >
-                      {PLANS.growth.ctaUpgrade}
-                    </button>
-                  </form>
-                )}
-              </div>
-            </div>
           </div>
 
           {isPaid && hasStripeCustomer && (

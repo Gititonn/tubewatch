@@ -46,14 +46,15 @@ export const PLANS: Record<Plan, PlanDef> = {
   pro: {
     id: "pro",
     name: "Pro",
-    priceMonthly: 19,
+    priceMonthly: 12,
     paid: true,
     highlight: true,
     aiCallsPerMonth: 300,
     competitorLimit: 10,
-    tagline: "The full niche outlier radar + AI coach for creators growing a real channel.",
+    tagline: "Your next video, decided — the full niche radar + AI coach for creators growing a real channel.",
     ctaUpgrade: "Upgrade to Pro",
     features: [
+      "Unlimited “3 videos to make next” for any channel",
       "Track up to 10 competitor channels",
       "Full outlier radar — your videos + theirs",
       "🧠 AI Strategy Coach + “Why It Worked” — 300/mo",
@@ -82,7 +83,11 @@ export const PLANS: Record<Plan, PlanDef> = {
   },
 };
 
-export const PLAN_LIST: PlanDef[] = [PLANS.free, PLANS.pro, PLANS.growth];
+// Customer-facing tiers. Growth ($49) is retired from the pricing UI (Jul 2026
+// pivot to a single, affordable paid tier) but kept defined in PLANS so
+// entitlements, Stripe config, and the webhook keep type-checking. Re-add it
+// here to bring it back.
+export const PLAN_LIST: PlanDef[] = [PLANS.free, PLANS.pro];
 
 /** Annual billing = 2 months free (pay for 10 months, get 12). */
 export const ANNUAL_MONTHS_FREE = 2;

@@ -233,6 +233,13 @@ export default async function DashboardPage() {
           )}
 
           <GettingStarted steps={gettingStartedSteps} />
+
+          {/* Once setup is done, the checklist vanishes — this keeps a single,
+              always-on "what to do next" nudge in its place, pointed at the core
+              loop (find a breakout → get your next 3 videos). */}
+          {gettingStartedSteps.every((s) => s.done) && (
+            <NextMove topOutlier={topOutlier} />
+          )}
         </>
       )}
 
@@ -283,8 +290,9 @@ export default async function DashboardPage() {
       {/* Starter prompts — quick, high-value ways into the AI Engine */}
       <div className="flex flex-wrap gap-2 mb-8">
         {[
-          "Analyze why a competitor just had a view spike",
-          "Suggest 3 title variations for a video optimized for CTR",
+          "What should my next video be, based on my niche's breakouts?",
+          "Turn my best outlier into 3 fresh video ideas",
+          "Suggest 3 title variations optimized for CTR",
         ].map((p) => (
           <Link
             key={p}
@@ -392,6 +400,43 @@ export default async function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function NextMove({ topOutlier }: { topOutlier: { title?: string | null; outlier_score?: number | null } | null }) {
+  // The perpetual "what next" cue. Pivot-aligned: always steers back to the
+  // one loop that matters — turn a niche breakout into the creator's next
+  // videos. Uses their own biggest outlier as the hook when there is one.
+  const hasOutlier = topOutlier?.outlier_score != null && topOutlier.outlier_score >= 1.5;
+  const sub = hasOutlier
+    ? `Your “${topOutlier?.title}” hit ${topOutlier?.outlier_score?.toFixed(1)}x your median — now see what's breaking out across your niche and turn it into your next 3 videos.`
+    : "See what's overperforming in your niche right now, then get 3 specific videos to make next — title, hook, and the breakout each is based on.";
+  return (
+    <Link href="/competitors/outliers">
+      <div
+        className="rounded-2xl border p-5 mb-8 flex items-center gap-4 transition-all hover:scale-[1.01]"
+        style={{
+          borderColor: "rgba(0,255,135,0.3)",
+          background: "linear-gradient(135deg, rgba(0,255,135,0.1) 0%, rgba(0,255,135,0.03) 60%, var(--bg-card) 100%)",
+          borderTop: "2px solid #00ff87",
+        }}
+      >
+        <div className="text-3xl flex-shrink-0">🎬</div>
+        <div className="flex-1 min-w-0">
+          <div className="text-xs font-black uppercase tracking-widest mb-1" style={{ color: "#00ff87" }}>
+            Your move this week
+          </div>
+          <div className="font-black text-white mb-0.5">Turn a breakout into your next 3 videos</div>
+          <div className="text-sm" style={{ color: "var(--text-secondary)" }}>{sub}</div>
+        </div>
+        <div
+          className="flex-shrink-0 px-4 py-2.5 rounded-xl font-black text-sm transition-transform hover:scale-105"
+          style={{ background: "#00ff87", color: "#000" }}
+        >
+          Get my next 3 →
+        </div>
+      </div>
+    </Link>
   );
 }
 

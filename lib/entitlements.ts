@@ -13,6 +13,21 @@ export function planLimits(plan: Plan) {
   };
 }
 
+/**
+ * Founder / admin bypass. Emails listed in the ADMIN_EMAILS env var (comma-
+ * separated) are exempt from plan caps — so the founder can dogfood and track
+ * every channel they watch without hitting a limit. Set ADMIN_EMAILS in Vercel;
+ * leave it unset in any environment where no one should be exempt.
+ */
+export function isAdminEmail(email: string | null | undefined): boolean {
+  if (!email) return false;
+  const allow = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return allow.includes(email.toLowerCase());
+}
+
 type SB = ReturnType<typeof createClient>;
 
 export type ConsumeResult =

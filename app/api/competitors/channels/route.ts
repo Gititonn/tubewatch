@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUserPlan } from "@/lib/plan";
-import { planLimits } from "@/lib/entitlements";
+import { planLimits, isAdminEmail } from "@/lib/entitlements";
 
 export async function GET() {
   const supabase = createClient();
@@ -26,11 +26,12 @@ export async function POST(request: Request) {
 
   const plan = await getUserPlan(supabase, user.id);
   const limit = planLimits(plan).competitorLimit;
+  const admin = isAdminEmail(user.email);
   const { count } = await supabase
     .from("competitor_channels")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id);
-  if ((count ?? 0) >= limit) {
+  if (!admin && (count ?? 0) >= limit) {
     return NextResponse.json(
       {
         error: `Your plan allows up to ${limit} competitor channel${limit === 1 ? "" : "s"}. Upgrade to track more.`,

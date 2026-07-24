@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import FeatureCarousel from "./feature-carousel";
 import ComparisonSection from "./comparison-section";
 import HeroDemo from "./hero-demo";
+import HeroTryIt from "./HeroTryIt";
 import ScoreMathSection from "./score-math-section";
 import { PLANS, PRICING_FOOTNOTE } from "@/lib/plans";
 import { createClient } from "@/lib/supabase/server";
@@ -112,18 +113,22 @@ export default async function Home() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black text-white mb-5 leading-tight max-w-3xl">
-            Find the breakout videos in your niche{" "}
+            Know exactly{" "}
             <span style={{ color: "#00ff87", textShadow: "0 0 40px rgba(0,255,135,0.45)" }}>
-              before you make your next one.
+              what to film next.
             </span>
           </h1>
 
-          <p className="text-lg mb-4 max-w-xl" style={{ color: "#888" }}>
-            Other tools rank raw view counts, so their &quot;outliers&quot; are old hits. TubeWatch
-            scores <strong style={{ color: "#ccc" }}>views-per-day against each channel&apos;s own median</strong> to
-            catch videos while they&apos;re breaking — and AI breaks down exactly why each one
-            worked, so you can adapt it for your channel.
+          <p className="text-lg mb-8 max-w-xl" style={{ color: "#888" }}>
+            Paste any channel and get <strong style={{ color: "#ccc" }}>3 specific videos to make next</strong> —
+            each built from the breakouts already working in that niche, with the title and hook worked out.
+            TubeWatch spots what&apos;s breaking (views-per-day vs. each channel&apos;s own median) and turns it into your next upload.
           </p>
+
+          {/* Primary action: try it instantly, no signup. */}
+          <div className="w-full flex justify-center mb-6">
+            <HeroTryIt />
+          </div>
 
           {/* The wedge, polarized: name the enemy, name who this is NOT for.
               "Growing creators, 1K–100K subs" was a demographic; this is a side. */}
@@ -260,7 +265,7 @@ export default async function Home() {
             <p style={{ color: "#888" }}>Start free. Upgrade when you&apos;re ready to go deeper.</p>
           </div>
 
-          <div className="grid gap-6" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+          <div className="grid gap-6 max-w-2xl mx-auto" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
             {/* Free */}
             <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
               <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>FREE</p>
@@ -287,18 +292,6 @@ export default async function Home() {
               </a>
             </div>
 
-            {/* Growth */}
-            <div className="rounded-2xl border p-8 flex flex-col" style={{ borderColor: "#2a2a2a", background: "#111" }}>
-              <p className="text-sm font-bold mb-2" style={{ color: "#888" }}>GROWTH</p>
-              <div className="flex items-end gap-1 mb-6">
-                <span className="text-4xl font-black text-white">${PLANS.growth.priceMonthly}</span>
-                <span className="mb-1" style={{ color: "#555" }}>/mo</span>
-              </div>
-              <PlanFeatures features={PLANS.growth.features} color="#aaa" />
-              <a href="/signup" className="block text-center py-3 rounded-xl font-bold border transition-colors hover:border-white hover:text-white" style={{ borderColor: "#2a2a2a", color: "#888" }}>
-                {PLANS.growth.ctaUpgrade} →
-              </a>
-            </div>
           </div>
 
           <p className="text-center mt-8 text-sm" style={{ color: "#444" }}>

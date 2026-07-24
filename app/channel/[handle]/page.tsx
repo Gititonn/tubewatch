@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getChannelAnalytics, type ChannelVideo } from "@/lib/channel-lookup";
+import NextVideosSection from "./NextVideosSection";
 
 export const dynamic = "force-dynamic";
 
@@ -76,9 +77,14 @@ export default async function ChannelPage({ params }: { params: { handle: string
         </div>
       </div>
 
+      {/* The payoff moment — 3 next-video ideas built from this channel's
+          breakouts, generated instantly with no login. This is what turns a
+          cold visitor into "oh, let me try this." */}
+      <NextVideosSection handle={channel.handle?.replace(/^@/, "") || handle} />
+
       <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
         <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
-          Recent videos ranked by <strong>outlier score</strong> — age-adjusted views/day vs. this channel&apos;s median.
+          The breakouts behind those ideas — recent videos ranked by <strong>outlier score</strong> (age-adjusted views/day vs. this channel&apos;s median).
         </p>
         <Link
           href="/signup"

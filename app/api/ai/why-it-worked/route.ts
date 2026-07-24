@@ -260,7 +260,7 @@ Write these sections, markdown, tight and tactical:
 1. **The Hook, Timed** — what the opening actually does and WHEN: quote the exact lines (with timestamps) that set the promise, the stakes, or the open loop. If no transcript, analyze the title/packaging promise only and say so.
 2. **What It Did Differently** — 2-3 concrete deltas vs the baseline videos (topic angle, title shape, length, pacing). Reference specific baseline titles.
 3. **The Breakout Shape** — read the lifetime multiple vs the current daily pace: is this a demand spike to copy QUICKLY (topic), or an evergreen performer to copy STRUCTURALLY (format)? Say which and why.
-4. **Your Move:** exactly 3 bullets — a title formula, a hook structure, a content angle — and each must point back to something quoted or compared above, adapted for a smaller channel in the same niche.${deepAuditSection}`;
+4. **Make These Next** — this is the payoff. Give exactly 3 concrete videos the creator should make next, each as: a **working title** (real and clickable, not a topic), a one-line **hook** (the first 10 seconds), and a one-line **why it fits** this smaller channel — each borrowing the PATTERN above (angle/format/title shape/hook), never cloning this exact video. Each must point back to something quoted or compared above.${deepAuditSection}`;
 
   const stream = await anthropic.messages.stream({
     model: "claude-haiku-4-5-20251001",

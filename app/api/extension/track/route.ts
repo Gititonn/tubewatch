@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/server";
 import { getChannelById, getChannelByHandle } from "@/lib/youtube";
-import { planLimits } from "@/lib/entitlements";
+import { planLimits, isAdminEmail } from "@/lib/entitlements";
 
 /**
  * Track a channel from the browser extension. Authenticated by the per-user API
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const svc = createServiceClient();
   const { data: profile } = await svc
     .from("profiles")
-    .select("id, plan")
+    .select("id, plan, email")
     .eq("extension_api_key", key)
     .single();
   if (!profile) return json({ error: "Invalid API key" }, 401);
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     .from("competitor_channels")
     .select("id", { count: "exact", head: true })
     .eq("user_id", profile.id);
-  if ((count ?? 0) >= limit) {
+  if (!isAdminEmail(profile.email) && (count ?? 0) >= limit) {
     return json({ error: `Your plan allows up to ${limit} tracked channels. Upgrade to track more.` }, 402);
   }
 
